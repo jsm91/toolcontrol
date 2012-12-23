@@ -79,13 +79,19 @@ $(document).ready(function() {
 
     // Navigation for the main page
     $("table#index_navigation td").click(function() {
+	$('body').append('<div id="mask"></div>');
+	$('#mask').fadeIn('fast');
 	$("td.selected").removeClass("selected");
 	$(this).addClass("selected");
 
 	var page_to_load = $(this).attr("id");
-	$("div#content").load("/"+page_to_load+"_list/");
 	$("div#banner_left").load("/"+page_to_load+"_banner/");
 	$("div.popup#add").load("/"+page_to_load+"_form/");
+	$("div#content").load("/"+page_to_load+"_list/", function() {
+	    $('#mask').fadeOut('fast', function() {
+		$('#mask').remove();
+	    });
+	});
 
 	// Reset the search box
 	$("input#search").val("");
