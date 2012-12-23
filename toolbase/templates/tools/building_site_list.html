@@ -1,0 +1,43 @@
+{% if search %}
+<div class="search_banner">
+  <img src="{{ STATIC_URL }}Icon_Info.svg">
+  <span>Viser søgeresultater for {{ search }}</span>
+</div>
+{% endif %}
+
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ name_sorting }}name">
+	Adresse
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ is_active_sorting }}is_active">
+	Aktiv
+      </a>
+    </th>
+    <th>Funktioner</th>
+  </tr>
+  {% for building_site in building_sites %}
+  <tr class="object_line" id="{{ building_site.id }}">
+    <td><input type="checkbox" class="object_checkbox"
+	       name="{{ building_site.id }}"></td>
+    <td>{{ building_site.name }}</td>
+    <td>
+      {% if building_site.is_active %}
+      <img src="{{ STATIC_URL }}Icon_True.svg">
+      {% endif %}
+    </td>
+    <td class="functions">
+      <a href="#{{ building_site.id }}" id="building_site" class="edit">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="#{{ building_site.id }}" id="building_site" class="delete">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

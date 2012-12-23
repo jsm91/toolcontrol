@@ -1,0 +1,24 @@
+<table>
+  <tr>
+    <th>Begivenhed</th>
+    <th>Dato</th>
+  </tr>
+  {% for event in events %}
+  <tr>
+    <td>
+      {% if event.event_type == "Udlån" %}
+      Udlånt til {{ event.loaner }}
+      {% else %}
+      {{ event.event_type }}
+      {% endif %}
+    </td>
+    <td>
+      {% if event.end_date %}
+      {{ event.start_date }} - {{ event.end_date }}
+      {% else %}
+      {{ event.start_date }}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>

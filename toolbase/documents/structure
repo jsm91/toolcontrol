@@ -1,0 +1,48 @@
+main app
+     Models
+	- (UserProfile)
+	- UserList
+	- LoanList
+     Forms
+        - UserForm
+	- UserListForm
+	- LoanListForm
+     Views
+        - stats
+	- user_list
+	- user
+tool app
+     Models
+	- Tool
+	- Event
+        - ToolList
+        - EventList
+     Forms
+        - ToolForm
+        - ToolListForm
+        - AddManyToolsForm
+        - EventListForm
+     	- LoanForm
+	- CheckoutForm
+     Views
+	- tool
+	- tool_list
+toolmodel app
+     Models
+	- ToolModel
+	- ToolModelList
+     Forms
+	- ToolModelForm
+	- ToolModelListForm
+     Views
+	- tool_model_list
+
+toolcategory app
+     Models
+	- ToolCategory
+	- ToolCategoryList
+     Forms
+	- ToolCategoryForm
+	- ToolCategoryListForm
+     Views
+	- tool_category_list

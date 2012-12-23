@@ -1,0 +1,16 @@
+<form method="POST" id="banner">
+  {% csrf_token %}
+  <select name="action">
+    <option name="nothing">Med det markerede...</option>
+    <option name="delete">Slet</option>
+    <option name="loan">Marker som udlånt</option>
+    <option name="service">Marker som serviceret</option>
+    <option name="repair">Marker som til reparation</option>
+    <option name="return">Marker som afleveret</option>
+    <option name="scrap">Markeret som kasseret</option>
+    <option name="lost">Marker som bortkommet</option>
+  </select>
+</form>
+<a href="#" id="add_many" class="popup">
+  <img src="{{ STATIC_URL }}Icon_Plus.svg">
+</a>

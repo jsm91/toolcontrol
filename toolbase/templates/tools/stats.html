@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block menu %}
+  <div class="menu_item" id="stats">
+    <img src="/static/Icon_Stats.svg">
+    Statistik
+  </div>
+<div id="menu_hidden">
+  <div class="menu_item" id="">
+    <img src="/static/Icon_Administration.svg">
+    Administration
+  </div>
+  <div class="menu_item" id="settings">
+    <img src="/static/Icon_Settings.svg">
+    Indstillinger
+  </div>
+  <div class="menu_item" id="logout">
+    <img src="/static/Icon_Logout.svg">
+    Log ud
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="stats_container">
+  <h3>Værktøjsstatistik</h3>
+  <hr>
+  <table>
+    <tr>
+      <th>Antal værktøj</th>
+      <td>{{ tool_count }} stk.</td>
+    </tr>
+    <tr>
+      <th>Antal modeller</th>
+      <td>{{ model_count }} stk.</td>
+    </tr>
+    <tr>
+      <th>Antal kategorier</th>
+      <td>{{ category_count }} stk.</td>
+    </tr>
+  </table>
+  <h3>Prisstatistik</h3>
+  <hr>
+  <table>
+    <tr>
+      <th>Samlet pris på værktøj</th>
+      <td>{{ sum_price_tools.price__sum }} kr.</td>
+    </tr>
+    <tr>
+      <th>Gennemsnitlig pris på værktøj</th>
+      <td>{{ avg_price_tools.price__avg }} kr./stk.</td>
+    </tr>
+    <tr>
+      <th>Gennemsnitlig pris på modeller</th>
+      <td>{{ avg_price_models.price__avg }} kr./stk.</td>
+    </tr>
+  </table>
+  <h3>Udfasningsstatistik</h3>
+  <hr>
+  <table>
+    <tr>
+      <th>Antal bortkommet værktøj</th>
+      <td>{{ lost_tool_count }} stk.</td>
+    </tr>
+    <tr>
+      <th>Antal kasseret værktøj</th>
+      <td>{{ scrapped_tool_count }} stk.</td>
+    </tr>
+    <tr>
+      <th>Fordeling af udfasningsmåder</th>
+      <td>{{ lost_tools_ratio }} % bortkommet - {{ scrapped_tools_ratio }} % kasseret</td>
+    </tr>
+  </table>
+</div>
+{% endblock %}

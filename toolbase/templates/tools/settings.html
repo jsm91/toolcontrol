@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block menu %}
+  <div class="menu_item" id="settings">
+    <img src="/static/Icon_Settings.svg">
+    Indstillinger
+  </div>
+<div id="menu_hidden">
+  <div class="menu_item" id="">
+    <img src="/static/Icon_Administration.svg">
+    Administration
+  </div>
+  <div class="menu_item" id="stats">
+    <img src="/static/Icon_Stats.svg">
+    Statistik
+  </div>
+  <div class="menu_item" id="logout">
+    <img src="/static/Icon_Logout.svg">
+    Log ud
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="settings_container">
+  <h3>Skift kodeord</h3>
+  <hr>
+  <form method="POST">
+    <table>
+      {% csrf_token %}  
+      {{ password_change_form.as_table }}
+      <tr>
+	<td colspan="2" class="submit_row">
+	  <input type="hidden" name="form" value="password_change">
+	  <input type="submit" value="Skift kode">
+	</td>
+      </tr>
+    </table>
+  </form>
+  
+  <h3>Skift indstillinger</h3>
+  <hr>
+  <form method="POST">
+    <table>
+      {% csrf_token %}  
+      {{ settings_form.as_table }}
+      <tr>
+	<td colspan="2" class="submit_row">
+	  <input type="hidden" name="form" value="settings">
+	  <input type="submit" value="Skift kode">
+	</td>
+      </tr>
+    </table>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+<form method="POST" id="banner">
+  {% csrf_token %}
+  <select name="action">
+    <option name="nothing">Med det markerede...</option>
+    <option name="delete">Slet</option>
+    <option name="make_active">Marker som aktiv</option>
+    <option name="make_inactive">Marker som inaktiv</option>
+  </select>
+</form>

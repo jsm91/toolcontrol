@@ -1,0 +1,88 @@
+{% if search %}
+<div class="search_banner">
+  <img src="{{ STATIC_URL }}Icon_Info.svg">
+  <span>Viser søgeresultater for {{ search }}</span>
+</div>
+{% endif %}
+
+<table>
+  <tr>
+    <th>&nbsp;</th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ name_sorting }}name">
+	Navn
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ email_sorting }}email">
+	Email
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ phone_number_sorting }}phone_number">
+	Telefonnummer
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ is_active_sorting }}is_active"
+	 title="Aktivitet">
+	A
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ is_office_admin_sorting }}is_office_admin" title="Kontoradmin">
+	KA
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ is_tool_admin_sorting }}is_tool_admin" ttle="Værktøjsadmin">
+	VA
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ is_loan_flagged_sorting }}is_loan_flagged" title="Låneflag">
+	LF
+      </a>
+    </th>
+    <th>Funktioner</th>
+  </tr>
+  {% for employee in employees %}
+  <tr class="object_line" id="{{ employee.id }}">
+    <td><input type="checkbox" class="object_checkbox"
+	       name="{{ employee.id }}"></td>
+    <td>{{ employee.name }}</td>
+    <td>{{ employee.email }}</td>
+    <td>{{ employee.phone_number }}</td>
+    <td>
+      {% if employee.is_active %}
+      <img src="{{ STATIC_URL }}Icon_True.svg">
+      {% endif %}
+    </td>
+    <td>
+      {% if employee.is_office_admin %}
+      <img src="{{ STATIC_URL }}Icon_Users.svg">
+      {% endif %}
+    </td>
+    <td>
+      {% if employee.is_tool_admin %}
+      <img src="{{ STATIC_URL }}Icon_Tools.svg">
+      {% endif %}
+    </td>
+    <td>
+      {% if employee.is_loan_flagged %}
+      <img src="{{ STATIC_URL }}Icon_Warning.svg">
+      {% endif %}
+    </td>
+    <td class="functions">
+      <a href="#{{ employee.id }}" id="employee" class="edit">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="#{{ employee.id }}" id="employee" class="delete">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+
