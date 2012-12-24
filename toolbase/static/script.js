@@ -80,6 +80,7 @@ $(document).ready(function() {
     // Navigation for the main page
     $("table#index_navigation td").click(function() {
 	$('body').append('<div id="mask"></div>');
+	$('body').append('<img id="loader" src="/static/ajax-loader.gif">');
 	$('#mask').fadeIn('fast');
 	$("td.selected").removeClass("selected");
 	$(this).addClass("selected");
@@ -88,6 +89,7 @@ $(document).ready(function() {
 	$("div#banner_left").load("/"+page_to_load+"_banner/");
 	$("div.popup#add").load("/"+page_to_load+"_form/");
 	$("div#content").load("/"+page_to_load+"_list/", function() {
+	    $("#loader").remove();
 	    $('#mask').fadeOut('fast', function() {
 		$('#mask').remove();
 	    });
