@@ -313,5 +313,4 @@ $(document).ready(function() {
 	});
 
     });
-
 });
