@@ -10,10 +10,12 @@
     <img src="/static/Icon_Administration.svg">
     Administration
   </div>
+  {% if user.is_tool_admin or user.is_office_admin %}
   <div class="menu_item" id="stats">
     <img src="/static/Icon_Stats.svg">
     Statistik
   </div>
+  {% endif %}
   <div class="menu_item" id="logout">
     <img src="/static/Icon_Logout.svg">
     Log ud

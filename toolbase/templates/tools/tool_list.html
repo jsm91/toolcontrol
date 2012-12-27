@@ -54,12 +54,14 @@
       <a href="#" id="{{ tool.id }}" class="show_history">
 	<img src="{{ STATIC_URL }}Icon_History.svg">
       </a>
-      <a href="#{{ tool.id }}" id="tool" class="edit">
-	<img src="{{ STATIC_URL }}Icon_Edit.svg">
-      </a>
-      <a href="#{{ tool.id }}" id="tool" class="delete">
-	<img src="{{ STATIC_URL }}Icon_Delete.svg">
-      </a>
+      {% if user.is_tool_admin or user.is_office_admin %}
+        <a href="#{{ tool.id }}" id="tool" class="edit">
+	  <img src="{{ STATIC_URL }}Icon_Edit.svg">
+	</a>
+	<a href="#{{ tool.id }}" id="tool" class="delete">
+	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
+	</a>
+      {% endif %}
     </td>
   </tr>
   <tr class="history" id="{{ tool.id }}">

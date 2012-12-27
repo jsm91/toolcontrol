@@ -3,10 +3,14 @@
 {% block sidebar %}
 <table id="index_navigation">
   <tr><td id="tool" class="selected">Værktøj</td></tr>
-  <tr><td id="model">Modeller</td></tr>
-  <tr><td id="category">Kategorier</td></tr>
-  <tr><td id="employee">Medarbejdere</td></tr>
-  <tr><td id="building_site">Byggepladser</td></tr>
+  {% if user.is_tool_admin or user.is_office_admin %}
+    <tr><td id="model">Modeller</td></tr>
+    <tr><td id="category">Kategorier</td></tr>
+  {% endif %}
+  {% if user.is_office_admin %}
+    <tr><td id="employee">Medarbejdere</td></tr>
+    <tr><td id="building_site">Byggepladser</td></tr>
+  {% endif %}
 </table>
 {% endblock %}
 
@@ -14,9 +18,11 @@
 <div id="banner">
   <div id="banner_left">Banner</div>
   <div id="banner_right">
-    <a href="#" id="add" class="popup">
-	    <img src="{{ STATIC_URL }}Icon_Plus.svg">
-    </a>
+    {% if user.is_tool_admin or user.is_office_admin %}
+      <a href="#" id="add" class="popup">
+	<img src="{{ STATIC_URL }}Icon_Plus.svg">
+      </a>
+    {% endif %}
     <input type="text" id="search" placeholder="Søg">
   </div>
   <div id="banner_clear"></div>
@@ -56,10 +62,12 @@
   Administration
 </div>
 <div id="menu_hidden">
+  {% if user.is_tool_admin or user.is_office_admin %}
   <div class="menu_item" id="stats">
     <img src="/static/Icon_Stats.svg">
     Statistik
   </div>
+  {% endif %}
   <div class="menu_item" id="settings">
     <img src="/static/Icon_Settings.svg">
     Indstillinger

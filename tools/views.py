@@ -16,6 +16,8 @@ from tools.forms import Loaner, Tool, ToolCategory, ToolModel
 
 from tools.models import Event
 
+from toolbase.utils import handle_loan_messages
+
 def login_view(request):
     if request.POST:
         authentication_form = AuthenticationForm(data=request.POST)
@@ -131,6 +133,9 @@ def tool_list(request):
 
 @login_required
 def model_list(request):
+    if not request.user.is_tool_admin and not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     search = request.GET.get('search', '')
     sorting = request.GET.get('sorting', 'name')
 
@@ -151,6 +156,9 @@ def model_list(request):
 
 @login_required
 def category_list(request):
+    if not request.user.is_tool_admin and not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     search = request.GET.get('search', '')
     sorting = request.GET.get('sorting', 'name')
 
@@ -169,6 +177,9 @@ def category_list(request):
 
 @login_required
 def employee_list(request):
+    if not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     search = request.GET.get('search', '')
     sorting = request.GET.get('sorting', 'name')
 
@@ -197,6 +208,9 @@ def employee_list(request):
 
 @login_required
 def building_site_list(request):
+    if not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     search = request.GET.get('search', '')
     sorting = request.GET.get('sorting', 'name')
 
@@ -245,21 +259,33 @@ def tool_banner(request):
 
 @login_required
 def model_banner(request):
+    if not request.user.is_tool_admin and not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     context = {}
     return render(request, 'tools/model_banner.html', context)
 
 @login_required
 def category_banner(request):
+    if not request.user.is_tool_admin and not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     context = {}
     return render(request, 'tools/category_banner.html', context)
 
 @login_required
 def employee_banner(request):
+    if not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     context = {}
     return render(request, 'tools/employee_banner.html', context)
 
 @login_required
 def building_site_banner(request):
+    if not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
     context = {}
     return render(request, 'tools/building_site_banner.html', context)
 
@@ -524,6 +550,10 @@ def tool_action(request):
     if action == 'loan':
         loaner_id = request.POST.get('loaner_id')
         loaner = get_object_or_404(Loaner, id = loaner_id)
+    elif action == 'loan_single':
+        loaner = request.user
+
+    tools = []
 
     for object_id in object_ids:
         tool = get_object_or_404(Tool, id = object_id)
@@ -540,14 +570,21 @@ def tool_action(request):
             tool.repair()
             response = {'response': 'Værktøj makeret som til reparation'}
         elif action == 'return':
-            tool.end_loan()
+            if request.user.is_tool_admin or request.user.is_office_admin:
+                tool.end_loan()
+            elif tool.loaned_to == request.user:
+                tool.end_loan()
             response = {'response': 'Værktøj markeret som afleveret'}
         elif action == 'delete':
             tool.delete()
             response = {'response': 'Værktøj slettet'}
-        elif action == 'loan':
+        elif action == 'loan' or action == 'loan_single':
             tool.loan(loaner)
+            tools.append(tool)
             response = {'response': 'Værktøj markeret som udlånt'}
+
+    if action == 'loan' or action == 'loan_single':
+        handle_loan_messages(tools, loaner)
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
