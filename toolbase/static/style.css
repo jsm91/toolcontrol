@@ -186,10 +186,6 @@ div#content a:hover {
     text-decoration:none;
 }
 
-tr.history td {
-    width:50%;
-}
-
 /* Navigation selections */
 td.selected {
     background-color:#08c;
@@ -214,6 +210,14 @@ tr.history, tr.history div {
 
 form {
     margin:0px;
+}
+
+td.history_event_type {
+    width:30%;
+}
+
+td.history_date {
+    width:70%;
 }
 
 /************************************/

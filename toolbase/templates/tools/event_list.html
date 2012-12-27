@@ -5,14 +5,14 @@
   </tr>
   {% for event in events %}
   <tr>
-    <td>
+    <td class="history_event_type">
       {% if event.event_type == "Udlån" %}
       Udlånt til {{ event.loaner }}
       {% else %}
       {{ event.event_type }}
       {% endif %}
     </td>
-    <td>
+    <td class="history_date">
       {% if event.end_date %}
       {{ event.start_date }} - {{ event.end_date }}
       {% else %}
