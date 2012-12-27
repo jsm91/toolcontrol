@@ -220,7 +220,7 @@ $(document).ready(function() {
 	    $("div#messages").fadeOut(function() {
 		$("div#messages").empty();
 	    });
-	}, 3000);
+	}, 15000);
     }
 
     // Click sort link

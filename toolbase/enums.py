@@ -1,0 +1,4 @@
+class TOOL_FAILURES:
+    NOT_IN_STORE = 1
+    NO_RIGHTS = 2
+    NOT_ON_LOAN = 3

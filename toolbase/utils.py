@@ -10,9 +10,9 @@ def handle_loan_messages(tools, loaner):
 
     for tool in tools:
         if tool != tools[-1]:
-            tool_string += tool.name + ', '
+            tool_string += tool + ', '
         else:
-            tool_string += tool.name
+            tool_string += tool
 
     print tools
     print loaner

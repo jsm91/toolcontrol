@@ -16,6 +16,7 @@ from tools.forms import Loaner, Tool, ToolCategory, ToolModel
 
 from tools.models import Event
 
+from toolbase.enums import TOOL_FAILURES
 from toolbase.utils import handle_loan_messages
 
 def login_view(request):
@@ -553,39 +554,187 @@ def tool_action(request):
     elif action == 'loan_single':
         loaner = request.user
 
-    tools = []
+    success_tools = []
+    failure_tools = {}
 
     for object_id in object_ids:
         tool = get_object_or_404(Tool, id = object_id)
         if action == 'service':
-            tool.service()
-            response = {'response': 'Værktøj markeret som serviceret'}
+            if tool.service():
+                success_tools.append(tool.name)
+            else:
+                try:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
+                except KeyError:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
         elif action == 'scrap':
-            tool.scrap()
-            response = {'response': 'Værktøj markeret som kasseret'}
+            if tool.scrap():
+                success_tools.append(tool.name)
+            else:
+                try:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
+                except KeyError:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
         elif action == 'lost':
-            tool.lost()
-            response = {'response': 'Værktøj markeret som bortkommet'}
+            if tool.lost():
+                success_tools.append(tool.name)
+            else:
+                try:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
+                except KeyError:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
         elif action == 'repair':
-            tool.repair()
-            response = {'response': 'Værktøj makeret som til reparation'}
+            if tool.repair():
+                success_tools.append(tool.name)
+            else:
+                try:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
+                except KeyError:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
         elif action == 'return':
-            if request.user.is_tool_admin or request.user.is_office_admin:
-                tool.end_loan()
-            elif tool.loaned_to == request.user:
-                tool.end_loan()
-            response = {'response': 'Værktøj markeret som afleveret'}
+            if request.user.is_tool_admin or request.user.is_office_admin or tool.loaned_to == request.user or tool.location == 'Lager' or tool.location == 'Reparation' or tool.location == 'Kasseret' or tool.location == 'Bortkommet':
+                if tool.end_loan():
+                    success_tools.append(tool.name)
+                else:
+                    try:
+                        failure_tools[TOOL_FAILURES.NOT_ON_LOAN].append(tool.name)
+                    except KeyError:
+                        failure_tools[TOOL_FAILURES.NOT_ON_LOAN] = [tool.name]
+            else:
+                try:
+                    failure_tools[TOOL_FAILURES.NO_RIGHTS].append(tool.name)
+                except KeyError:
+                    failure_tools[TOOL_FAILURES.NO_RIGHTS] = [tool.name]
         elif action == 'delete':
+            tool_name = tool.id
             tool.delete()
-            response = {'response': 'Værktøj slettet'}
+            success_tools.append(tool_name)
         elif action == 'loan' or action == 'loan_single':
-            tool.loan(loaner)
-            tools.append(tool)
-            response = {'response': 'Værktøj markeret som udlånt'}
+            if tool.loan(loaner):
+                success_tools.append(tool.name)
+            else:
+                try:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
+                except KeyError:
+                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
+
+    success_string = ''
+    for tool_name in success_tools:
+        if tool_name == success_tools[0]:
+            success_string = tool_name
+        elif tool_name == success_tools[-1]:
+            success_string += ' og ' + tool_name
+        else:
+            success_string += ', ' + tool_name
+
+    if action == 'service':
+        failure_string = ''
+        for key, val in failure_tools.items():
+            for tool_name in failure_tools[key]:
+                if tool_name == failure_tools[key][0]:
+                    failure_string = tool_name
+                elif tool_name == failure_tools[key][-1]:
+                    failure_string += ' og ' + tool_name
+                else:
+                    failure_string += ', ' + tool_name
+            if failure_tools.items():
+                if key == TOOL_FAILURES.NOT_IN_STORE:
+                    failure_string += ' blev ikke serviceret (værktøj ikke på lager)<br>'
+        if success_tools:
+            success_string += ' blev serviceret<br>'
+
+    elif action == 'scrap':
+        failure_string = ''
+        for key, val in failure_tools.items():
+            for tool_name in failure_tools[key]:
+                if tool_name == failure_tools[key][0]:
+                    failure_string = tool_name
+                elif tool_name == failure_tools[key][-1]:
+                    failure_string += ' og ' + tool_name
+                else:
+                    failure_string += ', ' + tool_name
+            if failure_tools.items():
+                if key == TOOL_FAILURES.NOT_IN_STORE:
+                    failure_string += ' blev ikke kasseret (værktøj ikke på lager)<br>'
+        if success_tools:
+            success_string += ' blev kasseret<br>'
+
+    elif action == 'lost':
+        failure_string = ''
+        for key, val in failure_tools.items():
+            for tool_name in failure_tools[key]:
+                if tool_name == failure_tools[key][0]:
+                    failure_string = tool_name
+                elif tool_name == failure_tools[key][-1]:
+                    failure_string += ' og ' + tool_name
+                else:
+                    failure_string += ', ' + tool_name
+            if failure_tools.items():
+                if key == TOOL_FAILURES.NOT_IN_STORE:
+                    failure_string += ' blev ikke markeret som bortkommet (værktøj ikke på lager)<br>'
+        if success_tools:
+            success_string += ' blev markeret som bortkommet<br>'
+
+    elif action == 'repair':
+        failure_string = ''
+        for key, val in failure_tools.items():
+            for tool_name in failure_tools[key]:
+                if tool_name == failure_tools[key][0]:
+                    failure_string = tool_name
+                elif tool_name == failure_tools[key][-1]:
+                    failure_string += ' og ' + tool_name
+                else:
+                    failure_string += ', ' + tool_name
+            if failure_tools.items():
+                if key == TOOL_FAILURES.NOT_IN_STORE:
+                    failure_string += ' blev ikke repareret (værktøj ikke på lager)<br>'
+        if success_tools:
+            success_string += ' blev repareret<br>'
+
+    elif action == 'return':
+        failure_string = ''
+        for key, val in failure_tools.items():
+            for tool_name in failure_tools[key]:
+                if tool_name == failure_tools[key][0]:
+                    failure_string += tool_name
+                elif tool_name == failure_tools[key][-1]:
+                    failure_string += ' og ' + tool_name
+                else:
+                    failure_string += ', ' + tool_name
+            if failure_tools.items():
+                if key == TOOL_FAILURES.NOT_ON_LOAN:
+                    failure_string += ' blev ikke afleveret (værktøj ikke udlånt)<br>'
+                elif key == TOOL_FAILURES.NO_RIGHTS:
+                    failure_string += ' blev ikke afleveret (ikke udlånt til dig)<br>'
+        if success_tools:
+            success_string += ' blev afleveret<br>'
+
+    elif action == 'delete':
+        if success_tools:
+            success_string += ' blev slettet<br>'
+
+    elif action == 'loan' or action == 'loan_single':
+        failure_string = ''
+        for key, val in failure_tools.items():
+            for tool_name in failure_tools[key]:
+                if tool_name == failure_tools[key][0]:
+                    failure_string = tool_name
+                elif tool_name == failure_tools[key][-1]:
+                    failure_string += ' og ' + tool_name
+                else:
+                    failure_string += ', ' + tool_name
+            if failure_tools.items():
+                if key == TOOL_FAILURES.NOT_IN_STORE:
+                    failure_string += ' blev ikke udlånt (værktøj ikke på lager)<br>'
+        if success_tools:
+            success_string += ' blev udlånt<br>'
+
+    response = {'response': success_string + failure_string}
 
     if action == 'loan' or action == 'loan_single':
-        handle_loan_messages(tools, loaner)
+        handle_loan_messages(success_tools, loaner)
 
+    print response
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
 
