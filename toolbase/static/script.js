@@ -241,8 +241,9 @@ $(document).ready(function() {
 	var loaner = $(this).attr("href").replace("#","");
 
 	$.post("/tool_action/", "object_ids="+object_ids+
-	       "&action=loan&loaner_id="+loaner, function() {
+	       "&action=loan&loaner_id="+loaner, function(data) {
 		   $("div#content").load("/tool_list/", "search="+search);
+		   set_message(data.response);
 	       });
 
 	// Close the popup
