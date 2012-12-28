@@ -314,4 +314,14 @@ $(document).ready(function() {
 	});
 
     });
+
+    // Mark all-checkbox
+    $(document).on("click", "input.mark_all", function() {
+	if($(this).is(":checked")) {
+	    $("input.object_checkbox").attr("checked", true);
+	}
+	else {
+	    $("input.object_checkbox").attr("checked", false);
+	}
+    });
 });
