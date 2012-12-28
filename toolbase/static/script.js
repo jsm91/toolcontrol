@@ -319,9 +319,11 @@ $(document).ready(function() {
     $(document).on("click", "input.mark_all", function() {
 	if($(this).is(":checked")) {
 	    $("input.object_checkbox").attr("checked", true);
+	    $("tr.object_line").addClass("selected");
 	}
 	else {
 	    $("input.object_checkbox").attr("checked", false);
+	    $("tr.object_line").removeClass("selected");
 	}
     });
 });
