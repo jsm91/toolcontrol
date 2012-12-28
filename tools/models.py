@@ -65,7 +65,7 @@ class Loaner(AbstractBaseUser):
         return self.event_set.filter(end_date=None)
 
 class ToolCategory(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField('Navn', max_length=200)
 
     total_price = models.IntegerField(default=0)
     number_of_models = models.IntegerField(default=0)
@@ -75,10 +75,10 @@ class ToolCategory(models.Model):
         return self.name
 
 class ToolModel(models.Model):
-    name = models.CharField(max_length=200)
-    category = models.ForeignKey(ToolCategory)
-    service_interval = models.IntegerField(default=6)
-    price = models.IntegerField(default=0)
+    name = models.CharField('Navn', max_length=200)
+    category = models.ForeignKey(ToolCategory, verbose_name='Kategori')
+    service_interval = models.IntegerField('Serviceinterval', default=6)
+    price = models.IntegerField('Pris', default=0)
 
     total_price = models.IntegerField(default=0)
     number_of_tools = models.IntegerField(default=0)
@@ -94,17 +94,18 @@ class Tool(models.Model):
         ('Bortkommet', 'Bortkommet'),
         ('Kasseret', 'Kasseret')
         )
-    name = models.CharField(max_length=200)
-    model = models.ForeignKey(ToolModel)
-    service_interval = models.IntegerField(default=6)
-    price = models.IntegerField(default=0)
-    last_service = models.DateTimeField(auto_now_add=True)
-    location = models.CharField(choices=LOCATION_CHOICES, max_length=20,
-                                default="Lager")
-    loaned_to = models.ForeignKey(Loaner, null=True)
+    name = models.CharField('Navn', max_length=200)
+    model = models.ForeignKey(ToolModel, verbose_name='Model')
+    service_interval = models.IntegerField('Serviceinterval', default=6)
+    price = models.IntegerField('Pris', default=0)
+    last_service = models.DateTimeField('Seneste service', auto_now_add=True)
+    location = models.CharField('Placering', choices=LOCATION_CHOICES, 
+                                max_length=20, default="Lager")
+    loaned_to = models.ForeignKey(Loaner, null=True, verbose_name='Udlånt til')
 
-    invoice_number = models.IntegerField(null=True, blank=True)
-    secondary_name = models.CharField(max_length=200, null=True, blank=True)
+    invoice_number = models.IntegerField('Bilagsnummer', null=True, blank=True)
+    secondary_name = models.CharField('Sekundært navn', max_length=200, 
+                                      null=True, blank=True)
 
     def service(self):
         if self.location == 'Lager':
