@@ -217,7 +217,11 @@ td.history_event_type {
 }
 
 td.history_date {
-    width:70%;
+    width:60%;
+}
+
+td.history_functions {
+    width:10%;
 }
 
 /************************************/
