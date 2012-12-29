@@ -287,14 +287,14 @@ $(document).ready(function() {
 	var object_type = $(this).attr("id");
 	var object_id = $(this).attr("href").replace("#","");
 
-	$.get("/"+object_type+"_delete/", "id="+object_id);
-
-	// If we are deleting an event, we want to reload the tool list
-	if(object_type == "event") {
-	    object_type = "tool";
-	}
-
-	$("div#content").load("/"+object_type+"_list/");
+	$.get("/"+object_type+"_delete/", "id="+object_id, function() {
+	    // If we are deleting an event, we want to reload the tool list
+	    if(object_type == "event") {
+		object_type = "tool";
+	    }
+	    
+	    $("div#content").load("/"+object_type+"_list/");
+	});
 	return false;
     });
 
