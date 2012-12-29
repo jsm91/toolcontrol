@@ -12,7 +12,8 @@ class ToolCategoryForm(forms.ModelForm):
 
 class ToolModelForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=ToolCategory.objects.all(),
-                                      empty_label=None)
+                                      empty_label=None,
+                                      label='Kategori')
 
     class Meta:
         model = ToolModel
@@ -20,7 +21,8 @@ class ToolModelForm(forms.ModelForm):
 
 class ToolForm(forms.ModelForm):
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all(),
-                                   empty_label=None)
+                                   empty_label=None,
+                                   label='Model')
 
     def __init__(self, *args, **kwargs):
         super(ToolForm, self).__init__(*args, **kwargs)

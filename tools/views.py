@@ -592,7 +592,7 @@ def tool_action(request):
                 except KeyError:
                     failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
         elif action == 'return':
-            if request.user.is_tool_admin or request.user.is_office_admin or tool.loaned_to == request.user or tool.location == 'Lager' or tool.location == 'Reparation' or tool.location == 'Kasseret' or tool.location == 'Bortkommet':
+            if request.user.is_admin() or tool.loaned_to == request.user or tool.location == 'Lager' or tool.location == 'Reparation' or tool.location == 'Kasseret' or tool.location == 'Bortkommet':
                 if tool.end_loan():
                     success_tools.append(tool.name)
                 else:
@@ -873,6 +873,33 @@ def loaner_delete(request):
     loaner.delete()
 
     response = {'response': 'Gennemført'}
+
+    return HttpResponse(simplejson.dumps(response), 
+                        mimetype="application/json")
+
+@login_required
+def event_delete(request):
+    if not request.user.is_admin():
+        response = {'response': 'Du har ikke rettigheder til at slette begivenheden'}
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+
+    event_id = request.GET.get('id')
+    event = get_object_or_404(Event, id = event_id)
+
+    # Dont allow deletion of creation events
+    if event.event_type == 'Oprettelse':
+        response = {'response': 'Begivenheden kan ikke slettes, da det er en oprettelse'}
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+        
+    tool = event.tool
+    event_type = event.event_type
+    event.delete()
+    if event_type == 'Service':
+        tool.update_last_service()
+
+    response = {'response': 'Begivenheden blev slettet'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")

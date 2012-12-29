@@ -3,7 +3,7 @@
 {% block sidebar %}
 <table id="index_navigation">
   <tr><td id="tool" class="selected">Værktøj</td></tr>
-  {% if user.is_tool_admin or user.is_office_admin %}
+  {% if user.is_admin %}
     <tr><td id="model">Modeller</td></tr>
     <tr><td id="category">Kategorier</td></tr>
   {% endif %}
@@ -18,7 +18,7 @@
 <div id="banner">
   <div id="banner_left">Banner hentes...</div>
   <div id="banner_right">
-    {% if user.is_tool_admin or user.is_office_admin %}
+    {% if user.is_admin %}
       <a href="#" id="add" class="popup">
 	<img src="{{ STATIC_URL }}Icon_Plus.svg">
       </a>
@@ -62,7 +62,7 @@
   Administration
 </div>
 <div id="menu_hidden">
-  {% if user.is_tool_admin or user.is_office_admin %}
+  {% if user.is_admin %}
   <div class="menu_item" id="stats">
     <img src="/static/Icon_Stats.svg">
     Statistik

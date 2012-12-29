@@ -44,6 +44,9 @@ class Loaner(AbstractBaseUser):
     USERNAME_FIELD = 'name'
     REQUIRED_FIELDS = []
 
+    def is_admin(self):
+        return self.is_tool_admin or self.is_office_admin
+
     def send_mail(self, subject, message):
         send_mail(subject, message, "toolbox@skougruppen.dk", [self.email])
 
@@ -76,7 +79,7 @@ class ToolCategory(models.Model):
 
 class ToolModel(models.Model):
     name = models.CharField('Navn', max_length=200)
-    category = models.ForeignKey(ToolCategory, verbose_name='Kategori')
+    category = models.ForeignKey(ToolCategory)
     service_interval = models.IntegerField('Serviceinterval', default=6)
     price = models.IntegerField('Pris', default=0)
 
@@ -95,13 +98,13 @@ class Tool(models.Model):
         ('Kasseret', 'Kasseret')
         )
     name = models.CharField('Navn', max_length=200)
-    model = models.ForeignKey(ToolModel, verbose_name='Model')
+    model = models.ForeignKey(ToolModel)
     service_interval = models.IntegerField('Serviceinterval', default=6)
     price = models.IntegerField('Pris', default=0)
     last_service = models.DateTimeField('Seneste service', auto_now_add=True)
     location = models.CharField('Placering', choices=LOCATION_CHOICES, 
                                 max_length=20, default="Lager")
-    loaned_to = models.ForeignKey(Loaner, null=True, verbose_name='Udlånt til')
+    loaned_to = models.ForeignKey(Loaner, null=True)
 
     invoice_number = models.IntegerField('Bilagsnummer', null=True, blank=True)
     secondary_name = models.CharField('Sekundært navn', max_length=200, 
@@ -169,6 +172,7 @@ class Tool(models.Model):
         return self.event_set.all().order_by('-start_date')[0]
 
     def update_last_service(self):
+        print "Update last service"
         try:
             last_service = self.event_set.filter(event_type='Service').order_by('-start_date')[0]
         except IndexError:
@@ -209,17 +213,15 @@ class Event(models.Model):
 
 
 @receiver(pre_delete, sender=Event)
-def delete_event(sender, instance, **kwargs):
+def pre_delete_event(sender, instance, **kwargs):
     """
     If this event is the last recorded event for a tool, set the tool's
-    location to be at a store and if the event is a service, recalculate
-    last service
+    location to be at store
 
     """
     if instance.tool.get_last_event() == instance:
         instance.tool.loaned_to = None
         instance.tool.location = 'Lager'
-        instance.tool.update_last_service()
         instance.tool.save()
 
 @receiver(pre_delete, sender=Tool)

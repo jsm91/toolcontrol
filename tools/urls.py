@@ -52,5 +52,5 @@ urlpatterns = patterns('tools.views',
     url(r'^employee_delete/$', 'loaner_delete', name='employee_delete'),
     url(r'^building_site_delete/$', 'loaner_delete', 
         name='building_site_delete'),
-
+    url(r'^event_delete/$', 'event_delete', name='event_delete'),
 )

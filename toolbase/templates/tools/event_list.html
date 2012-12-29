@@ -2,6 +2,9 @@
   <tr>
     <th>Begivenhed</th>
     <th>Dato</th>
+    {% if user.is_admin %}
+    <th>Funktioner</th>
+    {% endif %}
   </tr>
   {% for event in events %}
   <tr>
@@ -19,6 +22,17 @@
       {{ event.start_date }}
       {% endif %}
     </td>
+    {% if user.is_admin %}
+    <td>
+      {% if event.event_type != "Oprettelse" %}
+	<a href="#{{ event.id }}" id="event" class="delete">
+	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
+	</a>
+      {% else %}
+	&nbsp;
+      {% endif %}
+    </td>
+    {% endif %}
   </tr>
   {% endfor %}
 </table>
