@@ -106,6 +106,8 @@ class CreateManyToolsForm(forms.Form):
                                    help_text="Højeste indeksnummer")
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all(), 
                                    empty_label=None)
+    service_interval = forms.IntegerField(label="Serviceinterval", 
+                                          required=False)
     price = forms.IntegerField(label="Pris", required=False)
     invoice_number = forms.IntegerField(label = "Bilagsnummer", 
                                         required = False)
@@ -120,18 +122,22 @@ class CreateManyToolsForm(forms.Form):
             pass
         if self.fields['model'].initial:
             self.fields['price'].initial = self.fields['model'].initial.price
+            self.fields['service_interval'].initial = self.fields['model'].initial.service_interval
 
     def save(self, force_insert=False, force_update=False, commit=True):
         zeros = len(self.cleaned_data['start_index']) - 1
         if not self.cleaned_data['price']:
             price = self.cleaned_data['model'].price
+            price = self.cleaned_data['model'].service_interval
         else:
             price = self.cleaned_data['price']
+            price = self.cleaned_data['service_interval']
         for n in range(int(self.cleaned_data['start_index']),
                        self.cleaned_data['end_index']+1):
             name = (self.cleaned_data['prefix'] + 
                     self.get_zeros(n, zeros) + str(n))
             tool = Tool(name = name, price = price, 
+                        service_interval = service_interval,
                         model = self.cleaned_data['model'],
                         invoice_number = self.cleaned_data['invoice_number'],
                         secondary_name = self.cleaned_data['secondary_name'])

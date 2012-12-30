@@ -42,8 +42,13 @@
     {% else %}
       <tr class="object_line" id="{{ tool.id }}">
     {% endif %}
-    <td><input type="checkbox" class="object_checkbox"
-	       name="{{ tool.id }}"></td>
+    <td>
+      <input type="checkbox" class="object_checkbox"
+	       name="{{ tool.id }}">
+      {% if tool|check_for_service %}
+        <img src="{{ STATIC_URL }}Icon_Warning.svg" title="Værktøjet har overskredet serviceintervallet">
+      {% endif %}
+    </td>
     <td>{{ tool.name }}</td>
     <td>{{ tool.model.name }}</td>
     <td>{{ tool.model.category.name }}</td>
