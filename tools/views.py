@@ -61,7 +61,7 @@ def settings(request):
         'settings_form': settings_form,
         }
 
-    return render(request, 'tools/settings.html', context_dictionary)
+    return render(request, 'settings.html', context_dictionary)
 
 @login_required
 def stats(request):
@@ -92,7 +92,7 @@ def stats(request):
         'lost_tools_ratio': lost_tools_ratio,
         }
 
-    return render(request, 'tools/stats.html', context_dictionary)
+    return render(request, 'stats.html', context_dictionary)
 
 @login_required
 def index(request):
@@ -106,7 +106,7 @@ def index(request):
 
     context = {'loaners': Loaner.objects.filter(is_active=True).order_by('name'),
                'add_many_form': add_many_form}
-    return render(request, 'tools/index.html', context)
+    return render(request, 'index.html', context)
 
 @login_required
 def tool_list(request):
@@ -130,7 +130,7 @@ def tool_list(request):
     if sorting[0] != '-':
         context[sorting + '_sorting'] = '-'
 
-    return render(request, 'tools/tool_list.html', context)
+    return render(request, 'tool_list.html', context)
 
 @login_required
 def model_list(request):
@@ -153,7 +153,7 @@ def model_list(request):
     if sorting[0] != '-':
         context[sorting + '_sorting'] = '-'
 
-    return render(request, 'tools/model_list.html', context)
+    return render(request, 'model_list.html', context)
 
 @login_required
 def category_list(request):
@@ -174,7 +174,7 @@ def category_list(request):
     if sorting[0] != '-':
         context[sorting + '_sorting'] = '-'
 
-    return render(request, 'tools/category_list.html', context)
+    return render(request, 'category_list.html', context)
 
 @login_required
 def employee_list(request):
@@ -205,7 +205,7 @@ def employee_list(request):
     if sorting[0] != '-':
         context[sorting + '_sorting'] = '-'
 
-    return render(request, 'tools/employee_list.html', context)
+    return render(request, 'employee_list.html', context)
 
 @login_required
 def building_site_list(request):
@@ -237,7 +237,7 @@ def building_site_list(request):
     if sorting[0] != '-':
         context[sorting + '_sorting'] = '-'
 
-    return render(request, 'tools/building_site_list.html', context)
+    return render(request, 'building_site_list.html', context)
 
 @login_required
 def event_list(request):
@@ -246,17 +246,17 @@ def event_list(request):
 
     context = {'events': Event.objects.filter(tool=tool).order_by('start_date')}
 
-    return render(request, 'tools/event_list.html', context)
+    return render(request, 'event_list.html', context)
 
 @login_required
 def loaner_list(request):
     context = {'loaners': Loaner.objects.filter(is_active=True).order_by('name')}
-    return render(request, 'tools/loaner_list.html', context)
+    return render(request, 'loaner_list.html', context)
 
 @login_required
 def tool_banner(request):
     context = {}
-    return render(request, 'tools/tool_banner.html', context)
+    return render(request, 'tool_banner.html', context)
 
 @login_required
 def model_banner(request):
@@ -264,7 +264,7 @@ def model_banner(request):
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
-    return render(request, 'tools/model_banner.html', context)
+    return render(request, 'model_banner.html', context)
 
 @login_required
 def category_banner(request):
@@ -272,7 +272,7 @@ def category_banner(request):
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
-    return render(request, 'tools/category_banner.html', context)
+    return render(request, 'category_banner.html', context)
 
 @login_required
 def employee_banner(request):
@@ -280,7 +280,7 @@ def employee_banner(request):
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
-    return render(request, 'tools/employee_banner.html', context)
+    return render(request, 'employee_banner.html', context)
 
 @login_required
 def building_site_banner(request):
@@ -288,7 +288,7 @@ def building_site_banner(request):
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
-    return render(request, 'tools/building_site_banner.html', context)
+    return render(request, 'building_site_banner.html', context)
 
 @login_required
 def tool_form(request):
@@ -364,7 +364,7 @@ def tool_form(request):
         context = {'form': tool_form,
                    'object_type': 'tool'}
 
-    return render(request, 'tools/form.html', context)
+    return render(request, 'form.html', context)
 
 @login_required
 def model_form(request):
@@ -428,7 +428,7 @@ def model_form(request):
         context = {'form': model_form,
                    'object_type': 'model'}
 
-    return render(request, 'tools/form.html', context)
+    return render(request, 'form.html', context)
 
 @login_required
 def category_form(request):
@@ -470,7 +470,7 @@ def category_form(request):
         context = {'form': category_form,
                    'object_type': 'category'}
 
-    return render(request, 'tools/form.html', context)
+    return render(request, 'form.html', context)
 
 @login_required
 def employee_form(request):
@@ -484,7 +484,7 @@ def employee_form(request):
                                          instance = employee)
             if employee_form.is_valid():
                 employee_form.save()
-                response = {'response': 'Kategori redigeret'}
+                response = {'response': 'Medarbejder redigeret'}
             else:
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
@@ -492,7 +492,7 @@ def employee_form(request):
             employee_form = EmployeeForm(request.POST)
             if employee_form.is_valid():
                 employee_form.save()
-                response = {'response': 'Kategori oprettet'}
+                response = {'response': 'Medarbejder oprettet'}
             else:
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
@@ -512,7 +512,7 @@ def employee_form(request):
         context = {'form': employee_form,
                    'object_type': 'employee'}
 
-    return render(request, 'tools/form.html', context)
+    return render(request, 'form.html', context)
 
 @login_required
 def building_site_form(request):
@@ -526,7 +526,7 @@ def building_site_form(request):
                                          instance = building_site)
             if building_site_form.is_valid():
                 building_site_form.save()
-                response = {'response': 'Kategori redigeret'}
+                response = {'response': 'Byggeplads redigeret'}
             else:
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
@@ -534,7 +534,7 @@ def building_site_form(request):
             building_site_form = BuildingSiteForm(request.POST)
             if building_site_form.is_valid():
                 building_site_form.save()
-                response = {'response': 'Kategori oprettet'}
+                response = {'response': 'Byggeplads oprettet'}
             else:
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
@@ -554,7 +554,7 @@ def building_site_form(request):
         context = {'form': building_site_form,
                    'object_type': 'building_site'}
 
-    return render(request, 'tools/form.html', context)
+    return render(request, 'form.html', context)
 
 @login_required
 def tool_action(request):

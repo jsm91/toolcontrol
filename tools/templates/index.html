@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+<table id="index_navigation">
+  <tr><td id="tool" class="selected">Værktøj</td></tr>
+  {% if user.is_admin %}
+    <tr><td id="model">Modeller</td></tr>
+    <tr><td id="category">Kategorier</td></tr>
+  {% endif %}
+  {% if user.is_office_admin %}
+    <tr><td id="employee">Medarbejdere</td></tr>
+    <tr><td id="building_site">Byggepladser</td></tr>
+  {% endif %}
+</table>
+{% endblock %}
+
+{% block content %}
+<div id="banner">
+  <div id="banner_left">Banner hentes...</div>
+  <div id="banner_right">
+    {% if user.is_admin %}
+      <a href="#" id="add" class="popup">
+	<img src="{{ STATIC_URL }}Icon_Plus.svg">
+      </a>
+    {% endif %}
+    <input type="text" id="search" placeholder="Søg">
+  </div>
+  <div id="banner_clear"></div>
+</div>
+<div id="content">Indhold hentes...</div>
+{% endblock %}
+
+{% block popups %}
+<div class="popup" id="add">
+  Der er ikke valgt noget indhold
+</div>
+
+<div class="popup" id="loan">
+  {% for loaner in loaners %}
+  <a href="#{{ loaner.id }}" class="loan">{{ loaner.name }}</a><br>
+  {% endfor %}
+</div>
+
+<div class="popup" id="add_many">
+  <form method="POST">
+    <table>
+      {% csrf_token %}
+      {{ add_many_form.as_table }}
+      <tr>
+	<td class="bottom" colspan="2">
+	  <input type="submit" value="Gem">
+	</td>
+      </tr>
+    </table>
+  </form>
+</div>
+{% endblock %}
+
+{% block menu %}
+<div class="menu_item" id="">
+  <img src="/static/Icon_Administration.svg">
+  Administration
+</div>
+<div id="menu_hidden">
+  {% if user.is_admin %}
+  <div class="menu_item" id="stats">
+    <img src="/static/Icon_Stats.svg">
+    Statistik
+  </div>
+  {% endif %}
+  <div class="menu_item" id="settings">
+    <img src="/static/Icon_Settings.svg">
+    Indstillinger
+  </div>
+  <div class="menu_item" id="logout">
+    <img src="/static/Icon_Logout.svg">
+    Log ud
+  </div>
+</div>
+{% endblock %}

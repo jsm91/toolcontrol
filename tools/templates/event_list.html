@@ -1,0 +1,38 @@
+<table>
+  <tr>
+    {% if user.is_admin %}
+      <th>&nbsp;</th>
+    {% endif %}
+    <th>Begivenhed</th>
+    <th>Dato</th>
+  </tr>
+  {% for event in events %}
+  <tr>
+    {% if user.is_admin %}
+      <td class="history_functions">
+        {% if event.event_type != "Oprettelse" %}
+   	  <a href="#{{ event.id }}" id="event" class="delete">
+	    <img src="{{ STATIC_URL }}Icon_Delete.svg">
+	  </a>
+        {% else %}
+   	  &nbsp;
+	{% endif %}
+      </td>
+    {% endif %}
+    <td class="history_event_type">
+      {% if event.event_type == "Udlån" %}
+      Udlånt til {{ event.loaner }}
+      {% else %}
+      {{ event.event_type }}
+      {% endif %}
+    </td>
+    <td class="history_date">
+      {% if event.end_date %}
+      {{ event.start_date }} - {{ event.end_date }}
+      {% else %}
+      {{ event.start_date }}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>

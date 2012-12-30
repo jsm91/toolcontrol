@@ -192,6 +192,10 @@ td.selected {
     color:#FFFFFF;
 }
 
+tr.service_needed {
+    background-color: #FFFFCC;
+}    
+
 /* List selections */
 tr.selected {
     background-color:#08c;
