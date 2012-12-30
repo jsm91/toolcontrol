@@ -48,7 +48,8 @@ class Loaner(AbstractBaseUser):
         return self.is_tool_admin or self.is_office_admin
 
     def send_mail(self, subject, message):
-        send_mail(subject, message, "toolbox@skougruppen.dk", [self.email])
+        send_mail(subject, message, 'ToolBase <toolbase@skougruppen.dk>', 
+                  [self.email])
 
     def send_sms(self, message):
         params = urllib.urlencode({'username': 'hromby', 

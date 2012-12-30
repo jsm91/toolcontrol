@@ -629,7 +629,7 @@ def tool_action(request):
                 except KeyError:
                     failure_tools[TOOL_FAILURES.NO_RIGHTS] = [tool.name]
         elif action == 'delete':
-            tool_name = tool.id
+            tool_name = tool.name
             tool.delete()
             success_tools.append(tool_name)
         elif action == 'loan' or action == 'loan_single':
@@ -733,6 +733,7 @@ def tool_action(request):
             success_string += ' blev afleveret<br>'
 
     elif action == 'delete':
+        failure_string = ''
         if success_tools:
             success_string += ' blev slettet<br>'
 

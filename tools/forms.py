@@ -11,24 +11,22 @@ class ForgotPasswordForm(forms.Form):
 
     def save(self, commit=True):
         email = self.cleaned_data.get('email')
-        user = Loaner.objects.filter(email=email)[0]
-        token = Loaner.objects.make_random_password()
+        for user in Loaner.objects.filter(email=email):
+            token = Loaner.objects.make_random_password()
 
-        forgot_password_token = ForgotPasswordToken(token=token, user=user)
-        forgot_password_token.save()
+            forgot_password_token = ForgotPasswordToken(token=token, user=user)
+            forgot_password_token.save()
 
-        message = "Hej " + user.name + "<br><br>"
-        message += "Vi har fået en anmodning om at nulstille dit kodeord."
-        message += 'Hvis du ønsker at nulstille dit kodeord, bedes du tilgå '
-        message += 'denne URL: http://toolbase.rmbsupport.dk/reset_password/'
-        message += token + '. Hvis du ikke har bedt om at få nulstillet '
-        message += 'dit kodeord, kan du se bort fra denne mail<br><br>'
-        message += 'MVH<br>'
-        message += 'ToolBase for SkouGruppen A/S'
+            message = ('Hej ' + user.name + '\n\n' +
+                       'Vi har fået en anmodning om at nulstille dit kodeord.'+
+                       'Hvis du ønsker at nulstille dit kodeord, bedes du '+
+                       'tilgå denne URL: '+
+                       'http://toolbase.rmbsupport.dk/reset_password/' +token+
+                       '. Hvis du ikke har bedt om at få nulstillet '+
+                       'dit kodeord, kan du se bort fra denne mail\n\n'+
+                       'MVH\nToolBase for Skou Gruppen A/S')
 
-        user.send_mail('Nulstilling af kodeord', message)
-
-        return forgot_password_token
+            user.send_mail('Nulstilling af kodeord', message)
 
     def clean(self):
         cleaned_data = super(ForgotPasswordForm, self).clean()
