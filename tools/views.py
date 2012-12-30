@@ -326,6 +326,8 @@ def tool_form(request):
                     new_tool.model.category.save()
 
                 response = {'response': 'Værktøj redigeret'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         # Create new tool
         else:
@@ -344,7 +346,8 @@ def tool_form(request):
                 tool.model.category.save()
             
                 response = {'response': 'Værktøj oprettet'}
-
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
 
@@ -391,7 +394,9 @@ def model_form(request):
                     new_model.category.total_price += new_model.total_price
                     new_model.category.save()
 
-            response = {'response': 'Model redigeret'}
+                response = {'response': 'Model redigeret'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
             model_form = ToolModelForm(request.POST)
@@ -402,7 +407,10 @@ def model_form(request):
                 model.category.number_of_models += 1
                 model.category.save()
         
-            response = {'response': 'Model oprettet'}
+                response = {'response': 'Model oprettet'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
 
@@ -434,14 +442,18 @@ def category_form(request):
                                              instance = category)
             if category_form.is_valid():
                 category_form.save()
-            response = {'response': 'Kategori redigeret'}
+                response = {'response': 'Kategori redigeret'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
             category_form = ToolCategoryForm(request.POST)
             if category_form.is_valid():
                 category_form.save()
-        
-            response = {'response': 'Kategori oprettet'}
+                response = {'response': 'Kategori oprettet'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
             
@@ -472,14 +484,18 @@ def employee_form(request):
                                          instance = employee)
             if employee_form.is_valid():
                 employee_form.save()
-            response = {'response': 'Kategori redigeret'}
+                response = {'response': 'Kategori redigeret'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
             employee_form = EmployeeForm(request.POST)
             if employee_form.is_valid():
                 employee_form.save()
-        
-            response = {'response': 'Kategori oprettet'}
+                response = {'response': 'Kategori oprettet'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
             
@@ -510,14 +526,18 @@ def building_site_form(request):
                                          instance = building_site)
             if building_site_form.is_valid():
                 building_site_form.save()
-            response = {'response': 'Kategori redigeret'}
+                response = {'response': 'Kategori redigeret'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
             building_site_form = BuildingSiteForm(request.POST)
             if building_site_form.is_valid():
                 building_site_form.save()
-        
-            response = {'response': 'Kategori oprettet'}
+                response = {'response': 'Kategori oprettet'}
+            else:
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
             

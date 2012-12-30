@@ -1,13 +1,24 @@
 <table>
   <tr>
+    {% if user.is_admin %}
+      <th>&nbsp;</th>
+    {% endif %}
     <th>Begivenhed</th>
     <th>Dato</th>
-    {% if user.is_admin %}
-    <th>Funktioner</th>
-    {% endif %}
   </tr>
   {% for event in events %}
   <tr>
+    {% if user.is_admin %}
+      <td class="history_functions">
+        {% if event.event_type != "Oprettelse" %}
+   	  <a href="#{{ event.id }}" id="event" class="delete">
+	    <img src="{{ STATIC_URL }}Icon_Delete.svg">
+	  </a>
+        {% else %}
+   	  &nbsp;
+	{% endif %}
+      </td>
+    {% endif %}
     <td class="history_event_type">
       {% if event.event_type == "Udlån" %}
       Udlånt til {{ event.loaner }}
@@ -22,17 +33,6 @@
       {{ event.start_date }}
       {% endif %}
     </td>
-    {% if user.is_admin %}
-    <td class="history_functions">
-      {% if event.event_type != "Oprettelse" %}
-	<a href="#{{ event.id }}" id="event" class="delete">
-	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
-	</a>
-      {% else %}
-	&nbsp;
-      {% endif %}
-    </td>
-    {% endif %}
   </tr>
   {% endfor %}
 </table>

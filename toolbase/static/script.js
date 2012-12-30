@@ -102,12 +102,12 @@ $(document).ready(function() {
     // Creating or editing an object
     $(document).on("submit", "form.add", function() {
 	var object_type = $(this).attr("id");
-	$.post("/"+object_type+"_form/", $(this).serialize(), function() {
+	$.post("/"+object_type+"_form/", $(this).serialize(), function(data) {
 	    // Reload the page
 	    $("div#content").load("/"+object_type+"_list/");
-	});;
+	    set_message(data.response);
+	});
 
-	set_message("Element oprettet");
 
 	// Close the popup
 	$('#mask').fadeOut('fast', function() {
@@ -287,7 +287,8 @@ $(document).ready(function() {
 	var object_type = $(this).attr("id");
 	var object_id = $(this).attr("href").replace("#","");
 
-	$.get("/"+object_type+"_delete/", "id="+object_id, function() {
+	$.get("/"+object_type+"_delete/", "id="+object_id, function(data) {
+	    set_message(data.response);
 	    // If we are deleting an event, we want to reload the tool list
 	    if(object_type == "event") {
 		object_type = "tool";
