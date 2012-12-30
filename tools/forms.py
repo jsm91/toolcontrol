@@ -3,7 +3,44 @@ from __future__ import unicode_literals
 
 from django import forms
 
-from tools.models import Event, Loaner, Tool, ToolCategory, ToolModel
+from tools.models import Event, ForgotPasswordToken, Loaner, Tool
+from tools.models import ToolCategory, ToolModel
+
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField()
+
+    def save(self, commit=True):
+        email = self.cleaned_data.get('email')
+        user = Loaner.objects.filter(email=email)[0]
+        token = Loaner.objects.make_random_password()
+
+        forgot_password_token = ForgotPasswordToken(token=token, user=user)
+        forgot_password_token.save()
+
+        message = "Hej " + user.name + "<br><br>"
+        message += "Vi har fået en anmodning om at nulstille dit kodeord."
+        message += 'Hvis du ønsker at nulstille dit kodeord, bedes du tilgå '
+        message += 'denne URL: http://toolbase.rmbsupport.dk/reset_password/'
+        message += token + '. Hvis du ikke har bedt om at få nulstillet '
+        message += 'dit kodeord, kan du se bort fra denne mail<br><br>'
+        message += 'MVH<br>'
+        message += 'ToolBase for SkouGruppen A/S'
+
+        user.send_mail('Nulstilling af kodeord', message)
+
+        return forgot_password_token
+
+    def clean(self):
+        cleaned_data = super(ForgotPasswordForm, self).clean()
+        email = cleaned_data.get('email')
+
+        user = Loaner.objects.filter(email=email)[0]
+
+        if user is None:
+            raise forms.ValidationError('Ingen bruger med den angivne email')
+
+        return cleaned_data
+        
 
 class ToolCategoryForm(forms.ModelForm):
     class Meta:

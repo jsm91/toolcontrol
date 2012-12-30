@@ -49,12 +49,12 @@
     <td>
       {{ tool.name }}
       {% if tool|check_for_service %}
-        <img src="{{ STATIC_URL }}Icon_Warning.svg" title="Værktøjet har overskredet serviceintervallet">
+        <img src="{{ STATIC_URL }}Icon_Warning.svg" title="Værktøjet skal serviceres">
       {% endif %}
     </td>
     <td>{{ tool.model.name }}</td>
     <td>{{ tool.model.category.name }}</td>
-    <td>{{ tool.last_service }}</td>
+    <td id="last_service">{{ tool.last_service }}</td>
     <td>
       {% if tool.location == "Udlånt" %}
         {{ tool.loaned_to }}

@@ -11,10 +11,11 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import simplejson
 
 from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
-from tools.forms import SettingsForm, ToolForm, ToolCategoryForm, ToolModelForm
-from tools.forms import Loaner, Tool, ToolCategory, ToolModel
+from tools.forms import ForgotPasswordForm, SettingsForm, ToolForm
+from tools.forms import ToolCategoryForm, ToolModelForm
 
-from tools.models import Event
+from tools.models import Event, Loaner, Tool, ForgotPasswordToken
+from tools.models import ToolCategory, ToolModel
 
 from toolbase.enums import TOOL_FAILURES
 from toolbase.utils import handle_loan_messages
@@ -30,7 +31,7 @@ def login_view(request):
         authentication_form = AuthenticationForm()
 
     context_dictionary = {'authentication_form': authentication_form}
-    return render(request, 'tools/login.html', context_dictionary)
+    return render(request, 'login.html', context_dictionary)
 
 @login_required
 def logout_view(request):
@@ -575,6 +576,7 @@ def tool_action(request):
         loaner = request.user
 
     success_tools = []
+    success_tool_ids = []
     failure_tools = {}
 
     for object_id in object_ids:
@@ -582,6 +584,7 @@ def tool_action(request):
         if action == 'service':
             if tool.service():
                 success_tools.append(tool.name)
+                success_tool_ids.append(tool.id)
             else:
                 try:
                     failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
@@ -749,7 +752,8 @@ def tool_action(request):
         if success_tools:
             success_string += ' blev udlånt<br>'
 
-    response = {'response': success_string + failure_string}
+    response = {'response': success_string + failure_string,
+                'success_tool_ids': success_tool_ids}
 
     if action == 'loan' or action == 'loan_single':
         handle_loan_messages(success_tools, loaner)
@@ -923,3 +927,37 @@ def event_delete(request):
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
+
+def forgot_password(request):
+    if request.POST:
+        form = ForgotPasswordForm(data=request.POST)
+
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('login'))
+    else:
+        form = ForgotPasswordForm()
+
+    context = {'form': form}
+
+    return render(request, 'forgot_password.html', context)
+
+def reset_password(request, token):
+    forgot_password_token = get_object_or_404(ForgotPasswordToken, token=token)
+    user = forgot_password_token.user
+
+    password = Loaner.objects.make_random_password()
+    user.set_password(password)
+    user.save()
+
+    message = "Hej " + user.name + "<br>"
+    message += "Vi har nulstillet dit kodeord. Dit nye kodeord er " + password
+    message += ".<br><br>"
+    message += 'MVH<br>'
+    message += 'ToolBase for SkouGruppen A/S'
+
+    user.send_mail('Kodeord nulstillet', message)
+
+    forgot_password_token.delete()
+
+    return HttpResponseRedirect(reverse('login'))

@@ -53,4 +53,8 @@ urlpatterns = patterns('tools.views',
     url(r'^building_site_delete/$', 'loaner_delete', 
         name='building_site_delete'),
     url(r'^event_delete/$', 'event_delete', name='event_delete'),
+
+    # Forgot password
+    url(r'^forgot_password/$', 'forgot_password', name='forgot_password'),
+    url(r'^reset_password/(?P<token>\w+)$', 'reset_password', name='reset_password'),
 )

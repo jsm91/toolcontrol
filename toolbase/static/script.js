@@ -172,8 +172,9 @@ $(document).ready(function() {
 	    $('#mask').fadeIn('fast');
 	}
 	else {
-	    $.post("/"+object_type+"_action/", "object_ids="+object_ids.toString()+
-		   "&action="+action, function(data) {
+	    $.post("/"+object_type+"_action/", 
+		   "object_ids="+object_ids.toString()+"&action="+action, 
+		   function(data) {
 		       $("div#content").load("/"+object_type+"_list/", 
 					     "search="+search);
 		       set_message(data.response);

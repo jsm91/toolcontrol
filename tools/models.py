@@ -67,6 +67,10 @@ class Loaner(AbstractBaseUser):
     def get_finished_loans(self):
         return self.event_set.filter(end_date=None)
 
+class ForgotPasswordToken(models.Model):
+    token = models.CharField(max_length=200)
+    user = models.ForeignKey(Loaner)
+
 class ToolCategory(models.Model):
     name = models.CharField('Navn', max_length=200)
 
