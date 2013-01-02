@@ -95,6 +95,12 @@ div#banner {
     width:80%;
     background-color: #FAFAFA;
     border-bottom:1px solid #888;
+    height:50px;
+}
+
+div#content {
+    position:relative;
+    top:50px;
 }
 
 div#banner_left {
