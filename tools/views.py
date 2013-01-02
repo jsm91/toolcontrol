@@ -122,8 +122,12 @@ def tool_list(request):
                                     Q(location__iexact=search) |
                                     Q(secondary_name__icontains=search) |
                                     Q(invoice_number__icontains=search)).select_related('loaned_to').order_by(sorting)
+        if sorting == 'location' or sorting == '-location':
+            tools = tools.order_by(sorting, 'loaned_to__name')
     else:
         tools = Tool.objects.all().select_related('loaned_to', 'model__category').order_by(sorting)
+        if sorting == 'location' or sorting == '-location':
+            tools = tools.order_by(sorting, 'loaned_to__name')
 
     context = {'tools': tools,
                'search': search}
