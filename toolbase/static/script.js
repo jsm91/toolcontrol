@@ -104,7 +104,7 @@ $(document).ready(function() {
 		$('#mask').remove();
 	    });
 	});
-
+	
 	// Reset the search box
 	$("input#search").val("");
     });
@@ -236,11 +236,21 @@ $(document).ready(function() {
 
     // Click sort link
     $(document).on("click", "a.set_sorting", function() {
+	$('body').append('<div id="mask"></div>');
+	$('body').append('<img id="loader" src="/static/ajax-loader.gif">');
+	$('#mask').fadeIn('fast');
+
 	var object_type = $("table#index_navigation td.selected").attr("id");
 	var search = $("input#search").val();
 	var sorting = $(this).attr("id");
 	$("div#content").load("/"+object_type+"_list/", 
-			      "search="+search+"&sorting="+sorting);
+			      "search="+search+"&sorting="+sorting,
+			      function() {
+				  $("#loader").remove();
+				  $('#mask').fadeOut('fast', function() {
+				      $('#mask').remove();
+				  });
+			      });
 
 	return false;
     });
