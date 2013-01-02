@@ -91,7 +91,8 @@ div#main {
 }
 
 div#banner {
-    width:100%;
+    position:fixed;
+    width:80%;
     background-color: #FAFAFA;
     border-bottom:1px solid #888;
 }
