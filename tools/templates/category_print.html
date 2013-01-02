@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>ToolBase for Skou Gruppen A/S - Kategoriliste</title>
+    <style type="text/css">
+      table {
+        width:100%;
+        font-size:9pt;
+        border-spacing:0;
+      }
+      th {
+        text-align:left;
+      }
+      img {
+        height:9pt;
+      }
+      tr.row1 {
+        background-color: #EFEFEF;
+      }
+    </style>
+  </head>
+  <body onload="window.print();">
+    {% if search %}
+      Liste med søgeresultater for {{ search }}
+    {% else %}
+      Alle kategorier
+    {% endif %}
+    <table>
+      <tr>
+	<th>Navn</th>
+	<th>Antal modeller</th>
+	<th>Antal værktøj</th>
+	<th>Samlet pris</th>
+      </tr>
+      {% for category in categories %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td>{{ category.name }}</td>
+	<td>{{ category.number_of_models }} stk.</td>
+	<td>{{ category.number_of_tools }} stk.</td>
+	<td>{{ category.total_price }} kr.</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

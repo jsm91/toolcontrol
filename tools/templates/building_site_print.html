@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>ToolBase for Skou Gruppen A/S - Byggepladsliste</title>
+    <style type="text/css">
+      table {
+        width:100%;
+        font-size:9pt;
+        border-spacing:0;
+      }
+      th {
+        text-align:left;
+      }
+      img {
+        height:9pt;
+      }
+      tr.row1 {
+        background-color: #EFEFEF;
+      }
+    </style>
+  </head>
+  <body onload="window.print();">
+    {% if search %}
+      Liste med søgeresultater for {{ search }}
+    {% else %}
+      Alle byggepladser
+    {% endif %}
+    <table>
+      <tr>
+	<th>Navn</th>
+	<th>Aktiv</th>
+      </tr>
+      {% for building_site in building_sites %}
+      <tr class="{% cycle 'row1' 'row2' %}">
+        <td>{{ building_site.name }}</td>
+	<td>
+	  {% if building_site.is_active %}
+	  <img src="{{ STATIC_URL }}Icon_True.svg">
+	  {% endif %}
+	</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

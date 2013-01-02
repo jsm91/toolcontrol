@@ -220,11 +220,9 @@ def building_site_list(request):
         if search == "aktiv" or search == "aktive":
             building_sites = Loaner.objects.filter(is_employee=False,
                                                    is_active=True).order_by(sorting)
-            building_sites.filter(is_active=False)
         elif search == "inaktiv" or search == "inaktive":
             building_sites = Loaner.objects.filter(is_employee=False,
                                                    is_active=False).order_by(sorting)
-            building_sites.filter(is_active=False)
         else:
             building_sites = Loaner.objects.filter(is_employee=False,
                                                    name__icontains=search).order_by(sorting)
@@ -641,6 +639,7 @@ def tool_action(request):
                 except KeyError:
                     failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
 
+    # Generate success string
     success_string = ''
     for tool_name in success_tools:
         if tool_name == success_tools[0]:
@@ -650,8 +649,9 @@ def tool_action(request):
         else:
             success_string += ', ' + tool_name
 
+    # Generate failure string and append action to success string
+    failure_string = ''
     if action == 'service':
-        failure_string = ''
         for key, val in failure_tools.items():
             for tool_name in failure_tools[key]:
                 if tool_name == failure_tools[key][0]:
@@ -667,7 +667,6 @@ def tool_action(request):
             success_string += ' blev serviceret<br>'
 
     elif action == 'scrap':
-        failure_string = ''
         for key, val in failure_tools.items():
             for tool_name in failure_tools[key]:
                 if tool_name == failure_tools[key][0]:
@@ -683,7 +682,6 @@ def tool_action(request):
             success_string += ' blev kasseret<br>'
 
     elif action == 'lost':
-        failure_string = ''
         for key, val in failure_tools.items():
             for tool_name in failure_tools[key]:
                 if tool_name == failure_tools[key][0]:
@@ -699,7 +697,6 @@ def tool_action(request):
             success_string += ' blev markeret som bortkommet<br>'
 
     elif action == 'repair':
-        failure_string = ''
         for key, val in failure_tools.items():
             for tool_name in failure_tools[key]:
                 if tool_name == failure_tools[key][0]:
@@ -715,7 +712,6 @@ def tool_action(request):
             success_string += ' blev repareret<br>'
 
     elif action == 'return':
-        failure_string = ''
         for key, val in failure_tools.items():
             for tool_name in failure_tools[key]:
                 if tool_name == failure_tools[key][0]:
@@ -733,12 +729,10 @@ def tool_action(request):
             success_string += ' blev afleveret<br>'
 
     elif action == 'delete':
-        failure_string = ''
         if success_tools:
             success_string += ' blev slettet<br>'
 
     elif action == 'loan' or action == 'loan_single':
-        failure_string = ''
         for key, val in failure_tools.items():
             for tool_name in failure_tools[key]:
                 if tool_name == failure_tools[key][0]:
@@ -951,14 +945,111 @@ def reset_password(request, token):
     user.set_password(password)
     user.save()
 
-    message = "Hej " + user.name + "<br>"
-    message += "Vi har nulstillet dit kodeord. Dit nye kodeord er " + password
-    message += ".<br><br>"
-    message += 'MVH<br>'
-    message += 'ToolBase for SkouGruppen A/S'
+    message = ('Hej ' + user.name + '\n' +
+               'Vi har nulstillet dit kodeord. Dit nye kodeord er ' +
+               password + '. Du kan nu logge ind med dette kodeord og' +
+               'brugernavnet ' + user.name + '.\n\n' +
+               'MVH\n' +
+               'ToolBase for SkouGruppen A/S')
 
     user.send_mail('Kodeord nulstillet', message)
 
     forgot_password_token.delete()
 
     return HttpResponseRedirect(reverse('login'))
+
+def tool_print(request, search):
+    if search:
+        tools = Tool.objects.filter(Q(name__icontains=search) |
+                                    Q(model__name__icontains=search) |
+                                    Q(model__category__name__icontains=search) |
+                                    Q(loaned_to__name__icontains=search) | 
+                                    Q(location__iexact=search) |
+                                    Q(secondary_name__icontains=search) |
+                                    Q(invoice_number__icontains=search)).select_related('loaned_to')
+    else:
+        tools = Tool.objects.all().select_related('loaned_to', 'model__category')
+
+    context = {'tools': tools,
+               'search': search}
+
+    return render(request, 'tool_print.html', context)
+
+def model_print(request, search):
+    if not request.user.is_admin():
+        return HttpResponse('Du kan ikke se denne side')
+
+    if search:
+        models = ToolModel.objects.filter(Q(name__icontains=search) |
+                                          Q(category__name__icontains=search))
+    else:
+        models = ToolModel.objects.all()
+
+    context = {'models': models,
+               'search': search}
+
+    return render(request, 'model_print.html', context)
+
+@login_required
+def category_print(request, search):
+    if not request.user.is_admin():
+        return HttpResponse('Du kan ikke se denne side')
+
+    if search:
+        categories = ToolCategory.objects.filter(name__icontains=search)
+    else:
+        categories = ToolCategory.objects.all()
+
+    context = {'categories': categories,
+               'search': search}
+
+    return render(request, 'category_print.html', context)
+
+@login_required
+def employee_print(request, search):
+    if not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
+    if search:
+        if search == 'aktiv' or search == 'inaktive':
+            employees = Loaner.objects.filter(is_employee=True,
+                                              is_active=True)
+        elif search == 'inaktiv' or search == 'inaktive':
+            employees = Loaner.objects.filter(is_employee=True,
+                                              is_active=False)
+        else:
+            employees = Loaner.objects.filter(Q(is_employee=True) & 
+                                              Q(name__icontains=search) |
+                                              Q(phone_number__icontains=search) |
+                                              Q(email__icontains=search))
+    else:
+        employees = Loaner.objects.filter(is_employee=True)
+        
+    context = {'employees': employees,
+               'search': search}
+
+    return render(request, 'employee_print.html', context)
+
+@login_required
+def building_site_print(request, search):
+    if not request.user.is_office_admin:
+        return HttpResponse('Du kan ikke se denne side')
+
+    if search:
+        if search == "aktiv" or search == "aktive":
+            building_sites = Loaner.objects.filter(is_employee=False,
+                                                   is_active=True)
+        elif search == "inaktiv" or search == "inaktive":
+            building_sites = Loaner.objects.filter(is_employee=False,
+                                                   is_active=False)
+        else:
+            building_sites = Loaner.objects.filter(is_employee=False,
+                                                   name__icontains=search)
+
+    else:
+        building_sites = Loaner.objects.filter(is_employee=False)
+
+    context = {'building_sites': building_sites,
+               'search': search}
+
+    return render(request, 'building_site_print.html', context)

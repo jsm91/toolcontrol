@@ -40,6 +40,16 @@ $(document).ready(function() {
     $("div#banner_left").load("/tool_banner/");
     $("div.popup#add").load("/tool_form/");
 
+    // Print handling
+    $(document).on("click", "a.print", function() {
+	var search = $("input#search").val();
+	var object_type = $("table#index_navigation td.selected").attr("id");
+
+	window.location.href = object_type+"_print/"+search;
+	return false;
+
+    });
+
     // Popup handling
     $(document).on("click", "a.popup", function() {
 	var id = $(this).attr("id");
