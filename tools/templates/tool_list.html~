@@ -34,11 +34,6 @@
 	Placering
       </a>
     </th>
-    <th>
-      <a class="set_sorting" href="#" id="{{ price_sorting }}price">
-	Pris
-      </a>
-    </th>
     <th>Funktioner</th>
   </tr>
   {% for tool in tools %}
@@ -67,7 +62,6 @@
         {{ tool.location }}
       {% endif %}
     </td>
-    <td>{{ tool.price }} kr.</td>
     <td class="functions">
       <a href="#" id="{{ tool.id }}" class="show_history">
 	<img src="{{ STATIC_URL }}Icon_History.svg">

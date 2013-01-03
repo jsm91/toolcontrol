@@ -320,12 +320,19 @@ def tool_form(request):
                     new_tool.model.number_of_tools += 1
                     new_tool.model.total_price += new_tool.price
                     new_tool.model.save()
+                elif old_tool_price != new_tool.price:
+                    new_tool.model.total_price = (new_tool.model.total_price - 
+                                                  old_tool_price + new_tool.price)
+                    new_tool.model.save()
                 if old_tool_category != new_tool.model.category:
                     old_tool_category.number_of_tools -= 1
                     old_tool_category.total_price -= old_tool_price
                     old_tool_category.save()
                     new_tool.model.category.number_of_tools += 1
                     new_tool.model.category.total_price += new_tool.price
+                    new_tool.model.category.save()
+                elif old_tool_price != new_tool.price:
+                    new_tool.model.category.total_price = (new_tool.model.category.total_price - old_tool_price + new_tool.price)
                     new_tool.model.category.save()
 
                 response = {'response': 'Værktøj redigeret'}
