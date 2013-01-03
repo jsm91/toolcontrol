@@ -70,7 +70,7 @@
         <a href="#{{ tool.id }}" id="tool" class="edit">
 	  <img src="{{ STATIC_URL }}Icon_Edit.svg">
 	</a>
-	<a href="#{{ tool.id }}" id="tool" class="delete">
+	<a href="#{{ tool.id }}" id="{{ tool.name }}" class="delete">
 	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
 	</a>
       {% endif %}

@@ -870,36 +870,33 @@ def tool_delete(request):
 
 @login_required
 def model_delete(request):
-    model_id = request.POST.get('id')
+    model_id = request.GET.get('id')
     model = get_object_or_404(ToolModel, id = model_id)
-    model_name = model.name
     model.delete()
 
-    response = {'response': model_name+' slettet'}
+    response = {'response': 'Gennemført'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
 
 @login_required
 def category_delete(request):
-    category_id = request.POST.get('id')
+    category_id = request.GET.get('id')
     category = get_object_or_404(ToolCategory, id = category_id)
-    category_name = category.name
     category.delete()
 
-    response = {'response': category_name+' slettet'}
+    response = {'response': 'Gennemført'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
 
 @login_required
 def loaner_delete(request):
-    loaner_id = request.POST.get('id')
+    loaner_id = request.GET.get('id')
     loaner = get_object_or_404(Loaner, id = loaner_id)
-    loaner_name = loaner.name
     loaner.delete()
 
-    response = {'response': loaner_name+' slettet'}
+    response = {'response': 'Gennemført'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")

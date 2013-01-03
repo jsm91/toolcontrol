@@ -386,15 +386,21 @@ $(document).ready(function() {
 	return false;
     });
 
-    $(document).on("click", "a.delete_event", function() {
+    /* Handle deletes
+    $(document).on("click", "a.delete", function() {
+	var object_type = $(this).attr("id");
 	var object_id = $(this).attr("href").replace("#","");
-	var search = $("input#search").val();
 
-	$.get("/event_delete/", "id="+object_id, function(data) {
+	$.get("/"+object_type+"_delete/", "id="+object_id, function(data) {
 	    set_message(data.response);
-	    $("div#content").load("/tool_list/", "search="+search);
+	    // If we are deleting an event, we want to reload the tool list
+	    if(object_type == "event") {
+		object_type = "tool";
+	    }
+	    
+	    $("div#content").load("/"+object_type+"_list/");
 	});
 	return false;
-    });
+    });*/
 
 });
