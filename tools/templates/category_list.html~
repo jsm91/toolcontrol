@@ -42,7 +42,7 @@
       <a href="#{{ category.id }}" id="category" class="edit">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
-      <a href="#{{ category.id }}" id="category" class="delete">
+      <a href="#{{ category.id }}" id="{{ category.name }}" class="delete">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
     </td>

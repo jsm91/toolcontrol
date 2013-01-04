@@ -54,7 +54,7 @@
       <a href="#{{ model.id }}" id="model" class="edit">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
-      <a href="#{{ model.id }}" id="" class="delete">
+      <a href="#{{ model.id }}" id="{{ model.name }}" class="delete">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
     </td>
