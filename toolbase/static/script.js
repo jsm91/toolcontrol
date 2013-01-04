@@ -397,4 +397,13 @@ $(document).ready(function() {
 	return false;
     });
 
+    // When adding a tool, if the model is changed, update service and price
+    $(document).on("change", "select#id_model", function() {
+	var id = $(this).val();
+	$.getJSON("/model_object/", "id="+id, function(data) {
+	    var model = $.parseJSON(data.model)[0];
+	    $("input#id_service_interval").val(model.fields.service_interval);
+	    $("input#id_price").val(model.fields.price);
+	});
+    });
 });

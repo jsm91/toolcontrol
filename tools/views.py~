@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from django.db.models import Avg, Sum, Q
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.views.decorators.cache import cache_page
 from django.utils import simplejson
 
 from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
@@ -139,7 +138,6 @@ def tool_list(request):
     return render(request, 'tool_list.html', context)
 
 @login_required
-@cache_page(60 * 15)
 def model_list(request):
     if not request.user.is_tool_admin and not request.user.is_office_admin:
         return HttpResponse('Du kan ikke se denne side')
@@ -163,7 +161,6 @@ def model_list(request):
     return render(request, 'model_list.html', context)
 
 @login_required
-@cache_page(60 * 15)
 def category_list(request):
     if not request.user.is_tool_admin and not request.user.is_office_admin:
         return HttpResponse('Du kan ikke se denne side')
