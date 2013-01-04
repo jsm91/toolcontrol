@@ -320,12 +320,19 @@ def tool_form(request):
                     new_tool.model.number_of_tools += 1
                     new_tool.model.total_price += new_tool.price
                     new_tool.model.save()
+                elif old_tool_price != new_tool.price:
+                    new_tool.model.total_price = (new_tool.model.total_price - 
+                                                  old_tool_price + new_tool.price)
+                    new_tool.model.save()
                 if old_tool_category != new_tool.model.category:
                     old_tool_category.number_of_tools -= 1
                     old_tool_category.total_price -= old_tool_price
                     old_tool_category.save()
                     new_tool.model.category.number_of_tools += 1
                     new_tool.model.category.total_price += new_tool.price
+                    new_tool.model.category.save()
+                elif old_tool_price != new_tool.price:
+                    new_tool.model.category.total_price = (new_tool.model.category.total_price - old_tool_price + new_tool.price)
                     new_tool.model.category.save()
 
                 response = {'response': 'Værktøj redigeret'}
@@ -870,33 +877,36 @@ def tool_delete(request):
 
 @login_required
 def model_delete(request):
-    model_id = request.GET.get('id')
+    model_id = request.POST.get('id')
     model = get_object_or_404(ToolModel, id = model_id)
+    model_name = model.name
     model.delete()
 
-    response = {'response': 'Gennemført'}
+    response = {'response': model_name+' slettet'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
 
 @login_required
 def category_delete(request):
-    category_id = request.GET.get('id')
+    category_id = request.POST.get('id')
     category = get_object_or_404(ToolCategory, id = category_id)
+    category_name = category.name
     category.delete()
 
-    response = {'response': 'Gennemført'}
+    response = {'response': category_name+' slettet'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
 
 @login_required
 def loaner_delete(request):
-    loaner_id = request.GET.get('id')
+    loaner_id = request.POST.get('id')
     loaner = get_object_or_404(Loaner, id = loaner_id)
+    loaner_name = loaner.name
     loaner.delete()
 
-    response = {'response': 'Gennemført'}
+    response = {'response': loaner_name+' slettet'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")

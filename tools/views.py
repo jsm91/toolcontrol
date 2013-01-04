@@ -303,37 +303,9 @@ def tool_form(request):
             tool = get_object_or_404(Tool, id = tool_id)
             tool_form = ToolForm(data = request.POST, instance = tool)
 
-            # Save old model, category and price to update stats properly
-            old_tool_model = tool.model
-            old_tool_category = tool.model.category
-            old_tool_price = tool.price
-
             if tool_form.is_valid():
                 new_tool = tool_form.save()
                 tool_form = ToolForm()
-
-                # Update stats
-                if old_tool_model != new_tool.model:
-                    old_tool_model.number_of_tools -= 1
-                    old_tool_model.total_price -= old_tool_price
-                    old_tool_model.save()
-                    new_tool.model.number_of_tools += 1
-                    new_tool.model.total_price += new_tool.price
-                    new_tool.model.save()
-                elif old_tool_price != new_tool.price:
-                    new_tool.model.total_price = (new_tool.model.total_price - 
-                                                  old_tool_price + new_tool.price)
-                    new_tool.model.save()
-                if old_tool_category != new_tool.model.category:
-                    old_tool_category.number_of_tools -= 1
-                    old_tool_category.total_price -= old_tool_price
-                    old_tool_category.save()
-                    new_tool.model.category.number_of_tools += 1
-                    new_tool.model.category.total_price += new_tool.price
-                    new_tool.model.category.save()
-                elif old_tool_price != new_tool.price:
-                    new_tool.model.category.total_price = (new_tool.model.category.total_price - old_tool_price + new_tool.price)
-                    new_tool.model.category.save()
 
                 response = {'response': 'Værktøj redigeret'}
             else:
@@ -347,14 +319,6 @@ def tool_form(request):
                 event = Event(event_type="Oprettelse", tool=tool)
                 event.save()
                 
-                tool.model.total_price += tool.price
-                tool.model.number_of_tools += 1
-                tool.model.save()
-
-                tool.model.category.total_price += tool.price
-                tool.model.category.number_of_tools += 1
-                tool.model.category.save()
-            
                 response = {'response': 'Værktøj oprettet'}
             else:
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
@@ -386,23 +350,9 @@ def model_form(request):
             model = get_object_or_404(ToolModel, id = model_id)
             model_form = ToolModelForm(data = request.POST, instance = model)
 
-            # Save old category to update stats correct
-            old_tool_category = model.category
             if model_form.is_valid():
                 new_model = model_form.save()
                 model_form = ToolModelForm()
-
-                # Update stats
-                if new_model.category != old_tool_category:
-                    old_tool_category.number_of_models -= 1
-                    old_tool_category.number_of_tools -= new_model.number_of_tools
-                    old_tool_category.total_price -= new_model.total_price
-                    old_tool_category.save()
-
-                    new_model.category.number_of_models += 1
-                    new_model.category.number_of_tools += new_model.number_of_tools
-                    new_model.category.total_price += new_model.total_price
-                    new_model.category.save()
 
                 response = {'response': 'Model redigeret'}
             else:
@@ -414,9 +364,6 @@ def model_form(request):
                 model = model_form.save()
                 model_form = ToolModelForm()
             
-                model.category.number_of_models += 1
-                model.category.save()
-        
                 response = {'response': 'Model oprettet'}
             else:
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}

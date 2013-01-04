@@ -6,7 +6,6 @@ import datetime, urllib
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 from django.db import models
-from django.db.models import Sum
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
@@ -76,18 +75,9 @@ class ForgotPasswordToken(models.Model):
 class ToolCategory(models.Model):
     name = models.CharField('Navn', max_length=200)
 
-    def total_price(self):
-        price = Tool.objects.filter(model__category=self).aggregate(Sum('price'))
-        if price['price__sum'] is None:
-            return 0
-        else:
-            return price['price__sum']
-
-    def number_of_models(self):
-        return ToolModel.objects.filter(category=self).count()
-
-    def number_of_tools(self):
-        return Tool.objects.filter(model__category=self).count()
+    total_price = models.IntegerField(default=0)
+    number_of_models = models.IntegerField(default=0)
+    number_of_tools = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
@@ -98,15 +88,8 @@ class ToolModel(models.Model):
     service_interval = models.IntegerField('Serviceinterval', default=6)
     price = models.IntegerField('Pris', default=0)
 
-    def total_price(self):
-        price = Tool.objects.filter(model=self).aggregate(Sum('price'))
-        if price['price__sum'] is None:
-            return 0
-        else:
-            return price['price__sum']
-
-    def number_of_tools(self):
-        return Tool.objects.filter(model=self).count()
+    total_price = models.IntegerField(default=0)
+    number_of_tools = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.name
@@ -245,3 +228,20 @@ def pre_delete_event(sender, instance, **kwargs):
         instance.tool.loaned_to = None
         instance.tool.location = 'Lager'
         instance.tool.save()
+
+@receiver(pre_delete, sender=Tool)
+def delete_tool(sender, instance, **kwargs):
+    instance.model.number_of_tools -= 1
+    instance.model.total_price -= instance.price
+    instance.model.save()
+
+    instance.model.category.number_of_tools -= 1
+    instance.model.category.total_price -= instance.price
+    instance.model.category.save()
+
+@receiver(pre_delete, sender=ToolModel)
+def delete_tool_model(sender, instance, **kwargs):
+    # Don't update tool numbers in category - it will be updated when the
+    # individual tools are deleted
+    instance.category.number_of_models -= 1
+    instance.category.save()
