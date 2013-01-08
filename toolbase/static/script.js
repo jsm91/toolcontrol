@@ -403,7 +403,9 @@ $(document).ready(function() {
 	$.getJSON("/model_object/", "id="+id, function(data) {
 	    var model = $.parseJSON(data.model)[0];
 	    $("input#id_service_interval").val(model.fields.service_interval);
-	    $("input#id_price").val(model.fields.price);
+	    if (model.fields.price != 0) {
+		$("input#id_price").val(model.fields.price);
+	    }
 	});
     });
 });

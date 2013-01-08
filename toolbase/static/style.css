@@ -20,6 +20,15 @@ div#top {
     height:10%;
     background: -webkit-linear-gradient(top, #EEE 0%, #B8B8B8 100%); /* Chrome10+,Safari5.1+ */
     background: -moz-linear-gradient(top, #EEE 0%, #B8B8B8 100%); /* FF3.6+ */
+    background: #EEE; /* Old browsers */
+    background: -webkit-gradient(linear, left top, left bottom, 
+				 color-stop(0%,#EEE), 
+				 color-stop(100%, #B8B8B8)); /* Chrome,Safari4+ */
+    background: -o-linear-gradient(top, #EEE 0%,#B8B8B8 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #EEE 0%,#B8B8B8 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #EEE 0%,#B8B8B8 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#EEE', endColorstr='#B8B8B8',GradientType=0 ); /* IE6-9 */
+    
     z-index:100;
 }
 
@@ -266,6 +275,10 @@ div.popup {
     color:#FFF;
 }
 
+div.popup table {
+	padding-right:5px;
+}
+
 div.popup a {
     color:#FFF;
     margin:5px;
@@ -321,7 +334,6 @@ div.popup input, div.popup select {
     border-radius: 5px;
     background-color: #EFEFEF;
     padding:5px;
-    margin:3px;
     border:none;
     font-size:9pt;
     width:100%;

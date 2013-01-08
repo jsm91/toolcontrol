@@ -65,7 +65,6 @@ class ToolForm(forms.ModelForm):
             self.fields['model'].initial = ToolModel.objects.all()[0]
         except:
             pass
-
         if self.fields['model'].initial:
             self.fields['price'].initial = self.fields['model'].initial.price
             self.fields['service_interval'].initial = self.fields['model'].initial.service_interval

@@ -180,15 +180,6 @@ class CreateManyToolsForm(forms.Form):
             tool.save()
             event = Event(event_type = "Oprettelse", tool = tool)
             event.save()
-        number_of_tools = (self.cleaned_data['end_index'] + 
-                           1 - int(self.cleaned_data['start_index']))
-        model = self.cleaned_data['model']
-        model.number_of_tools += number_of_tools
-        model.total_price += (number_of_tools * price)
-        model.save()
-        model.category.number_of_tools += number_of_tools
-        model.category.total_price += (number_of_tools * price)
-        model.category.save()
 
     def get_zeros(self, n, zeros):
         while n > 9:

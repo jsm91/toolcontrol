@@ -45,7 +45,7 @@
 </div>
 
 <div class="popup" id="add_many">
-  <form method="POST">
+  <form method="POST" action="/">
     <table>
       {% csrf_token %}
       {{ add_many_form.as_table }}
@@ -70,22 +70,22 @@
 
 {% block menu %}
 <div class="menu_item" id="">
-  <img src="/static/Icon_Administration.svg">
+  <img src="/static/Icon_Administration.svg" alt="Ikon for administration">
   Administration
 </div>
 <div id="menu_hidden">
   {% if user.is_admin %}
   <div class="menu_item" id="stats">
-    <img src="/static/Icon_Stats.svg">
+    <img src="/static/Icon_Stats.svg" alt="Ikon for statistik">
     Statistik
   </div>
   {% endif %}
   <div class="menu_item" id="settings">
-    <img src="/static/Icon_Settings.svg">
+    <img src="/static/Icon_Settings.svg" alt="Ikon for indstillinger">
     Indstillinger
   </div>
   <div class="menu_item" id="logout">
-    <img src="/static/Icon_Logout.svg">
+    <img src="/static/Icon_Logout.svg" alt="Ikon for log ud">
     Log ud
   </div>
 </div>
