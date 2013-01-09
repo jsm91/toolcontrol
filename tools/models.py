@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime, urllib
+import datetime, re, urllib
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
@@ -57,14 +57,21 @@ class Loaner(AbstractBaseUser):
                                    'password': 'IRMLVJ',
                                    'recipient': self.phone_number,
                                    'message': message.encode('utf-8'),
-                                   'utf8': 1})
+                                   'utf8': 1,
+                                   'from': 'ToolControl',})
 
-        #f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
-        #content = f.read()
-        #pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
-        #match = pattern.search(content)
-        #return match.group('status'), match.group('message')
-        print "Send SMS with text " + message
+        print "1"
+        f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
+        print "2"
+        content = f.read()
+        print "3"
+        pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
+        print "4"
+        match = pattern.search(content)
+        print "5"
+        print match.group('status')
+        print match.group('message')
+        return match.group('status'), match.group('message')
 
     def get_finished_loans(self):
         return self.event_set.filter(end_date=None)

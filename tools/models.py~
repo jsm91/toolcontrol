@@ -1,11 +1,12 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime, urllib
+import datetime, re, urllib
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models import Sum
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
@@ -58,12 +59,18 @@ class Loaner(AbstractBaseUser):
                                    'message': message.encode('utf-8'),
                                    'utf8': 1})
 
-        #f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
-        #content = f.read()
-        #pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
-        #match = pattern.search(content)
-        #return match.group('status'), match.group('message')
-        print "Send SMS with text " + message
+        print "1"
+        f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
+        print "2"
+        content = f.read()
+        print "3"
+        pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
+        print "4"
+        match = pattern.search(content)
+        print "5"
+        print match.group('status')
+        print match.group('message')
+        return match.group('status'), match.group('message')
 
     def get_finished_loans(self):
         return self.event_set.filter(end_date=None)
@@ -75,9 +82,18 @@ class ForgotPasswordToken(models.Model):
 class ToolCategory(models.Model):
     name = models.CharField('Navn', max_length=200)
 
-    total_price = models.IntegerField(default=0)
-    number_of_models = models.IntegerField(default=0)
-    number_of_tools = models.IntegerField(default=0)
+    def total_price(self):
+        price = Tool.objects.filter(model__category=self).aggregate(Sum('price'))
+        if price['price__sum'] is None:
+            return 0
+        else:
+            return price['price__sum']
+
+    def number_of_models(self):
+        return ToolModel.objects.filter(category=self).count()
+
+    def number_of_tools(self):
+        return Tool.objects.filter(model__category=self).count()
 
     def __unicode__(self):
         return self.name
@@ -88,8 +104,15 @@ class ToolModel(models.Model):
     service_interval = models.IntegerField('Serviceinterval', default=6)
     price = models.IntegerField('Pris', default=0)
 
-    total_price = models.IntegerField(default=0)
-    number_of_tools = models.IntegerField(default=0)
+    def total_price(self):
+        price = Tool.objects.filter(model=self).aggregate(Sum('price'))
+        if price['price__sum'] is None:
+            return 0
+        else:
+            return price['price__sum']
+
+    def number_of_tools(self):
+        return Tool.objects.filter(model=self).count()
 
     def __unicode__(self):
         return self.name
@@ -228,20 +251,3 @@ def pre_delete_event(sender, instance, **kwargs):
         instance.tool.loaned_to = None
         instance.tool.location = 'Lager'
         instance.tool.save()
-
-@receiver(pre_delete, sender=Tool)
-def delete_tool(sender, instance, **kwargs):
-    instance.model.number_of_tools -= 1
-    instance.model.total_price -= instance.price
-    instance.model.save()
-
-    instance.model.category.number_of_tools -= 1
-    instance.model.category.total_price -= instance.price
-    instance.model.category.save()
-
-@receiver(pre_delete, sender=ToolModel)
-def delete_tool_model(sender, instance, **kwargs):
-    # Don't update tool numbers in category - it will be updated when the
-    # individual tools are deleted
-    instance.category.number_of_models -= 1
-    instance.category.save()

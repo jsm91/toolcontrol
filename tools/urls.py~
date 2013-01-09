@@ -11,6 +11,9 @@ urlpatterns = patterns('tools.views',
     url(r'^stats/$', 'stats', name='stats'),
     url(r'^settings/$', 'settings', name='settings'),
 
+    # AJAX requests for objects
+    url(r'^model_object/$', 'model_object', name='model_object'),
+
     # AJAX requests for lists
     url(r'^tool_list/$', 'tool_list', name='tool_list'),
     url(r'^model_list/$', 'model_list', name='model_list'),
