@@ -45,7 +45,7 @@
 </div>
 
 <div class="popup" id="add_many">
-  <form method="POST" action="/">
+  <form method="POST">
     <table>
       {% csrf_token %}
       {{ add_many_form.as_table }}
@@ -59,33 +59,39 @@
 </div>
 
 <div class="popup" id="delete">
-  <p>Er du sikker på, at du vil slette?</p>
-  <form method="POST" action="/object_delete/" id="delete">
-    {% csrf_token %}
-    <input type="hidden" id="id" name="id" value="0">		
-    <input type="submit" value="Slet">
+  <form method="POST" action="/object_delete/">
+	<p>Er du sikker på, at du vil slette?</p>
+    <table>
+      {% csrf_token %}
+      <tr>
+	    <td class="bottom" colspan="2">
+	      <input type="hidden" id="id" name="id" value="0">		
+	      <input type="submit" value="Slet">
+    	</td>
+      </tr>
+    </table>
   </form>
 </div>
 {% endblock %}
 
 {% block menu %}
 <div class="menu_item" id="">
-  <img src="/static/Icon_Administration.svg" alt="Ikon for administration">
+  <img src="/static/Icon_Administration.svg">
   Administration
 </div>
 <div id="menu_hidden">
   {% if user.is_admin %}
   <div class="menu_item" id="stats">
-    <img src="/static/Icon_Stats.svg" alt="Ikon for statistik">
+    <img src="/static/Icon_Stats.svg">
     Statistik
   </div>
   {% endif %}
   <div class="menu_item" id="settings">
-    <img src="/static/Icon_Settings.svg" alt="Ikon for indstillinger">
+    <img src="/static/Icon_Settings.svg">
     Indstillinger
   </div>
   <div class="menu_item" id="logout">
-    <img src="/static/Icon_Logout.svg" alt="Ikon for log ud">
+    <img src="/static/Icon_Logout.svg">
     Log ud
   </div>
 </div>

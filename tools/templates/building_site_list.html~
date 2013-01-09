@@ -34,8 +34,7 @@
       <a href="#{{ building_site.id }}" id="building_site" class="edit">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
-      <a href="#{{ building_site.id }}" id="{{ building_site.name }}" 
-	 class="delete">
+      <a href="#{{ building_site.id }}" id="building_site" class="delete">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
     </td>

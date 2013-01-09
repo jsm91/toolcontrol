@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
-from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db.models import Avg, Sum, Q
 from django.http import HttpResponse, HttpResponseRedirect
@@ -1016,15 +1015,3 @@ def building_site_print(request, search):
                'search': search}
 
     return render(request, 'building_site_print.html', context)
-
-@login_required
-def model_object(request):
-    model_id = request.GET.get('id')
-    model = get_object_or_404(ToolModel, id=model_id)
-
-    response = {
-        'model': serializers.serialize('json', [model,])
-        }
-
-    return HttpResponse(simplejson.dumps(response), 
-                        mimetype='application/json')

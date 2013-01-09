@@ -7,11 +7,11 @@
     <th>Dato</th>
   </tr>
   {% for event in events %}
-  <tr class="event_line" id="{{ event.id }}">
+  <tr>
     {% if user.is_admin %}
       <td class="history_functions">
         {% if event.event_type != "Oprettelse" %}
-   	  <a href="#{{ event.id }}" id="event" class="delete_event">
+   	  <a href="#{{ event.id }}" id="event" class="delete">
 	    <img src="{{ STATIC_URL }}Icon_Delete.svg">
 	  </a>
         {% else %}

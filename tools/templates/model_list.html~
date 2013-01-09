@@ -29,10 +29,14 @@
       </a>
     </th>
     <th>
-      Samlet pris
+      <a class="set_sorting" href="#" id="{{ total_price_sorting }}total_price">
+	Samlet pris
+      </a>
     </th>
     <th>
-      Antal værktøj
+      <a class="set_sorting" href="#" id="{{ number_of_tools_sorting }}number_of_tools">
+	Antal værktøj
+      </a>
     </th>
     <th>Funktioner</th>
   </tr>

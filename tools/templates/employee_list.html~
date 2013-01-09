@@ -77,7 +77,7 @@
       <a href="#{{ employee.id }}" id="employee" class="edit">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
-      <a href="#{{ employee.id }}" id="{{ employee.name }}" class="delete">
+      <a href="#{{ employee.id }}" id="employee" class="delete">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
     </td>
