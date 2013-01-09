@@ -59,11 +59,19 @@
 </div>
 
 <div class="popup" id="delete">
-  <p>Er du sikker på, at du vil slette?</p>
   <form method="POST" action="/object_delete/" id="delete">
-    {% csrf_token %}
     <input type="hidden" id="id" name="id" value="0">		
-    <input type="submit" value="Slet">
+    {% csrf_token %}
+    <table>
+      <tr>
+	<td>Er du sikker på, at du vil slette?</td>
+      </tr>
+      <tr>
+	<td class="bottom">
+	  <input type="submit" value="Slet">
+	</td>
+      </tr>
+    </table>
   </form>
 </div>
 {% endblock %}
