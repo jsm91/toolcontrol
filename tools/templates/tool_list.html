@@ -34,11 +34,13 @@
 	Placering
       </a>
     </th>
+    {% if user.is_admin %}
     <th>
       <a class="set_sorting" href="#" id="{{ price_sorting }}price">
 	Pris
       </a>
     </th>
+	{% endif %}
     <th>Funktioner</th>
   </tr>
   {% for tool in tools %}
@@ -67,7 +69,9 @@
         {{ tool.location }}
       {% endif %}
     </td>
+    {% if user.is_admin %}
     <td>{{ tool.price }} kr.</td>
+	{% endif %}
     <td class="functions">
       <a href="#" id="{{ tool.id }}" class="show_history">
 	<img src="{{ STATIC_URL }}Icon_History.svg">

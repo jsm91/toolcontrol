@@ -97,8 +97,6 @@ class EmployeeForm(forms.ModelForm):
             employee.send_mail('Oprettet som bruger', message)
             employee.send_sms(message)
 
-            print password
-
         if commit:
             employee.save()
         return employee
