@@ -60,7 +60,7 @@ div#menu_hidden {
 }
 
 div.menu_item {
-    padding:5px;
+    padding:5px 5px 5px 10px;
 }
 
 div.menu_item img {
@@ -88,7 +88,7 @@ div#sidebar table {
 }
 
 div#sidebar td {
-    padding:5px;
+    padding: 10px 10px 10px 20px;
 }
 
 div#main {
