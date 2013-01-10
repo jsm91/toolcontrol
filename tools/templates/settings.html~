@@ -34,7 +34,7 @@
       <tr>
 	<td colspan="2" class="submit_row">
 	  <input type="hidden" name="form" value="password_change">
-	  <input type="submit" value="Gem kode">
+	  <input type="submit" value="Skift kode">
 	</td>
       </tr>
     </table>
@@ -49,7 +49,7 @@
       <tr>
 	<td colspan="2" class="submit_row">
 	  <input type="hidden" name="form" value="settings">
-	  <input type="submit" value="Gem indstillinger">
+	  <input type="submit" value="Skift kode">
 	</td>
       </tr>
     </table>
