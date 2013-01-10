@@ -65,7 +65,6 @@ class ToolForm(forms.ModelForm):
             self.fields['model'].initial = ToolModel.objects.all()[0]
         except:
             pass
-
         if self.fields['model'].initial:
             self.fields['price'].initial = self.fields['model'].initial.price
             self.fields['service_interval'].initial = self.fields['model'].initial.service_interval
@@ -97,8 +96,6 @@ class EmployeeForm(forms.ModelForm):
 
             employee.send_mail('Oprettet som bruger', message)
             employee.send_sms(message)
-
-            print password
 
         if commit:
             employee.save()

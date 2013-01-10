@@ -46,7 +46,7 @@ class ToolCategoryForm(forms.ModelForm):
         fields = ['name',]
 
 class ToolModelForm(forms.ModelForm):
-    category = forms.ModelChoiceField(queryset=ToolCategory.objects.all(),
+    category = forms.ModelChoiceField(queryset=ToolCategory.objects.all().order_by('name'),
                                       empty_label=None,
                                       label='Kategori')
 
@@ -55,7 +55,7 @@ class ToolModelForm(forms.ModelForm):
         exclude = ['number_of_tools', 'total_price']
 
 class ToolForm(forms.ModelForm):
-    model = forms.ModelChoiceField(queryset=ToolModel.objects.all(),
+    model = forms.ModelChoiceField(queryset=ToolModel.objects.all().order_by('name'),
                                    empty_label=None,
                                    label='Model')
 
