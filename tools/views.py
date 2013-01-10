@@ -1,6 +1,9 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
+import logging
+logger = logging.getLogger(__name__)
+
 from django.contrib.auth import login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
@@ -124,7 +127,7 @@ def tool_list(request):
                                     Q(secondary_name__icontains=search) |
                                     Q(invoice_number__icontains=search)).select_related('loaned_to').order_by(sorting)
         if sorting == 'location' or sorting == '-location':
-            tools = tools.order_by(sorting, 'loaned_to__name')
+            tools = tools.order_by(sorting, 'loaned_to__name')        
     else:
         tools = Tool.objects.all().select_related('loaned_to', 'model__category').order_by(sorting)
         if sorting == 'location' or sorting == '-location':
@@ -447,11 +450,18 @@ def employee_form(request):
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
+            logger.debug('%s is creating a new employee: %s, %s, %s' %
+                         (request.user,
+                          request.POST.get('name'),
+                          request.POST.get('email'),
+                          request.POST.get('phone_number')))
             employee_form = EmployeeForm(request.POST)
             if employee_form.is_valid():
                 employee_form.save()
+                logger.debug('The employee was successfully created')
                 response = {'response': 'Medarbejder oprettet'}
             else:
+                logger.debug('The employee was not created')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         return HttpResponse(simplejson.dumps(response), 

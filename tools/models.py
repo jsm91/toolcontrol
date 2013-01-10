@@ -3,6 +3,9 @@ from __future__ import unicode_literals
 
 import datetime, re, urllib
 
+import logging
+logger = logging.getLogger(__name__)
+
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 from django.db import models
@@ -31,7 +34,7 @@ class Loaner(AbstractBaseUser):
 
     is_active = models.BooleanField('Aktiv', default=True)
     is_office_admin = models.BooleanField('Kontoradmin', default=False)
-    is_tool_admin = models.BooleanField('Værktøjstadmin', default=False)
+    is_tool_admin = models.BooleanField('Værktøjsadmin', default=False)
     is_loan_flagged = models.BooleanField('Låneflag', default=False)
     is_employee = models.BooleanField('Medarbejder', default=True)
 
@@ -49,10 +52,16 @@ class Loaner(AbstractBaseUser):
         return self.is_tool_admin or self.is_office_admin
 
     def send_mail(self, subject, message):
-        send_mail(subject, message, 'ToolControl <kontor@toolcontrol.dk>', 
-                  [self.email])
+        logger.debug('Sending mail to %s with content %s' % (self.name, message))
+        try:
+            send_mail(subject, message, 'ToolControl <kontor@toolcontrol.dk>', 
+                      [self.email])
+            logger.debug('Mail successfully sent')
+        except Exception, e:
+            logger.debug('Mail not sent: %s' % e)
 
     def send_sms(self, message):
+        logger.debug('Sending SMS to %s with content %s' % (self.name, message))
         params = urllib.urlencode({'username': 'hromby', 
                                    'password': 'IRMLVJ',
                                    'recipient': self.phone_number,
@@ -60,17 +69,14 @@ class Loaner(AbstractBaseUser):
                                    'utf8': 1,
                                    'from': 'ToolControl',})
 
-        print "1"
         f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
-        print "2"
         content = f.read()
-        print "3"
         pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
-        print "4"
         match = pattern.search(content)
-        print "5"
-        print match.group('status')
-        print match.group('message')
+
+        logger.debug('SMS gateway returned "%s: %s"' % (match.group('status'),
+                                                        match.group('message')))
+
         return match.group('status'), match.group('message')
 
     def get_finished_loans(self):
