@@ -27,9 +27,11 @@ from toolbase.utils import handle_loan_messages
 def login_view(request):
     if request.POST:
         authentication_form = AuthenticationForm(data=request.POST)
+        logger.info('%s is trying to log in' % request.POST.get('username'))
         if authentication_form.is_valid():
             user = authentication_form.get_user()
             login(request, user)
+            logger.info('Login successful')
             return HttpResponseRedirect(reverse('index'))
     else:
         authentication_form = AuthenticationForm()
@@ -39,6 +41,7 @@ def login_view(request):
 
 @login_required
 def logout_view(request):
+    logger.info('%s has logged out' % request.user)
     logout(request)
     return HttpResponseRedirect(reverse('login'))
 
@@ -50,17 +53,25 @@ def settings(request):
     if request.POST:
         form = request.POST.get('form')
         if form == 'password_change':
+            logger.info('%s is trying to change password' % request.user)
             password_change_form = PasswordChangeForm(user = request.user,
                                                       data = request.POST)
             if password_change_form.is_valid():
                 password_change_form.save()
+                logger.info('Password changed succesfully')
                 password_change_form = PasswordChangeForm(request.user)
+            else:
+                logger.info('Password not changed')
         elif form == 'settings':
+            logger.info('%s is trying to change settings' % request.user)
             settings_form = SettingsForm(instance = request.user,
                                          data = request.POST)
             if settings_form.is_valid():
                 settings_form.save()
-                
+                logger.info('Settings changed succesfully')
+            else:
+                logger.info('Settings not succesfully')
+
     context_dictionary = {
         'password_change_form': password_change_form,
         'settings_form': settings_form,
@@ -102,10 +113,14 @@ def stats(request):
 @login_required
 def index(request):
     if request.POST:
+        logger.info('%s is creating many tools' % request.user)
         add_many_form = CreateManyToolsForm(request.POST)
         if add_many_form.is_valid():
             add_many_form.save()
+            logger.info('Many tools created successfully')
             add_many_form = CreateManyToolsForm()
+        else:
+            logger.info('Many tools not created')
     else:
         add_many_form = CreateManyToolsForm()
 
@@ -305,26 +320,33 @@ def tool_form(request):
         # Edit an existing tool
         if tool_id != 0:
             tool = get_object_or_404(Tool, id = tool_id)
+            logger.info('%s is editing a tool (%s)' % (request.user, tool.name))
             tool_form = ToolForm(data = request.POST, instance = tool)
 
             if tool_form.is_valid():
                 new_tool = tool_form.save()
+                logger.info('Tool edited successfully')
                 tool_form = ToolForm()
 
                 response = {'response': 'Værktøj redigeret'}
             else:
+                logger.info('Tool not edited')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         # Create new tool
         else:
+            logger.info('%s is creating a tool (%s)' % (request.user,
+                                                        request.POST.get('name')))
             tool_form = ToolForm(request.POST)
             if tool_form.is_valid():
                 tool = tool_form.save()
+                logger.info('Tool successfully created')
                 event = Event(event_type="Oprettelse", tool=tool)
                 event.save()
                 
                 response = {'response': 'Værktøj oprettet'}
             else:
+                logger.info('Tool not created')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
@@ -352,24 +374,30 @@ def model_form(request):
         # Edit an existing model
         if model_id != 0:
             model = get_object_or_404(ToolModel, id = model_id)
+            logger.info('%s is editing a model (%s)' % (request.user, model.name))
             model_form = ToolModelForm(data = request.POST, instance = model)
 
             if model_form.is_valid():
                 new_model = model_form.save()
+                logger.info('Model successfully edited')
                 model_form = ToolModelForm()
 
                 response = {'response': 'Model redigeret'}
             else:
+                logger.info('Model not edited')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
+            logger.info('%s is creating a model (%s)' % (request.user, request.POST.get('name')))
             model_form = ToolModelForm(request.POST)
             if model_form.is_valid():
                 model = model_form.save()
+                logger.info('Model successfully created')
                 model_form = ToolModelForm()
             
                 response = {'response': 'Model oprettet'}
             else:
+                logger.info('Model not created')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         return HttpResponse(simplejson.dumps(response), 
@@ -399,20 +427,26 @@ def category_form(request):
         # Edit an existing category
         if category_id != 0:
             category = get_object_or_404(ToolCategory, id = category_id)
+            logger.info('%s is editing a category (%s)' % (request.user, category.name))
             category_form = ToolCategoryForm(data = request.POST, 
                                              instance = category)
             if category_form.is_valid():
                 category_form.save()
+                logger.info('Category successfully edited')
                 response = {'response': 'Kategori redigeret'}
             else:
+                logger.info('Category not edited')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
+            logger.info('%s is creating a category (%s)' % (request.user, request.POST.get('name')))
             category_form = ToolCategoryForm(request.POST)
             if category_form.is_valid():
                 category_form.save()
+                logger.info('Category successfully created')
                 response = {'response': 'Kategori oprettet'}
             else:
+                logger.info('Category not created')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         return HttpResponse(simplejson.dumps(response), 
@@ -441,12 +475,15 @@ def employee_form(request):
         # Edit an existing employee
         if employee_id != 0:
             employee = get_object_or_404(Loaner, id = employee_id)
+            logger.info('%s is editing an employee (%s)' % (request.user, employee.name))
             employee_form = EmployeeForm(data = request.POST, 
                                          instance = employee)
             if employee_form.is_valid():
                 employee_form.save()
+                logger.info('Employee successfully created')
                 response = {'response': 'Medarbejder redigeret'}
             else:
+                logger.info('Employee not created')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
@@ -458,10 +495,10 @@ def employee_form(request):
             employee_form = EmployeeForm(request.POST)
             if employee_form.is_valid():
                 employee_form.save()
-                logger.debug('The employee was successfully created')
+                logger.debug('Employee successfully created')
                 response = {'response': 'Medarbejder oprettet'}
             else:
-                logger.debug('The employee was not created')
+                logger.debug('Employee not created')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         return HttpResponse(simplejson.dumps(response), 
@@ -490,20 +527,26 @@ def building_site_form(request):
         # Edit an existing building_site
         if building_site_id != 0:
             building_site = get_object_or_404(Loaner, id = building_site_id)
+            logger.info('%s is editing a building site (%s)' % (request.user, building_site.name))
             building_site_form = BuildingSiteForm(data = request.POST, 
                                          instance = building_site)
             if building_site_form.is_valid():
                 building_site_form.save()
+                logger.info('Building site successfully edited')
                 response = {'response': 'Byggeplads redigeret'}
             else:
+                logger.info('Building site not edited')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
+            logger.info('%s is creating a building site (%s)' % (request.user, request.POST.get('name')))
             building_site_form = BuildingSiteForm(request.POST)
             if building_site_form.is_valid():
                 building_site_form.save()
+                logger.info('Building site successfully created')
                 response = {'response': 'Byggeplads oprettet'}
             else:
+                logger.info('Building site not created')
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         return HttpResponse(simplejson.dumps(response), 
