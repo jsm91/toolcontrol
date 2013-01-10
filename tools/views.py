@@ -913,7 +913,7 @@ def reset_password(request, token):
                password + '. Du kan nu logge ind med dette kodeord og' +
                'brugernavnet ' + user.name + '.\n\n' +
                'MVH\n' +
-               'ToolBase for SkouGruppen A/S')
+               'ToolControl')
 
     user.send_mail('Kodeord nulstillet', message)
 

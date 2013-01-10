@@ -49,7 +49,7 @@ class Loaner(AbstractBaseUser):
         return self.is_tool_admin or self.is_office_admin
 
     def send_mail(self, subject, message):
-        send_mail(subject, message, 'ToolBase <toolbase@skougruppen.dk>', 
+        send_mail(subject, message, 'ToolControl <kontor@toolcontrol.dk>', 
                   [self.email])
 
     def send_sms(self, message):

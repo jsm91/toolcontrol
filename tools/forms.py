@@ -86,13 +86,13 @@ class EmployeeForm(forms.ModelForm):
             password = Loaner.objects.make_random_password()
             employee.set_password(password)
             
-            message = ('Hej ' + employee.name + '\n' + 
-                       'Du er netop blevet oprettet i ToolBase-systemet ' +
+            message = ('Hej ' + employee.name + '\n\n' + 
+                       'Du er netop blevet oprettet i ToolControl-systemet ' +
                        'hos Skou Gruppen A/S. Du kan logge ind med navnet ' +
                        employee.name + ' samt kodeordet ' + password + '. ' +
                        'Kodeordet kan ændres når du er logget ind.\n\n' +
                        'MVH\n' +
-                       'Skou Gruppen A/S')
+                       'ToolControl')
 
             employee.send_mail('Oprettet som bruger', message)
             employee.send_sms(message)

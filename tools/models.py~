@@ -57,7 +57,8 @@ class Loaner(AbstractBaseUser):
                                    'password': 'IRMLVJ',
                                    'recipient': self.phone_number,
                                    'message': message.encode('utf-8'),
-                                   'utf8': 1})
+                                   'utf8': 1,
+                                   'from': 'ToolControl',})
 
         print "1"
         f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
