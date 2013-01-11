@@ -1,7 +1,7 @@
 <form method="POST" class="add" id="{{ object_type }}">
   <table>
     {% csrf_token %}
-    {{ form.as_table }}
+    {{ form.as_new_table }}
     <tr>
       <td class="bottom" colspan="2">
 	{% if id %}

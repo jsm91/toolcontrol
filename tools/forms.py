@@ -6,6 +6,27 @@ from django import forms
 from tools.models import Event, ForgotPasswordToken, Loaner, Tool
 from tools.models import ToolCategory, ToolModel
 
+class NewForm(forms.Form):
+    def as_new_table(self):
+        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        return self._html_output(
+            normal_row = '<tr%(html_class_attr)s><th>%(label)s %(help_text)s</th><td>%(errors)s%(field)s</td></tr>',
+            error_row = '<tr><td colspan="2">%s</td></tr>',
+            row_ender = '</td></tr>',
+            help_text_html = '<img src="/static/Icon_Info.svg" title="%s">',
+            errors_on_separate_row = False)
+
+class NewModelForm(forms.ModelForm):
+    def as_new_table(self):
+        "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
+        return self._html_output(
+            normal_row = '<tr%(html_class_attr)s><th>%(label)s %(help_text)s</th><td>%(errors)s%(field)s</td></tr>',
+            error_row = '<tr><td colspan="2">%s</td></tr>',
+            row_ender = '</td></tr>',
+            help_text_html = '<img src="/static/Icon_Info.svg" title="%s">',
+            errors_on_separate_row = False)
+    
+
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField()
 
@@ -40,21 +61,26 @@ class ForgotPasswordForm(forms.Form):
         return cleaned_data
         
 
-class ToolCategoryForm(forms.ModelForm):
+class ToolCategoryForm(NewModelForm):
     class Meta:
         model = ToolCategory
         fields = ['name',]
 
-class ToolModelForm(forms.ModelForm):
+class ToolModelForm(NewModelForm):
     category = forms.ModelChoiceField(queryset=ToolCategory.objects.all().order_by('name'),
                                       empty_label=None,
                                       label='Kategori')
+
+    def __init__(self, *args, **kwargs):
+        super(ToolModelForm, self).__init__(*args, **kwargs)
+        self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøj af denne model ikke skal serviceres'
+
 
     class Meta:
         model = ToolModel
         exclude = ['number_of_tools', 'total_price']
 
-class ToolForm(forms.ModelForm):
+class ToolForm(NewModelForm):
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all().order_by('name'),
                                    empty_label=None,
                                    label='Model')
@@ -68,12 +94,12 @@ class ToolForm(forms.ModelForm):
         if self.fields['model'].initial:
             self.fields['price'].initial = self.fields['model'].initial.price
             self.fields['service_interval'].initial = self.fields['model'].initial.service_interval
-
+        self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøjet ikke skal serviceres'
     class Meta:
         model = Tool
         exclude = ['location','loaned_to']
 
-class EmployeeForm(forms.ModelForm):
+class EmployeeForm(NewModelForm):
     class Meta:
         model = Loaner
         exclude = ['password', 'last_login', 'is_loan_flagged', 'is_employee',
@@ -101,8 +127,7 @@ class EmployeeForm(forms.ModelForm):
             employee.save()
         return employee
     
-
-class BuildingSiteForm(forms.ModelForm):
+class BuildingSiteForm(NewModelForm):
     class Meta:
         model = Loaner
         fields = ['name', 'is_active']
@@ -129,17 +154,18 @@ class SettingsForm(forms.ModelForm):
         self.fields['sms_loan_threshold'].required = False
         self.fields['email_loan_threshold'].required = False
 
-class CreateManyToolsForm(forms.Form):
+class CreateManyToolsForm(NewForm):
     prefix = forms.CharField(label="Præfiks", 
                              help_text="Præfiks der deles af alt værktøjet")
     start_index = forms.CharField(label="Startindeks", 
-                                  help_text="Laveste indeksnummer med foranstillede nuller.")
+                                  help_text="Laveste indeksnummer med foranstillede nuller")
     end_index = forms.IntegerField(label="Slutindeks", 
                                    help_text="Højeste indeksnummer")
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all(), 
                                    empty_label=None)
     service_interval = forms.IntegerField(label="Serviceinterval", 
-                                          required=False)
+                                          required=False,
+                                          help_text = 'Antal måneder mellem service for denne slags værktøj')
     price = forms.IntegerField(label="Pris", required=False)
     invoice_number = forms.IntegerField(label = "Bilagsnummer", 
                                         required = False)

@@ -261,7 +261,6 @@ td.history_functions {
 /************************************/
 
 div.popup {
-    display:none;
     z-index: 99999;
     position: fixed; top:50%; left:50%;
     background: #333;
@@ -278,26 +277,44 @@ div.popup {
 
 div.popup td.bottom input {
     width:100%;
+    margin-left:0px;
+}
+
+div.popup table {
+    border-spacing:0px;
 }
 
 div.popup th {
+    border-bottom:1px solid #FFF;
     text-align:left;
 }
 
-div.popup td {
-    font-size:7pt;
+div.popup th img {
+    height:12pt;
+    vertical-align:middle;
 }
 
-div.popup input, div.popup select {
+div.popup td {
+    border-bottom:1px solid #FFF;
+}
+
+div.popup td.bottom, div.popup td.text {
+    border-bottom:none;
+}
+
+div.popup input {
     border-radius: 5px;
     border:none;
     padding:5px;
     background-color:#FFFFFF;
     width:200px;
+    margin-left:10px;
 }
 
 div.popup select {
+    margin:5px 0px 5px 0px;
     width:210px;
+    margin-left:10px;
 }
 
 #mask {

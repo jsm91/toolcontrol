@@ -44,32 +44,32 @@
   {% endfor %}
 </div>
 
-<div class="popup" id="add_many">
-  <form method="POST" action="/">
-    <table>
-      {% csrf_token %}
-      {{ add_many_form.as_table }}
-      <tr>
-    	<td class="bottom" colspan="2">
-	      <input type="submit" value="Gem">
-    	</td>
-      </tr>
-    </table>
-  </form>
-</div>
-
 <div class="popup" id="delete">
   <form method="POST" action="/object_delete/" id="delete">
     <input type="hidden" id="id" name="id" value="0">		
     {% csrf_token %}
     <table>
       <tr>
-	<td>Er du sikker på, at du vil slette?</td>
+	<td class="text">Er du sikker på, at du vil slette?</td>
       </tr>
       <tr>
 	<td class="bottom">
 	  <input type="submit" value="Slet">
 	</td>
+      </tr>
+    </table>
+  </form>
+</div>
+
+<div class="popup" id="add_many">
+  <form method="POST" action="/">
+    <table>
+      {% csrf_token %}
+      {{ add_many_form.as_new_table }}
+      <tr>
+    	<td class="bottom" colspan="2">
+	      <input type="submit" value="Gem">
+    	</td>
       </tr>
     </table>
   </form>
