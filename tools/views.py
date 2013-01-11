@@ -21,8 +21,8 @@ from tools.forms import ToolCategoryForm, ToolModelForm
 from tools.models import Event, Loaner, Tool, ForgotPasswordToken
 from tools.models import ToolCategory, ToolModel
 
-from toolbase.enums import TOOL_FAILURES
-from toolbase.utils import handle_loan_messages
+from toolcontrol.enums import TOOL_FAILURES
+from toolcontrol.utils import handle_loan_messages
 
 def login_view(request):
     if request.POST:

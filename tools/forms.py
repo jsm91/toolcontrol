@@ -42,10 +42,10 @@ class ForgotPasswordForm(forms.Form):
                        'Vi har fået en anmodning om at nulstille dit kodeord.'+
                        'Hvis du ønsker at nulstille dit kodeord, bedes du '+
                        'tilgå denne URL: '+
-                       'http://toolbase.rmbsupport.dk/reset_password/' +token+
+                       'http://skou.toolcontrol.dk/reset_password/' +token+
                        '. Hvis du ikke har bedt om at få nulstillet '+
                        'dit kodeord, kan du se bort fra denne mail\n\n'+
-                       'MVH\nToolBase for Skou Gruppen A/S')
+                       'MVH\nToolControl for Skou Gruppen A/S')
 
             user.send_mail('Nulstilling af kodeord', message)
 
