@@ -58,7 +58,7 @@ class Loaner(AbstractBaseUser):
                       [self.email])
             logger.debug('Mail successfully sent')
         except Exception, e:
-            logger.debug('Mail not sent: %s' % e)
+            logger.error('Mail not sent: %s' % e)
 
     def send_sms(self, message):
         logger.debug('Sending SMS to %s with content %s' % (self.name, message))
@@ -74,8 +74,12 @@ class Loaner(AbstractBaseUser):
         pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
         match = pattern.search(content)
 
-        logger.debug('SMS gateway returned "%s: %s"' % (match.group('status'),
-                                                        match.group('message')))
+        if match.group('status') == 'succes':
+            logger.debug('SMS gateway returned "%s: %s"' % (match.group('status'),
+                                                            match.group('message')))
+        else:
+            logger.error('SMS gateway returned "%s: %s"' % (match.group('status'),
+                                                            match.group('message')))
 
         return match.group('status'), match.group('message')
 
@@ -207,11 +211,13 @@ class Tool(models.Model):
         return self.event_set.all().order_by('-start_date')[0]
 
     def update_last_service(self):
-        print "Update last service"
+        logger.info('Updating last service for %s' % self.name)
         try:
             last_service = self.event_set.filter(event_type='Service').order_by('-start_date')[0]
+            logger.info('Last service is a service event at %s' % last_service.start_date)
         except IndexError:
             last_service = self.event_set.filter(event_type='Oprettelse').order_by('-start_date')[0]
+            logger.info('Last service is a creation event at %s' % last_service.start_date)
 
         self.last_service = last_service.start_date
         self.save()
