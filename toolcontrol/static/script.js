@@ -42,12 +42,8 @@ $(document).ready(function() {
 
     // Print handling
     $(document).on("click", "a.print", function() {
-	var search = $("input#search").val();
-	var object_type = $("table#index_navigation td.selected").attr("id");
-
-	window.location.href = object_type+"_print/"+search;
+	window.print();
 	return false;
-
     });
 
     // Popup handling
