@@ -60,15 +60,4 @@ urlpatterns = patterns('tools.views',
     # Forgot password
     url(r'^forgot_password/$', 'forgot_password', name='forgot_password'),
     url(r'^reset_password/(?P<token>\w+)$', 'reset_password', name='reset_password'),
-
-    # Print list
-    url(r'^tool_print/(?P<search>\w*)$', 'tool_print', name='tool_print'),
-    url(r'^model_print/(?P<search>\w*)$', 'model_print', name='model_print'),
-    url(r'^category_print/(?P<search>\w*)$', 'category_print', 
-        name='category_print'),
-    url(r'^employee_print/(?P<search>\w*)$', 'employee_print', 
-        name='employee_print'),
-    url(r'^building_site_print/(?P<search>\w*)$', 'building_site_print', 
-        name='building_site_print'),
-
 )

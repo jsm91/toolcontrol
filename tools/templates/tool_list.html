@@ -8,7 +8,7 @@
 
 <table>
   <tr>
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
       <a class="set_sorting" href="#" id="{{ name_sorting }}name">
 	Navn
@@ -41,15 +41,15 @@
       </a>
     </th>
 	{% endif %}
-    <th>Funktioner</th>
+    <th class="functions">Funktioner</th>
   </tr>
   {% for tool in tools %}
     {% if tool|check_for_service %}
-      <tr class="object_line service_needed" id="{{ tool.id }}">
+      <tr class="object_line service_needed {% cycle 'row1' 'row2' %}" id="{{ tool.id }}">
     {% else %}
-      <tr class="object_line" id="{{ tool.id }}">
+      <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ tool.id }}">
     {% endif %}
-    <td>
+    <td class="object_checkbox">
       <input type="checkbox" class="object_checkbox"
 	       name="{{ tool.id }}">
     </td>

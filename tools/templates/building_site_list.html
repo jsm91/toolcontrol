@@ -7,7 +7,7 @@
 
 <table>
   <tr>
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
       <a class="set_sorting" href="#" id="{{ name_sorting }}name">
 	Adresse
@@ -18,11 +18,11 @@
 	Aktiv
       </a>
     </th>
-    <th>Funktioner</th>
+    <th class="functions">Funktioner</th>
   </tr>
   {% for building_site in building_sites %}
-  <tr class="object_line" id="{{ building_site.id }}">
-    <td><input type="checkbox" class="object_checkbox"
+  <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ building_site.id }}">
+    <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
 	       name="{{ building_site.id }}"></td>
     <td>{{ building_site.name }}</td>
     <td>

@@ -790,7 +790,6 @@ def tool_action(request):
     if action == 'loan' or action == 'loan_single':
         handle_loan_messages(success_tools, loaner)
 
-    print response
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
 
@@ -1075,102 +1074,6 @@ def reset_password(request, token):
     logger.info('Password reset for %s' % user.name)
 
     return HttpResponseRedirect(reverse('login'))
-
-def tool_print(request, search):
-    if search:
-        tools = Tool.objects.filter(Q(name__icontains=search) |
-                                    Q(model__name__icontains=search) |
-                                    Q(model__category__name__icontains=search) |
-                                    Q(loaned_to__name__icontains=search) | 
-                                    Q(location__iexact=search) |
-                                    Q(secondary_name__icontains=search) |
-                                    Q(invoice_number__icontains=search)).select_related('loaned_to')
-    else:
-        tools = Tool.objects.all().select_related('loaned_to', 'model__category')
-
-    context = {'tools': tools,
-               'search': search}
-
-    return render(request, 'tool_print.html', context)
-
-def model_print(request, search):
-    if not request.user.is_admin():
-        return HttpResponse('Du kan ikke se denne side')
-
-    if search:
-        models = ToolModel.objects.filter(Q(name__icontains=search) |
-                                          Q(category__name__icontains=search))
-    else:
-        models = ToolModel.objects.all()
-
-    context = {'models': models,
-               'search': search}
-
-    return render(request, 'model_print.html', context)
-
-@login_required
-def category_print(request, search):
-    if not request.user.is_admin():
-        return HttpResponse('Du kan ikke se denne side')
-
-    if search:
-        categories = ToolCategory.objects.filter(name__icontains=search)
-    else:
-        categories = ToolCategory.objects.all()
-
-    context = {'categories': categories,
-               'search': search}
-
-    return render(request, 'category_print.html', context)
-
-@login_required
-def employee_print(request, search):
-    if not request.user.is_office_admin:
-        return HttpResponse('Du kan ikke se denne side')
-
-    if search:
-        if search == 'aktiv' or search == 'inaktive':
-            employees = Loaner.objects.filter(is_employee=True,
-                                              is_active=True)
-        elif search == 'inaktiv' or search == 'inaktive':
-            employees = Loaner.objects.filter(is_employee=True,
-                                              is_active=False)
-        else:
-            employees = Loaner.objects.filter(Q(is_employee=True) & 
-                                              Q(name__icontains=search) |
-                                              Q(phone_number__icontains=search) |
-                                              Q(email__icontains=search))
-    else:
-        employees = Loaner.objects.filter(is_employee=True)
-        
-    context = {'employees': employees,
-               'search': search}
-
-    return render(request, 'employee_print.html', context)
-
-@login_required
-def building_site_print(request, search):
-    if not request.user.is_office_admin:
-        return HttpResponse('Du kan ikke se denne side')
-
-    if search:
-        if search == "aktiv" or search == "aktive":
-            building_sites = Loaner.objects.filter(is_employee=False,
-                                                   is_active=True)
-        elif search == "inaktiv" or search == "inaktive":
-            building_sites = Loaner.objects.filter(is_employee=False,
-                                                   is_active=False)
-        else:
-            building_sites = Loaner.objects.filter(is_employee=False,
-                                                   name__icontains=search)
-
-    else:
-        building_sites = Loaner.objects.filter(is_employee=False)
-
-    context = {'building_sites': building_sites,
-               'search': search}
-
-    return render(request, 'building_site_print.html', context)
 
 @login_required
 def model_object(request):

@@ -7,7 +7,7 @@
 
 <table>
   <tr>
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
       <a class="set_sorting" href="#" id="{{ name_sorting }}name">
 	Navn
@@ -22,11 +22,11 @@
     <th>
       Samlet pris
     </th>
-    <th>Funktioner</th>
+    <th class="functions">Funktioner</th>
   </tr>
   {% for category in categories %}
-  <tr class="object_line" id="{{ category.id }}">
-    <td><input type="checkbox" class="object_checkbox"
+  <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ category.id }}">
+    <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
 	       name="{{ category.id }}"></td>
     <td>{{ category.name }}</td>
     <td>{{ category.number_of_models }} stk.</td>

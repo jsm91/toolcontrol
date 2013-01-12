@@ -1,0 +1,34 @@
+div#top, div#sidebar, div#banner, tr.history, th.functions, td.functions, th.object_checkbox, td.object_checkbox, div.popup {
+    display:none;
+}
+
+div#main {
+    position:absolute;
+    top: 0;
+    left: 0;
+    width:100%;
+    height:100%;
+}
+
+div#content {
+    position:relative;
+    top:0px;
+}
+
+table {
+    width: 100%;
+    border-spacing:0px;
+}
+
+th {
+    text-align: left;
+}
+
+a {
+    color: #000000;
+    text-decoration:none;
+}
+
+tr.row1 {
+    background-color: #EEEEEE;
+}
