@@ -1,0 +1,18 @@
+<table>
+  <tr>
+    <th>Værktøj</th>
+    <th>Dato</th>
+  </tr>
+  {% for loan in loans %}
+  <tr>
+    <td>{{ loan.tool }}</td>
+    <td>
+      {% if loan.end_date %}
+      {{ loan.start_date }} - {{ loan.end_date }}
+      {% else %}
+      {{ loan.start_date }}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
