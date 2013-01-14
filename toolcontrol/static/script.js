@@ -65,7 +65,7 @@ $(document).ready(function() {
 	    'margin-left' : -popMargLeft
 	});
 
-        //Fade in the popup
+	//Fade in the popup
 	$(popupBox).fadeIn('slow');
 		
 	// Add the mask to body
@@ -205,6 +205,66 @@ $(document).ready(function() {
 				       $("tr#"+tool+".history").show();
 				       $("tr#"+tool+".history div").slideDown();
 				   });
+	}
+	return false;
+    });
+
+    // Show loans for a loaner
+    $(document).on("click", "a.show_loans", function() {
+	var loaner = $(this).attr("id");
+	if($("tr#"+loaner+".history").is(":visible")) {
+	    $("tr#"+loaner+".history div").slideUp(function() {
+		$("tr#"+loaner+".history").hide();
+	    });
+	}
+	else {
+	    $("tr#" + loaner + 
+	      ".history div").load("/loan_list/", "loaner_id="+loaner,
+				   function() {
+				       $("tr#"+loaner+".history").show();
+				       $("tr#"+loaner+".history div").slideDown();
+				   });
+	}
+	return false;
+    });
+
+
+    // Show tools for a model
+    $(document).on("click", "a.show_model_tools", function() {
+	var model = $(this).attr("id");
+	if($("tr#"+model+".tools").is(":visible")) {
+	    $("tr#"+model+".tools div").slideUp(function() {
+		$("tr#"+model+".tools").hide();
+	    });
+	}
+	else {
+	    $("tr#" + model + 
+	      ".tools div").load("/simple_tool_list/", "model_id="+model+
+				 "&show_model=false",
+				 function() {
+				     $("tr#"+model+".tools").show();
+				     $("tr#"+model+".tools div").slideDown();
+				 });
+	}
+	return false;
+    });
+
+    // Show tools for a category
+    $(document).on("click", "a.show_category_tools", function() {
+	var category = $(this).attr("id");
+	if($("tr#"+category+".tools").is(":visible")) {
+	    $("tr#"+category+".tools div").slideUp(function() {
+		$("tr#"+category+".tools").hide();
+	    });
+	}
+	else {
+	    $("tr#" + category + 
+	      ".tools div").load("/simple_tool_list/", "category_id="+category+
+				 "&show_model=true",
+				 function() {
+				     $("tr#"+category+".tools").show();
+				     $("tr#"+category+".tools div").slideDown();
+				 });
 	}
 	return false;
     });

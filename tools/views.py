@@ -276,6 +276,31 @@ def loaner_list(request):
     return render(request, 'loaner_list.html', context)
 
 @login_required
+def loan_list(request):
+    loaner_id = request.GET.get('loaner_id')
+    loaner = get_object_or_404(Loaner, id = loaner_id)
+
+    context = {'loans': Event.objects.filter(loaner=loaner).order_by('-start_date')}
+    return render(request, 'loan_list.html', context)
+
+@login_required
+def simple_tool_list(request):
+    show_model = request.GET.get('show_model')
+
+    if show_model == 'true':
+        category_id = request.GET.get('category_id')
+        category = get_object_or_404(ToolCategory, id = category_id)
+        context = {'tools': Tool.objects.filter(model__category=category).order_by('name'),
+                   'show_model': True}
+    else:
+        model_id = request.GET.get('model_id')
+        model = get_object_or_404(ToolModel, id = model_id)
+        context = {'tools': Tool.objects.filter(model=model).order_by('name'),
+                   'show_model': False}
+        
+    return render(request, 'simple_tool_list.html', context)
+
+@login_required
 def tool_banner(request):
     context = {}
     return render(request, 'tool_banner.html', context)

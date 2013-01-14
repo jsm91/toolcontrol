@@ -23,6 +23,8 @@ urlpatterns = patterns('tools.views',
         name='building_site_list'),
     url(r'^event_list/$', 'event_list', name='event_list'),
     url(r'^loaner_list/$', 'loaner_list', name='loaner_list'),
+    url(r'^loan_list/$', 'loan_list', name='loan_list'),
+    url(r'^simple_tool_list/$', 'simple_tool_list', name='simple_tool_list'),
 
     # AJAX requests for banners
     url(r'^tool_banner/$', 'tool_banner', name='tool_banner'),

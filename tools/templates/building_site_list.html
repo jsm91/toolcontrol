@@ -31,6 +31,9 @@
       {% endif %}
     </td>
     <td class="functions">
+      <a href="#" id="{{ building_site.id }}" class="show_loans">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
       <a href="#{{ building_site.id }}" id="building_site" class="edit">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
@@ -38,6 +41,13 @@
 	 class="delete">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
+    </td>
+  </tr>
+  <tr class="history" id="{{ building_site.id }}">
+    <td colspan="9">
+      <div>
+	Historie ikke hentet korrekt
+      </div>
     </td>
   </tr>
   {% endfor %}

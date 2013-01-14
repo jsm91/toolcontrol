@@ -74,6 +74,9 @@
       {% endif %}
     </td>
     <td class="functions">
+      <a href="#" id="{{ employee.id }}" class="show_loans">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
       <a href="#{{ employee.id }}" id="employee" class="edit">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
@@ -82,7 +85,12 @@
       </a>
     </td>
   </tr>
+  <tr class="history" id="{{ employee.id }}">
+    <td colspan="9">
+      <div>
+	Historie ikke hentet korrekt
+      </div>
+    </td>
+  </tr>
   {% endfor %}
 </table>
-
-

@@ -233,7 +233,7 @@ tr.selected td {
 }
 
 /* Tool history */
-tr.history, tr.history div {
+tr.history, tr.history div, tr.tools, tr.tools div {
     display:none;
     background-color:#EEE;
 }

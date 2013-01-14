@@ -33,12 +33,22 @@
     <td>{{ category.number_of_tools }} stk.</td>
     <td>{{ category.total_price }} kr.</td>
     <td class="functions">
+      <a href="#" id="{{ category.id }}" class="show_category_tools">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
       <a href="#{{ category.id }}" id="category" class="edit">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
       <a href="#{{ category.id }}" id="{{ category.name }}" class="delete">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
+    </td>
+  </tr>
+  <tr class="tools" id="{{ category.id }}">
+    <td colspan="6">
+      <div>
+	Værktøj ikke hentet korrekt
+      </div>
     </td>
   </tr>
   {% endfor %}
