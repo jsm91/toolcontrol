@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
+import datetime
 
 from django.db.models import Q
+from django.utils import timezone
 
 from tools.models import Loaner
 
@@ -38,3 +40,13 @@ def handle_loan_messages(tools, loaner):
     for admin in admins:
         admin.send_mail('Værktøj udlånt', message)
 
+def check_for_service(tool):
+    if tool.service_interval == 0:
+        return False
+
+    now = timezone.now()
+    service_interval = datetime.timedelta(days=tool.service_interval*30*0.9)
+
+    # Find out whether the time between last service and now is bigger than
+    # the max service interval
+    return now - tool.last_service > service_interval

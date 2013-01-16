@@ -149,6 +149,12 @@ class Tool(models.Model):
     secondary_name = models.CharField('Sekundært navn', max_length=200, 
                                       null=True, blank=True)
 
+    def get_location(self):
+        if self.location == 'Udlånt':
+            return self.loaned_to
+        else:
+            return self.location
+
     def service(self):
         if self.location == 'Lager':
             event = Event(event_type='Service', tool=self)
