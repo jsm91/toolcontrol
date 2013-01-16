@@ -5,7 +5,7 @@ import datetime
 from django.db.models import Q
 from django.utils import timezone
 
-from tools.models import Loaner
+from tools.models import Employee
 
 def handle_loan_messages(tools, loaner):
     tool_string = ''
@@ -16,26 +16,22 @@ def handle_loan_messages(tools, loaner):
         else:
             tool_string += tool
 
-    print tools
-    print loaner
-    print len(tools)
-
     message = loaner.name + ' har netop lånt værktøjet ' + tool_string
 
     if loaner.is_loan_flagged:
-        admins = Loaner.objects.filter(Q(is_tool_admin=True)|
+        admins = Employee.objects.filter(Q(is_tool_admin=True)|
                                        Q(is_office_admin=True))
     else:
-        admins = Loaner.objects.filter(sms_loan_threshold__lte=len(tools))
+        admins = Employee.objects.filter(sms_loan_threshold__lte=len(tools))
 
     for admin in admins:
         admin.send_sms(message)
 
     if loaner.is_loan_flagged:
-        admins = Loaner.objects.filter(Q(is_tool_admin=True)|
+        admins = Employee.objects.filter(Q(is_tool_admin=True)|
                                        Q(is_office_admin=True))
     else:
-        admins = Loaner.objects.filter(email_loan_threshold__lte=len(tools))
+        admins = Employee.objects.filter(email_loan_threshold__lte=len(tools))
 
     for admin in admins:
         admin.send_mail('Værktøj udlånt', message)

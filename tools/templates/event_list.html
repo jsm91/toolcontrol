@@ -21,7 +21,7 @@
     {% endif %}
     <td class="history_event_type">
       {% if event.event_type == "Udlån" %}
-      Udlånt til {{ event.loaner }}
+      Udlånt til {{ event.get_loan_location }}
       {% else %}
       {{ event.event_type }}
       {% endif %}

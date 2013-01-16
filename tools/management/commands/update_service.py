@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from toolcontrol.utils import check_for_service
 
-from tools.models import Loaner, Tool
+from tools.models import Employee, Tool
 
 class Command(BaseCommand):
     help = 'Sends a mail to every employee that has a tool that needs service'
@@ -26,11 +26,11 @@ class Command(BaseCommand):
             for tool in tools_to_service:
                 message += '%s (%s)\n'% (tool.name, tool.get_location())
 
-        for admin in Loaner.objects.filter(is_tool_admin=True):
+        for admin in Employee.objects.filter(is_tool_admin=True):
             admin.send_sms(message)
 
         # Send SMS to all loaners who have tools that need service
-        for employee in Loaner.objects.filter(is_employee=True):
+        for employee in Employee.objects.filter(is_employee=True):
             tools_to_service = []
         
             for tool in employee.tool_set.all():

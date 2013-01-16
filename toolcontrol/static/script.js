@@ -110,7 +110,12 @@ $(document).ready(function() {
 	var object_type = $(this).attr("id");
 	$.post("/"+object_type+"_form/", $(this).serialize(), function(data) {
 	    // Reload the page
-	    $("div#content").load("/"+object_type+"_list/");
+	    if(object_type == "loan") {
+		    $("div#content").load("/tool_list/");
+	    }
+	    else {
+		    $("div#content").load("/"+object_type+"_list/");
+		}
 	    set_message(data.response);
 	});
 
@@ -157,8 +162,8 @@ $(document).ready(function() {
 	if (action == "loan") {
 	    var popupBox = "div.popup#loan";
 
-	    $(popupBox).load("/loaner_list/", function() {
-		$("a.loan").attr("id", object_ids.toString());
+	    $(popupBox).load("/loan_form/", function() {
+		$("input#id_tools").attr("value", object_ids.toString());
 	    });
 	    
 	    //Set the center alignment padding + border
@@ -212,6 +217,8 @@ $(document).ready(function() {
     // Show loans for a loaner
     $(document).on("click", "a.show_loans", function() {
 	var loaner = $(this).attr("id");
+	var object_type = $("table#index_navigation td.selected").attr("id");
+	
 	if($("tr#"+loaner+".history").is(":visible")) {
 	    $("tr#"+loaner+".history div").slideUp(function() {
 		$("tr#"+loaner+".history").hide();
@@ -219,7 +226,7 @@ $(document).ready(function() {
 	}
 	else {
 	    $("tr#" + loaner + 
-	      ".history div").load("/loan_list/", "loaner_id="+loaner,
+	      ".history div").load("/loan_list/", "loaner_id="+loaner+"&object_type="+object_type,
 				   function() {
 				       $("tr#"+loaner+".history").show();
 				       $("tr#"+loaner+".history div").slideDown();

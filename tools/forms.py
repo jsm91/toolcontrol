@@ -2,8 +2,9 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.shortcuts import get_object_or_404
 
-from tools.models import Event, ForgotPasswordToken, Loaner, Tool
+from tools.models import Event, ForgotPasswordToken, ConstructionSite, Employee, Tool
 from tools.models import ToolCategory, ToolModel
 
 class NewForm(forms.Form):
@@ -26,14 +27,41 @@ class NewModelForm(forms.ModelForm):
             help_text_html = '<img src="/static/Icon_Info.svg" title="%s">',
             errors_on_separate_row = False)
     
+class LoanForm(NewModelForm):
+    tools = forms.CharField(widget=forms.HiddenInput)
+
+    class Meta:
+        model = Event
+        fields = ['employee', 'construction_site',]
+
+    def clean(self):
+        cleaned_data = super(LoanForm, self).clean()
+
+        employee = cleaned_data.get('employee')
+        construction_site = cleaned_data.get('construction_site')
+
+        if not(employee or construction_site):
+        	print employee
+        	print construction_site
+        	raise forms.ValidationError('Enten medarbejder eller byggeplads er påkrævet')
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        cd = self.cleaned_data
+        tool_ids = cd['tools'].split(',')
+
+        for tool_id in tool_ids:
+            tool = get_object_or_404(Tool, id = tool_id)
+            tool.loan(cd['employee'], cd['construction_site'])
 
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField()
 
     def save(self, commit=True):
         email = self.cleaned_data.get('email')
-        for user in Loaner.objects.filter(email=email):
-            token = Loaner.objects.make_random_password()
+        for user in Employee.objects.filter(email=email):
+            token = Employee.objects.make_random_password()
 
             forgot_password_token = ForgotPasswordToken(token=token, user=user)
             forgot_password_token.save()
@@ -53,7 +81,7 @@ class ForgotPasswordForm(forms.Form):
         cleaned_data = super(ForgotPasswordForm, self).clean()
         email = cleaned_data.get('email')
 
-        user = Loaner.objects.filter(email=email)[0]
+        user = Employee.objects.filter(email=email)[0]
 
         if user is None:
             raise forms.ValidationError('Ingen bruger med den angivne email')
@@ -101,7 +129,7 @@ class ToolForm(NewModelForm):
 
 class EmployeeForm(NewModelForm):
     class Meta:
-        model = Loaner
+        model = Employee
         exclude = ['password', 'last_login', 'is_loan_flagged', 'is_employee',
                    'sms_loan_threshold', 'email_loan_threshold',]
 
@@ -109,7 +137,7 @@ class EmployeeForm(NewModelForm):
         employee = super(EmployeeForm, self).save(commit=False)
 
         if not employee.pk:
-            password = Loaner.objects.make_random_password()
+            password = Employee.objects.make_random_password()
             employee.set_password(password)
             
             message = ('Hej ' + employee.name + '\n\n' + 
@@ -129,19 +157,17 @@ class EmployeeForm(NewModelForm):
     
 class BuildingSiteForm(NewModelForm):
     class Meta:
-        model = Loaner
-        fields = ['name', 'is_active']
+        model = ConstructionSite
 
     def save(self, commit=True):
         building_site = super(BuildingSiteForm, self).save(commit=False)
-        building_site.is_employee = False
         if commit:
             building_site.save()
         return building_site
 
 class SettingsForm(forms.ModelForm):
     class Meta:
-        model = Loaner
+        model = Employee
         fields = ['sms_loan_threshold', 'email_loan_threshold',
                   'email', 'phone_number',]
 

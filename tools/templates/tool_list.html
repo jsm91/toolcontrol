@@ -62,13 +62,7 @@
     <td>{{ tool.model.name }}</td>
     <td>{{ tool.model.category.name }}</td>
     <td id="last_service">{{ tool.last_service }}</td>
-    <td>
-      {% if tool.location == "Udlånt" %}
-        {{ tool.loaned_to }}
-      {% else %}
-        {{ tool.location }}
-      {% endif %}
-    </td>
+    <td>{{ tool.get_location }}</td>
     {% if user.is_admin %}
     <td>{{ tool.price }} kr.</td>
 	{% endif %}

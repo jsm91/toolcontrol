@@ -14,7 +14,7 @@
     {% endif %}
     <td>
       {% if tool.location == "Udlånt" %}
-        {{ tool.loaned_to }}
+        {{ tool.get_location }}
       {% else %}
         {{ tool.location }}
       {% endif %}

@@ -15,10 +15,10 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import simplejson
 
 from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
-from tools.forms import ForgotPasswordForm, SettingsForm, ToolForm
+from tools.forms import ForgotPasswordForm, LoanForm, SettingsForm, ToolForm
 from tools.forms import ToolCategoryForm, ToolModelForm
 
-from tools.models import Event, Loaner, Tool, ForgotPasswordToken
+from tools.models import ConstructionSite, Event, Employee, Tool, ForgotPasswordToken
 from tools.models import ToolCategory, ToolModel
 
 from toolcontrol.enums import TOOL_FAILURES
@@ -124,7 +124,7 @@ def index(request):
     else:
         add_many_form = CreateManyToolsForm()
 
-    context = {'loaners': Loaner.objects.filter(is_active=True).order_by('name'),
+    context = {'employees': Employee.objects.filter(is_active=True).order_by('name'),
                'add_many_form': add_many_form}
     return render(request, 'index.html', context)
 
@@ -210,18 +210,15 @@ def employee_list(request):
 
     if search:
         if search == 'aktiv' or search == 'inaktive':
-            employees = Loaner.objects.filter(is_employee=True,
-                                              is_active=True).order_by(sorting)
+            employees = Employee.objects.filter(is_active=True).order_by(sorting)
         elif search == 'inaktiv' or search == 'inaktive':
-            employees = Loaner.objects.filter(is_employee=True,
-                                              is_active=False).order_by(sorting)
+            employees = Employee.objects.filter(is_active=False).order_by(sorting)
         else:
-            employees = Loaner.objects.filter(Q(is_employee=True) & 
-                                              Q(name__icontains=search) |
+            employees = Employee.objects.filter(Q(name__icontains=search) |
                                               Q(phone_number__icontains=search) |
                                               Q(email__icontains=search)).order_by(sorting)
     else:
-        employees = Loaner.objects.filter(is_employee=True).order_by(sorting)
+        employees = Employee.objects.all().order_by(sorting)
         
     context = {'employees': employees,
                'search': search}
@@ -241,17 +238,14 @@ def building_site_list(request):
 
     if search:
         if search == "aktiv" or search == "aktive":
-            building_sites = Loaner.objects.filter(is_employee=False,
-                                                   is_active=True).order_by(sorting)
+            building_sites = ConstructionSite.objects.filter(is_active=True).order_by(sorting)
         elif search == "inaktiv" or search == "inaktive":
-            building_sites = Loaner.objects.filter(is_employee=False,
-                                                   is_active=False).order_by(sorting)
+            building_sites = ConstructionSite.objects.filter(is_active=False).order_by(sorting)
         else:
-            building_sites = Loaner.objects.filter(is_employee=False,
-                                                   name__icontains=search).order_by(sorting)
+            building_sites = ConstructionSite.objects.filter(name__icontains=search).order_by(sorting)
 
     else:
-        building_sites = Loaner.objects.filter(is_employee=False).order_by(sorting)
+        building_sites = ConstructionSite.objects.all().order_by(sorting)
 
     context = {'building_sites': building_sites,
                'search': search}
@@ -271,16 +265,18 @@ def event_list(request):
     return render(request, 'event_list.html', context)
 
 @login_required
-def loaner_list(request):
-    context = {'loaners': Loaner.objects.filter(is_active=True).order_by('name')}
-    return render(request, 'loaner_list.html', context)
-
-@login_required
 def loan_list(request):
     loaner_id = request.GET.get('loaner_id')
-    loaner = get_object_or_404(Loaner, id = loaner_id)
+    object_type = request.GET.get('object_type')
+    print object_type
+    
+    if object_type == 'employee':
+        employee = get_object_or_404(Employee, id = loaner_id)
+        context = {'loans': Event.objects.filter(employee=employee).order_by('-start_date')}
+    elif object_type == 'building_site':
+        construction_site = get_object_or_404(ConstructionSite, id = loaner_id)
+        context = {'loans': Event.objects.filter(construction_site=construction_site).order_by('-start_date')}
 
-    context = {'loans': Event.objects.filter(loaner=loaner).order_by('-start_date')}
     return render(request, 'loan_list.html', context)
 
 @login_required
@@ -499,7 +495,7 @@ def employee_form(request):
 
         # Edit an existing employee
         if employee_id != 0:
-            employee = get_object_or_404(Loaner, id = employee_id)
+            employee = get_object_or_404(Employee, id = employee_id)
             logger.info('%s is editing an employee (%s)' % (request.user, employee.name))
             employee_form = EmployeeForm(data = request.POST, 
                                          instance = employee)
@@ -532,7 +528,7 @@ def employee_form(request):
     employee_id = request.GET.get('id')
 
     if employee_id:
-        employee = get_object_or_404(Loaner, id = employee_id)
+        employee = get_object_or_404(Employee, id = employee_id)
         employee_form = EmployeeForm(instance=employee)
         context = {'form': employee_form,
                    'object_type': 'employee',
@@ -551,7 +547,7 @@ def building_site_form(request):
 
         # Edit an existing building_site
         if building_site_id != 0:
-            building_site = get_object_or_404(Loaner, id = building_site_id)
+            building_site = get_object_or_404(ConstructionSite, id = building_site_id)
             logger.info('%s is editing a building site (%s)' % (request.user, building_site.name))
             building_site_form = BuildingSiteForm(data = request.POST, 
                                          instance = building_site)
@@ -580,7 +576,7 @@ def building_site_form(request):
     building_site_id = request.GET.get('id')
 
     if building_site_id:
-        building_site = get_object_or_404(Loaner, id = building_site_id)
+        building_site = get_object_or_404(ConstructionSite, id = building_site_id)
         building_site_form = BuildingSiteForm(instance=building_site)
         context = {'form': building_site_form,
                    'object_type': 'building_site',
@@ -591,6 +587,28 @@ def building_site_form(request):
                    'object_type': 'building_site'}
 
     return render(request, 'form.html', context)
+
+@login_required
+def loan_form(request):
+	if request.POST:
+		print request.POST
+		logger.info('%s is loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
+		loan_form = LoanForm(request.POST)
+		if loan_form.is_valid():
+			loan_form.save()
+			logger.info('Tools loaned')
+			response = {'response': 'Værktøj udlånt'}
+		else:
+			logger.info('Tools not loaned')
+			print loan_form
+			response = {'response': 'Værktøj ikke udlånt'}
+			
+		return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+	
+	loan_form = LoanForm()
+	context = {'form': loan_form, 'object_type': 'loan'}
+	return render(request, 'form.html', context)
 
 @login_required
 def tool_action(request):
@@ -609,14 +627,14 @@ def tool_action(request):
                             mimetype="application/json")
 
     if action == 'loan':
-        loaner_id = request.POST.get('loaner_id')
+        employee_id = request.POST.get('employee_id')
         try:
-            loaner = get_object_or_404(Loaner, id = loaner_id)
+            employee = get_object_or_404(Employee, id = employee_id)
         except Http404:
-            logger.error('Loaner with id %s not found' % loaner_id)
+            logger.error('Employee with id %s not found' % employee_id)
             raise Http404
     elif action == 'loan_single':
-        loaner = request.user
+        employee = request.user
 
     success_tools = []
     success_tool_ids = []
@@ -691,15 +709,15 @@ def tool_action(request):
             tool.delete()
             success_tools.append(tool_name)
         elif action == 'loan' or action == 'loan_single':
-            if tool.loan(loaner):
+            if tool.loan(employee):
                 success_tools.append(tool.name)
-                logger.info('Tool with id %s loaned to %s' % (tool.id, loaner.name))
+                logger.info('Tool with id %s loaned to %s' % (tool.id, employee.name))
             else:
                 try:
                     failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
                 except KeyError:
                     failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
-                logger.info('Tool with id %s not loaned to %s (not in store)' % (tool.id, loaner.name))
+                logger.info('Tool with id %s not loaned to %s (not in store)' % (tool.id, employee.name))
 
     # Generate success string
     success_string = ''
@@ -813,7 +831,7 @@ def tool_action(request):
                 'success_tool_ids': success_tool_ids}
 
     if action == 'loan' or action == 'loan_single':
-        handle_loan_messages(success_tools, loaner)
+        handle_loan_messages(success_tools, employee)
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
@@ -877,72 +895,112 @@ def category_action(request):
                         mimetype="application/json")
 
 @login_required
-def loaner_action(request):
+def construction_site_action(request):
     action = request.POST.get('action')
     object_ids = request.POST.get('object_ids', '')
 
-    logger.info('Loaner action started by %s: %s on loaners %s' % (request.user,
+    logger.info('Construction site action started by %s: %s on sites %s' % (request.user, action, object_ids))
+
+    if object_ids != '':
+        object_ids = object_ids.split(',')
+    else:
+        logger.info('No employees selected')
+        response = {'response': 'Ingen byggepladser valgt'}
+        return HttpResponse(simplejson.dumps(response),
+                            mimetype='application/json')
+
+    for object_id in object_ids:
+        try:
+            construction_site = get_object_or_404(ConstructionSite, 
+                                                  id = object_id)
+        except Http404:
+            logger.error('Construction site with id %s not found', object_id)
+
+        if action == 'delete':
+            logger.warning('Construction site with id %s deleted' % object_id)
+            construction_site.delete()
+            response = {'response': 'Byggeplads(er) slettet'}
+        elif action == 'make_inactive':
+            construction_site.is_active = False
+            logger.info('Construction site with id %s marked as inactive' % object_id)
+            construction_site.save()
+            response = {'response': 'Byggeplads(er) markeret som inaktiv(e)'}
+        elif action == 'make_active':
+            construction_site.is_active = True
+            logger.info('Construction site with id %s marked as active' % object_id)
+            construction_site.save()
+            response = {'response': 'Byggeplads(er) markeret som aktiv(e)'}
+            
+    return HttpResponse(simplejson.dumps(response), 
+                        mimetype="application/json")
+
+@login_required
+def employee_action(request):
+    action = request.POST.get('action')
+    object_ids = request.POST.get('object_ids', '')
+
+    logger.info('Employee action started by %s: %s on employees %s' % (request.user,
                                                                    action, 
                                                                    object_ids))
 
     if object_ids != '':
         object_ids = object_ids.split(',')
     else:
-        logger.info('No loaners selected')
-        response = {'response': 'Ingen låner valgt'}        
+        logger.info('No employees selected')
+        response = {'response': 'Ingen medarbejdere valgt'}        
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
 
     for object_id in object_ids:
         try:
-            loaner = get_object_or_404(Loaner, id = object_id)
+            employee = get_object_or_404(Employee, id = object_id)
         except Http404:
-            logger.error('Loaner with id %s not found' % object_id)
+            logger.error('Employee with id %s not found' % object_id)
 
         if action == 'delete':
-            logger.warning('Loaner with id %s deleted' % object_id)
-            loaner.delete()
-            response = {'response': 'Låner(e) slettet'}
+            logger.warning('Employee with id %s deleted' % object_id)
+            employee.delete()
+            response = {'response': 'Medarbejder(e) slettet'}
         elif action == 'make_inactive':
-            loaner.is_active = False
-            logger.info('Loaner with id %s marked as inactive' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) markeret som inaktiv(e)'}
+            employee.is_active = False
+            logger.info('Employee with id %s marked as inactive' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) markeret som inaktiv(e)'}
         elif action == 'make_active':
-            loaner.is_active = True
-            logger.info('Loaner with id %s marked as active' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) markeret som aktiv(e)'}
+            employee.is_active = True
+            logger.info('Employee with id %s marked as active' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) markeret som aktiv(e)'}
         elif action == 'set_office_admin':
-            loaner.is_office_admin = True
-            logger.info('Loaner with id %s marked as office admin' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) markeret som kontoradmin'}
+            employee.is_office_admin = True
+            logger.info('Employee with id %s marked as office admin' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) markeret som kontoradmin'}
         elif action == 'remove_office_admin':
-            loaner.is_office_admin = False
-            logger.info('Loaner with id %s removed as office admin' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) fjernet som kontoradmin'}
+            employee.is_office_admin = False
+            logger.info('Employee with id %s removed as office admin' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) fjernet som kontoradmin'}
         elif action == 'set_tool_admin':
-            loaner.is_tool_admin = True
-            logger.info('Loaner with id %s marked as tool admin' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) markeret som værktøjsadmin'}
+            employee.is_tool_admin = True
+            logger.info('Employee with id %s marked as tool admin' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) markeret som værktøjsadmin'}
         elif action == 'remove_tool_admin':
-            loaner.is_tool_admin = False
-            logger.info('Loaner with id %s removed as tool admin' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) fjernet som værktøjsadmin'}
+            employee.is_tool_admin = False
+            logger.info('Employee with id %s removed as tool admin' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) fjernet som værktøjsadmin'}
         elif action == 'set_loan_flag':
-            loaner.is_loan_flagged = True
-            logger.info('Loaner with id %s marked as loan flagged' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) markeret med låneflag'}
+            employee.is_loan_flagged = True
+            logger.info('Employee with id %s marked as loan flagged' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) markeret med låneflag'}
         elif action == 'remove_loan_flag':
-            loaner.is_loan_flagged = False
-            logger.info('Loaner with id %s removed as loan flagged' % object_id)
-            loaner.save()
-            response = {'response': 'Låner(e) fik fjernet låneflag'}
+            employee.is_loan_flagged = False
+            logger.info('Employee with id %s removed as loan flagged' % object_id)
+            employee.save()
+            response = {'response': 'Medarbejder(e) fik fjernet låneflag'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
@@ -1007,21 +1065,41 @@ def category_delete(request):
                         mimetype="application/json")
 
 @login_required
-def loaner_delete(request):
-    loaner_id = request.POST.get('id')
-    logger.info('%s is trying to delete loaner with id %s' % (request.user,
-                                                              loaner_id))
+def employee_delete(request):
+    employee_id = request.POST.get('id')
+    logger.info('%s is trying to delete employee with id %s' % (request.user,
+                                                              employee_id))
     try:
-        loaner = get_object_or_404(Loaner, id = loaner_id)
+        employee = get_object_or_404(Employee, id = employee_id)
     except Http404:
-        logger.error('Loaner with id %s not found' % loaner_id)
+        logger.error('Employee with id %s not found' % employee_id)
         raise Http404
 
-    loaner_name = loaner.name
-    loaner.delete()
-    logger.info('Loaner with id %s deleted' % loaner_id)
+    employee_name = employee.name
+    employee.delete()
+    logger.info('Employee with id %s deleted' % employee_id)
 
-    response = {'response': loaner_name+' slettet'}
+    response = {'response': employee_name+' slettet'}
+
+    return HttpResponse(simplejson.dumps(response), 
+                        mimetype="application/json")
+
+@login_required
+def construction_site_delete(request):
+    construction_site_id = request.POST.get('id')
+    logger.info('%s is trying to delete construction site with id %s' % (request.user,
+                                                              construction_site_id))
+    try:
+        construction_site = get_object_or_404(ConstructionSite, id = construction_site_id)
+    except Http404:
+        logger.error('ConstructionSite with id %s not found' % construction_site_id)
+        raise Http404
+
+    construction_site_name = construction_site.name
+    construction_site.delete()
+    logger.info('ConstructionSite with id %s deleted' % construction_site_id)
+
+    response = {'response': construction_site_name+' slettet'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
@@ -1081,7 +1159,7 @@ def reset_password(request, token):
     forgot_password_token = get_object_or_404(ForgotPasswordToken, token=token)
     user = forgot_password_token.user
 
-    password = Loaner.objects.make_random_password()
+    password = Employee.objects.make_random_password()
     user.set_password(password)
     user.save()
 

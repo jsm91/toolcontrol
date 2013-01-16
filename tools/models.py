@@ -13,21 +13,25 @@ from django.db.models import Sum
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
-class LoanerManager(BaseUserManager):
-    def create_user(self, name, password=None):
-        loaner = self.model(name=name)
+class EmployeeManager(BaseUserManager):
+    def create_user(self, name, email, phone_number, password=None):
+        employee = self.model(name=name, email=email, 
+                              phone_number=phone_number)
         
-        loaner.set_password(password)
-        loaner.save(using=self._db)
-        return loaner
+        employee.set_password(password)
+        employee.save(using=self._db)
+        return employee
 
-    def create_superuser(self, name, password):
-        loaner = self.create_employee(name=name, password=password)
-        loaner.is_office_admin = True
-        loaner.save(using=self._db)
-        return loaner
+    def create_superuser(self, name, email, phone_number, password):
+        employee = self.create_employee(name=name, email=email, 
+                                        phone_number=phone_number,
+                                        password=password)
+        employee.is_office_admin = True
+        employee.is_tool_admin = True
+        employee.save(using=self._db)
+        return employee
 
-class Loaner(AbstractBaseUser):
+class Employee(AbstractBaseUser):
     name = models.CharField('Navn', max_length=200, unique=True, db_index=True)
     email = models.EmailField('Email', max_length=255, blank=True)
     phone_number = models.IntegerField('Telefonnummer', null=True)
@@ -36,17 +40,16 @@ class Loaner(AbstractBaseUser):
     is_office_admin = models.BooleanField('Kontoradmin', default=False)
     is_tool_admin = models.BooleanField('Værktøjsadmin', default=False)
     is_loan_flagged = models.BooleanField('Låneflag', default=False)
-    is_employee = models.BooleanField('Medarbejder', default=True)
 
     sms_loan_threshold = models.IntegerField('Min. udlån ved sms', 
                                              null=True, default=None)
     email_loan_threshold = models.IntegerField('Min. udlån ved email', 
                                                null=True, default=None)
 
-    objects = LoanerManager()
+    objects = EmployeeManager()
     
     USERNAME_FIELD = 'name'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email', 'phone_number']
 
     def is_admin(self):
         return self.is_tool_admin or self.is_office_admin
@@ -86,9 +89,16 @@ class Loaner(AbstractBaseUser):
     def get_finished_loans(self):
         return self.event_set.filter(end_date=None)
 
+class ConstructionSite(models.Model):
+    name = models.CharField('Navn', max_length=200)
+    is_active = models.BooleanField('Aktiv', default=True)
+
+    def __unicode__(self):
+        return self.name
+
 class ForgotPasswordToken(models.Model):
     token = models.CharField(max_length=200)
-    user = models.ForeignKey(Loaner)
+    user = models.ForeignKey(Employee)
 
 class ToolCategory(models.Model):
     name = models.CharField('Navn', max_length=200)
@@ -143,7 +153,9 @@ class Tool(models.Model):
     last_service = models.DateTimeField('Seneste service', auto_now_add=True)
     location = models.CharField('Placering', choices=LOCATION_CHOICES, 
                                 max_length=20, default="Lager")
-    loaned_to = models.ForeignKey(Loaner, null=True)
+
+    employee = models.ForeignKey(Employee, null=True)
+    construction_site = models.ForeignKey(ConstructionSite, null=True)
 
     invoice_number = models.IntegerField('Bilagsnummer', null=True, blank=True)
     secondary_name = models.CharField('Sekundært navn', max_length=200, 
@@ -151,7 +163,12 @@ class Tool(models.Model):
 
     def get_location(self):
         if self.location == 'Udlånt':
-            return self.loaned_to
+            if self.employee and self.construction_site:
+                return "%s/%s" % (self.employee, self.construction_site)
+            elif self.employee:
+                return self.employee
+            else:
+                return self.construction_site
         else:
             return self.location
 
@@ -185,12 +202,17 @@ class Tool(models.Model):
         else:
             return False
 
-    def loan(self, loaner):
+    def loan(self, employee=None, construction_site=None):
+        if not(employee or construction_site):
+            return False
         if self.location == 'Lager':
-            event = Event(event_type='Udlån', tool=self, loaner=loaner)
+            event = Event(event_type='Udlån', tool=self,
+                          employee=employee, 
+                          construction_site=construction_site)
             event.save()
             self.location = 'Udlånt'
-            self.loaned_to = loaner
+            self.employee = employee
+            self.construction_site = construction_site
             self.save()
             return True
         else:
@@ -240,7 +262,10 @@ class Event(models.Model):
         ('Bortkommet', 'Bortkommet'),
         )
     tool = models.ForeignKey(Tool)
-    loaner = models.ForeignKey(Loaner, null=True)
+
+    employee = models.ForeignKey(Employee, verbose_name="Medarbejder", null=True, blank=True)
+    construction_site = models.ForeignKey(ConstructionSite, verbose_name="Byggeplads", null=True, blank=True)
+
     event_type = models.CharField(choices=EVENT_TYPE_CHOICES, max_length=200)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True)
@@ -251,13 +276,21 @@ class Event(models.Model):
         self.end_date = datetime.datetime.now()
         self.save()
         self.tool.location = "Lager"
-        self.tool.loaned_to = None
+        self.tool.employee = None
+        self.tool.construction_site = None
         self.tool.save()
         return True
 
     def __unicode__(self):
         return "%s -> %s" % (self.tool, self.loaner)
 
+    def get_loan_location(self):
+        if self.employee and self.construction_site:
+            return "%s/%s" % (self.employee, self.construction_site)
+        elif self.employee:
+            return self.employee
+        else:
+            return self.construction_site
 
 @receiver(pre_delete, sender=Event)
 def pre_delete_event(sender, instance, **kwargs):
