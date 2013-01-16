@@ -30,7 +30,7 @@ class Command(BaseCommand):
             admin.send_sms(message)
 
         # Send SMS to all loaners who have tools that need service
-        for employee in Employee.objects.filter(is_employee=True):
+        for employee in Employee.objects.all():
             tools_to_service = []
         
             for tool in employee.tool_set.all():
