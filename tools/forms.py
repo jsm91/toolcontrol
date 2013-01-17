@@ -128,7 +128,7 @@ class ToolForm(NewModelForm):
         self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøjet ikke skal serviceres'
     class Meta:
         model = Tool
-        exclude = ['location','loaned_to','end_date']
+        exclude = ['location','employee','construction_site','end_date']
 
 class EmployeeForm(NewModelForm):
     class Meta:
