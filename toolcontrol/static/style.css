@@ -337,18 +337,3 @@ div#messages {
     color:white;
     padding:10px;
 }
-
-div.popup#loan {
-    text-align:center;
-    width:300px;
-    height:200px;
-    overflow-y:auto;
-}
-
-div.popup#loan a {
-    color: white;
-}
-
-div.popup#loan a:hover {
-    text-decoration:none;
-}

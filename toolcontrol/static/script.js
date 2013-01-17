@@ -164,8 +164,6 @@ $(document).ready(function() {
 
 	    $(popupBox).load("/loan_form/", function() {
 		$("input#id_tools").attr("value", object_ids.toString());
-	    });
-	    
 	    //Set the center alignment padding + border
 	    var popMargTop = ($(popupBox).height() + 24) / 2; 
 	    var popMargLeft = ($(popupBox).width() + 24) / 2; 
@@ -173,6 +171,8 @@ $(document).ready(function() {
 	    $(popupBox).css({ 
 		'margin-top' : -popMargTop,
 		'margin-left' : -popMargLeft
+	    });
+
 	    });
 
             //Fade in the popup
@@ -317,27 +317,6 @@ $(document).ready(function() {
 
 	return false;
     });
-
-    // Handle loans
-    $(document).on("click", "a.loan", function() {
-	var object_ids = $(this).attr("id")
-	var search = $("input#search").val();
-	var loaner = $(this).attr("href").replace("#","");
-
-	$.post("/tool_action/", "object_ids="+object_ids+
-	       "&action=loan&loaner_id="+loaner, function(data) {
-		   $("div#content").load("/tool_list/", "search="+search);
-		   set_message(data.response);
-	       });
-
-	// Close the popup
-	$('#mask').fadeOut('fast', function() {
-	    $('#mask').remove();
-	}); 
-	$('div.popup').fadeOut('slow'); 
-
-	return false;
-    });	
 
     // Handle edits
     $(document).on("click", "a.edit", function() {
