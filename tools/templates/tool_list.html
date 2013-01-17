@@ -29,6 +29,16 @@
 	Seneste service
       </a>
     </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ buy_date_sorting }}buy_date">
+	Indkøbsdato
+      </a>
+    </th>
+    <th>
+      <a class="set_sorting" href="#" id="{{ end_date_sorting }}end_date">
+	Ophørsdato
+      </a>
+    </th>
     <th>Placering</th>
     {% if user.is_admin %}
     <th>
@@ -57,7 +67,9 @@
     </td>
     <td>{{ tool.model.name }}</td>
     <td>{{ tool.model.category.name }}</td>
-    <td id="last_service">{{ tool.last_service }}</td>
+    <td id="last_service">{{ tool.last_service|date:"DATE_FORMAT" }}</td>
+    <td>{{ tool.buy_date|date:"DATE_FORMAT" }}</td>
+    <td>{{ tool.end_date|date:"DATE_FORMAT" }}</td>
     <td>{{ tool.get_location }}</td>
     {% if user.is_admin %}
     <td>{{ tool.price }} kr.</td>

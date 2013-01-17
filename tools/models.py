@@ -161,6 +161,11 @@ class Tool(models.Model):
     secondary_name = models.CharField('Sekundært navn', max_length=200, 
                                       null=True, blank=True)
 
+    buy_date = models.DateTimeField('Købsdato', 
+                                    default=datetime.datetime.now())
+    end_date = models.DateTimeField('Ophørsdato',
+                                    null=True, blank=True)
+
     def get_location(self):
         if self.location == 'Udlånt':
             if self.employee and self.construction_site:
@@ -187,6 +192,7 @@ class Tool(models.Model):
             event = Event(event_type='Kasseret', tool=self)
             event.save()
             self.location = 'Kasseret'
+            self.end_date = datetime.datetime.now()
             self.save()
             return True
         else:
@@ -197,6 +203,7 @@ class Tool(models.Model):
             event = Event(event_type='Bortkommet', tool=self)
             event.save()
             self.location = 'Bortkommet'
+            self.end_date = datetime.datetime.now()
             self.save()
             return True
         else:

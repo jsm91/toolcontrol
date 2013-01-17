@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django import forms
 from django.shortcuts import get_object_or_404
 
@@ -115,6 +117,7 @@ class ToolForm(NewModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ToolForm, self).__init__(*args, **kwargs)
+        self.fields['buy_date'].initial = datetime.datetime.now()
         try:
             self.fields['model'].initial = ToolModel.objects.all()[0]
         except:
@@ -125,7 +128,7 @@ class ToolForm(NewModelForm):
         self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøjet ikke skal serviceres'
     class Meta:
         model = Tool
-        exclude = ['location','loaned_to']
+        exclude = ['location','loaned_to','end_date']
 
 class EmployeeForm(NewModelForm):
     class Meta:
@@ -198,8 +201,11 @@ class CreateManyToolsForm(NewForm):
     secondary_name = forms.CharField(label = "Sekundært navn", 
                                      required = False)
 
+    buy_date = forms.DateTimeField(label = "Indkøbsdato")
+
     def __init__(self, *args, **kwargs):
         super(CreateManyToolsForm, self).__init__(*args, **kwargs)
+        self.fields['buy_date'].initial = datetime.datetime.now()
         try:
             self.fields['model'].initial = ToolModel.objects.all()[0]
         except:
@@ -225,7 +231,8 @@ class CreateManyToolsForm(NewForm):
                         service_interval = service_interval,
                         model = self.cleaned_data['model'],
                         invoice_number = self.cleaned_data['invoice_number'],
-                        secondary_name = self.cleaned_data['secondary_name'])
+                        secondary_name = self.cleaned_data['secondary_name'],
+                        buy_date = self.cleaned_data['buy_date'])
             tool.save()
             event = Event(event_type = "Oprettelse", tool = tool)
             event.save()

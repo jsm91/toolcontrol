@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-import logging
+import datetime, logging
 logger = logging.getLogger(__name__)
 
 from django.contrib.auth import login, logout, get_user_model
@@ -95,6 +95,20 @@ def stats(request):
         scrapped_tools_ratio = 0
         lost_tools_ratio = 0
 
+    alive_tools = Tool.objects.filter(end_date__isnull=True)
+    timedeltas = [datetime.datetime.now() - tool.buy_date for tool in alive_tools]
+    try:
+        average_age = (sum(timedeltas, datetime.timedelta(0)) / alive_tools.count()).days
+    except ZeroDivisionError:
+        average_age = 0
+
+    dead_tools = Tool.objects.filter(end_date__isnull=False)
+    timedeltas = [tool.end_date - tool.buy_date for tool in dead_tools]
+    try:
+        average_life = (sum(timedeltas, datetime.timedelta(0)) / dead_tools.count()).days
+    except ZeroDivisionError:
+        average_life = 0
+
     context_dictionary = {
         'tool_count': Tool.objects.all().count(),
         'model_count': ToolModel.objects.all().count(),
@@ -106,6 +120,8 @@ def stats(request):
         'scrapped_tool_count': scrapped_tool_count,
         'scrapped_tools_ratio': scrapped_tools_ratio,
         'lost_tools_ratio': lost_tools_ratio,
+        'average_age': average_age,
+        'average_life': average_life,
         }
 
     return render(request, 'stats.html', context_dictionary)
@@ -1131,6 +1147,9 @@ def event_delete(request):
     logger.warning('Event deleted (type: %s)' % event.event_type)
     if event_type == 'Service':
         tool.update_last_service()
+    elif event_type == 'Bortkommet' or event_type == 'Kasseret':
+        tool.end_date = None
+        tool.save()
 
     response = {'response': 'Begivenheden blev slettet'}
 
