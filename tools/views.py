@@ -1019,6 +1019,33 @@ def employee_action(request):
                         mimetype="application/json")
 
 @login_required
+def delete(request, class_to_delete):
+    object_id = request.POST.get('id')
+    logger.warning('%s is trying to delete %s with id %s' % (request.user,
+                                                             class_to_delete.__name__,
+                                                             object_id))
+
+    if not request.user.is_admin():
+        logger.error('%s does not have rights to delete' % (class_to_delete.__name__, 
+                                                            object_id))
+        raise Http404
+
+    try:
+        object_to_delete = get_object_or_404(class_to_delete, id = object_id)
+    except Http404:
+        logger.error('%s with id %s not found' % (class_to_delete.__name__, object_id))
+        raise Http404
+    
+    name = object_to_delete.name
+    object_to_delete.delete()
+    logger.warning('%s with id %s deleted' % (class_to_delete.__name__, object_id))
+
+    response = {'response': name + ' slettet'}
+
+    return HttpResponse(simplejson.dumps(response), 
+                        mimetype="application/json")
+
+@login_required
 def tool_delete(request):
     tool_id = request.POST.get('id')
     logger.warning('%s is trying to delete tool with id %s' % (request.user,
@@ -1034,8 +1061,6 @@ def tool_delete(request):
 
     response = {'response': tool_name+' slettet'}
 
-    return HttpResponse(simplejson.dumps(response), 
-                        mimetype="application/json")
 
 @login_required
 def model_delete(request):

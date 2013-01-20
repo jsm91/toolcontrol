@@ -1,5 +1,8 @@
 from django.conf.urls import patterns, include, url
 
+from tools.models import ConstructionSite, Employee, Tool, ToolCategory
+from tools.models import ToolModel
+
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -51,12 +54,16 @@ urlpatterns = patterns('tools.views',
         name='building_site_action'),
 
     # AJAX requests for deletes
-    url(r'^tool_delete/$', 'tool_delete', name='tool_delete'),
-    url(r'^model_delete/$', 'model_delete', name='model_delete'),
-    url(r'^category_delete/$', 'category_delete', name='category_delete'),
-    url(r'^employee_delete/$', 'employee_delete', name='employee_delete'),
-    url(r'^building_site_delete/$', 'construction_site_delete', 
-        name='building_site_delete'),
+    url(r'^tool_delete/$', 'delete', 
+        {'class_to_delete': Tool}, name='tool_delete'),
+    url(r'^model_delete/$', 'delete', 
+        {'class_to_delete': ToolModel}, name='model_delete'),
+    url(r'^category_delete/$', 'delete', 
+        {'class_to_delete': ToolCategory}, name='category_delete'),
+    url(r'^employee_delete/$', 'delete', 
+        {'class_to_delete': Employee}, name='employee_delete'),
+    url(r'^building_site_delete/$', 'delete', 
+        {'class_to_delete': ConstructionSite}, name='building_site_delete'),
     url(r'^event_delete/$', 'event_delete', name='event_delete'),
 
     # Forgot password
