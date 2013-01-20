@@ -10,46 +10,88 @@
   <tr>
     <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
-      <a class="set_sorting" href="#" id="{{ name_sorting }}name">
-	Navn
-      </a>
+      {% if ordering == "-name" %}
+        <a class="set_ordering" href="#" id="name">
+	  Navn
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-name">
+	  Navn
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ model__name_sorting }}model__name">
-	Model
-      </a>
+      {% if ordering == "-model__name" %}
+        <a class="set_ordering" href="#" id="model__name">
+	  Model
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-model__name">
+	  Model
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ model__category__name_sorting }}model__category__name">
-	Kategori
-      </a>
+      {% if ordering == "-model__category__name" %}
+        <a class="set_ordering" href="#" id="model__category__name">
+	  Kategori
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-model__category__name">
+	  Kategori
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ last_service_sorting }}last_service">
-	Seneste service
-      </a>
+      {% if ordering == "-last_service" %}
+        <a class="set_ordering" href="#" id="last_service">
+	  Seneste service
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-last_service">
+	  Seneste service
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ buy_date_sorting }}buy_date">
-	Indkøbsdato
-      </a>
+      {% if ordering == "-buy_date" %}
+        <a class="set_ordering" href="#" id="buy_date">
+	  Indkøbsdato
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-buy_date">
+	  Indkøbsdato
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ end_date_sorting }}end_date">
-	Ophørsdato
-      </a>
+      {% if ordering == "-end_date" %}
+        <a class="set_ordering" href="#" id="end_date">
+	  Ophørsdato
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-end_date">
+	  Ophørsdato
+	</a>
+      {% endif %}
     </th>
     <th>Placering</th>
     {% if user.is_admin %}
-    <th>
-      <a class="set_sorting" href="#" id="{{ price_sorting }}price">
-	Pris
-      </a>
-    </th>
-	{% endif %}
+      <th>
+	{% if ordering == "-price" %}
+          <a class="set_ordering" href="#" id="price">
+	    Pris
+	  </a>
+	{% else %}
+          <a class="set_ordering" href="#" id="-price">
+	    Pris
+	  </a>
+        {% endif %}
+      </th>
+    {% endif %}
     <th class="functions">Funktioner</th>
   </tr>
-  {% for tool in tools %}
+  {% for tool in object_list %}
     {% if tool|check_for_service %}
       <tr class="object_line service_needed {% cycle 'row1' 'row2' %}" id="{{ tool.id }}">
     {% else %}
@@ -89,7 +131,7 @@
     </td>
   </tr>
   <tr class="history" id="{{ tool.id }}">
-    <td colspan="8">
+    <td colspan="10">
       <div>
 	Historie ikke hentet korrekt
       </div>

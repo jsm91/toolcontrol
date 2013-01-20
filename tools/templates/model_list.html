@@ -9,24 +9,48 @@
   <tr>
     <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
-      <a class="set_sorting" href="#" id="{{ name_sorting }}name">
-	Navn
-      </a>
+      {% if ordering == "-name" %}
+        <a class="set_ordering" href="#" id="name">
+	  Navn
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-name">
+	  Navn
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ category__name_sorting }}category__name">
-	Kategori
-      </a>
+      {% if ordering == "-category__name" %}
+        <a class="set_ordering" href="#" id="category__name">
+	  Kategori
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-category__name">
+	  Kategori
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ service_interval_sorting }}service_interval">
-	Serviceinterval
-      </a>
+      {% if ordering == "-service_interval" %}
+        <a class="set_ordering" href="#" id="service_interval">
+	  Serviceinterval
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-service_interval">
+	  Serviceinterval
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ price_sorting }}price">
-	Pris
-      </a>
+      {% if ordering == "-price" %}
+        <a class="set_ordering" href="#" id="price">
+	  Pris
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-price">
+	  Pris
+	</a>
+      {% endif %}
     </th>
     <th>
       Samlet pris
@@ -36,7 +60,7 @@
     </th>
     <th class="functions">Funktioner</th>
   </tr>
-  {% for model in models %}
+  {% for model in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ model.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
 	       name="{{ model.id }}"></td>

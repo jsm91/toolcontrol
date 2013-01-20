@@ -9,9 +9,15 @@
   <tr>
     <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
-      <a class="set_sorting" href="#" id="{{ name_sorting }}name">
-	Navn
-      </a>
+      {% if ordering == "-name" %}
+        <a class="set_ordering" href="#" id="name">
+	  Navn
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-name">
+	  Navn
+	</a>
+      {% endif %}
     </th>
     <th>
       Antal modeller
@@ -24,7 +30,7 @@
     </th>
     <th class="functions">Funktioner</th>
   </tr>
-  {% for category in categories %}
+  {% for category in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ category.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
 	       name="{{ category.id }}"></td>

@@ -9,18 +9,30 @@
   <tr>
     <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
-      <a class="set_sorting" href="#" id="{{ name_sorting }}name">
-	Adresse
-      </a>
+      {% if ordering == "-name" %}
+        <a class="set_ordering" href="#" id="name">
+	  Adresse
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-name">
+	  Adresse
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ is_active_sorting }}is_active">
-	Aktiv
-      </a>
+      {% if ordering == "-is_active" %}
+        <a class="set_ordering" href="#" id="is_active">
+	  Aktiv
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-is_active">
+	  Aktiv
+	</a>
+      {% endif %}
     </th>
     <th class="functions">Funktioner</th>
   </tr>
-  {% for building_site in building_sites %}
+  {% for building_site in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ building_site.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
 	       name="{{ building_site.id }}"></td>

@@ -6,7 +6,7 @@
     {% endif %}
     <th>Placering</th>
   </tr>
-  {% for tool in tools %}
+  {% for tool in object_list %}
   <tr>
     <td>{{ tool.name }}</td>
     {% if show_model %}

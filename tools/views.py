@@ -13,6 +13,7 @@ from django.db.models import Avg, Sum, Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils import simplejson
+from django.views.generic import ListView
 
 from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
 from tools.forms import ForgotPasswordForm, LoanForm, SettingsForm
@@ -144,170 +145,149 @@ def index(request):
                'add_many_form': add_many_form}
     return render(request, 'index.html', context)
 
-@login_required
-def tool_list(request):
-    search = request.GET.get('search', '')
-    sorting = request.GET.get('sorting', 'name')
+class ToolListView(ListView):
+    template_name = 'tool_list.html'
 
-    if search:
-        tools = Tool.objects.filter(Q(name__icontains=search) |
-                                    Q(model__name__icontains=search) |
-                                    Q(model__category__name__icontains=search) |
-                                    Q(employee__name__icontains=search) | 
-                                    Q(construction_site__name__icontains=search) | 
-                                    Q(location__iexact=search) |
-                                    Q(secondary_name__icontains=search) |
-                                    Q(invoice_number__icontains=search)).select_related('loaned_to').order_by(sorting)
-    else:
-        tools = Tool.objects.all().select_related('loaned_to', 'model__category').order_by(sorting)
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        ordering = self.request.GET.get('ordering', 'name')
 
-    context = {'tools': tools,
-               'search': search}
+        return Tool.objects.filter(Q(name__icontains=search) |
+                                   Q(model__name__icontains=search) |
+                                   Q(model__category__name__icontains=search) |
+                                   Q(employee__name__icontains=search) | 
+                                   Q(construction_site__name__icontains=search) | 
+                                   Q(location__iexact=search) |
+                                   Q(secondary_name__icontains=search) |
+                                   Q(invoice_number__icontains=search)).select_related('loaned_to').order_by(ordering)
 
-    if sorting[0] != '-':
-        context[sorting + '_sorting'] = '-'
+    def get_context_data(self, **kwargs):
+        context = super(ToolListView, self).get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search')
+        context['ordering'] = self.request.GET.get('ordering')
+        return context
 
-    return render(request, 'tool_list.html', context)
+class ModelListView(ListView):
+    template_name = 'model_list.html'
 
-@login_required
-def model_list(request):
-    if not request.user.is_tool_admin and not request.user.is_office_admin:
-        return HttpResponse('Du kan ikke se denne side')
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        ordering = self.request.GET.get('ordering', 'name')
 
-    search = request.GET.get('search', '')
-    sorting = request.GET.get('sorting', 'name')
+        return ToolModel.objects.filter(Q(name__icontains=search) |
+                                        Q(category__name__icontains=search)).order_by(ordering)
 
-    if search:
-        models = ToolModel.objects.filter(Q(name__icontains=search) |
-                                          Q(category__name__icontains=search)).order_by(sorting)
-    else:
-        models = ToolModel.objects.all().order_by(sorting)
+    def get_context_data(self, **kwargs):
+        context = super(ModelListView, self).get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search')
+        context['ordering'] = self.request.GET.get('ordering')
+        return context
 
-    context = {'models': models,
-               'search': search}
+class CategoryListView(ListView):
+    template_name = 'category_list.html'
 
-    # Reverse the sorting link
-    if sorting[0] != '-':
-        context[sorting + '_sorting'] = '-'
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        ordering = self.request.GET.get('ordering', 'name')
 
-    return render(request, 'model_list.html', context)
+        return ToolCategory.objects.filter(name__icontains=search).order_by(ordering)
 
-@login_required
-def category_list(request):
-    if not request.user.is_tool_admin and not request.user.is_office_admin:
-        return HttpResponse('Du kan ikke se denne side')
+    def get_context_data(self, **kwargs):
+        context = super(CategoryListView, self).get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search')
+        context['ordering'] = self.request.GET.get('ordering')
+        return context
 
-    search = request.GET.get('search', '')
-    sorting = request.GET.get('sorting', 'name')
+class EmployeeListView(ListView):
+    template_name = 'employee_list.html'
 
-    if search:
-        categories = ToolCategory.objects.filter(name__icontains=search).order_by(sorting)
-    else:
-        categories = ToolCategory.objects.all().order_by(sorting)
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        ordering = self.request.GET.get('ordering', 'name')
 
-    context = {'categories': categories,
-               'search': search}
-
-    if sorting[0] != '-':
-        context[sorting + '_sorting'] = '-'
-
-    return render(request, 'category_list.html', context)
-
-@login_required
-def employee_list(request):
-    if not request.user.is_office_admin:
-        return HttpResponse('Du kan ikke se denne side')
-
-    search = request.GET.get('search', '')
-    sorting = request.GET.get('sorting', 'name')
-
-    if search:
         if search == 'aktiv' or search == 'inaktive':
-            employees = Employee.objects.filter(is_active=True).order_by(sorting)
+            return Employee.objects.filter(is_active=True).order_by(sorting)
         elif search == 'inaktiv' or search == 'inaktive':
-            employees = Employee.objects.filter(is_active=False).order_by(sorting)
+            return Employee.objects.filter(is_active=False).order_by(sorting)
         else:
-            employees = Employee.objects.filter(Q(name__icontains=search) |
-                                              Q(phone_number__icontains=search) |
-                                              Q(email__icontains=search)).order_by(sorting)
-    else:
-        employees = Employee.objects.all().order_by(sorting)
-        
-    context = {'employees': employees,
-               'search': search}
+            return Employee.objects.filter(Q(name__icontains=search) |
+                                           Q(phone_number__icontains=search) |
+                                           Q(email__icontains=search)).order_by(ordering)
 
-    if sorting[0] != '-':
-        context[sorting + '_sorting'] = '-'
+    def get_context_data(self, **kwargs):
+        context = super(EmployeeListView, self).get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search')
+        context['ordering'] = self.request.GET.get('ordering')
+        return context
 
-    return render(request, 'employee_list.html', context)
+class ConstructionSiteListView(ListView):
+    template_name = 'building_site_list.html'
 
-@login_required
-def building_site_list(request):
-    if not request.user.is_office_admin:
-        return HttpResponse('Du kan ikke se denne side')
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        ordering = self.request.GET.get('ordering', 'name')
 
-    search = request.GET.get('search', '')
-    sorting = request.GET.get('sorting', 'name')
-
-    if search:
-        if search == "aktiv" or search == "aktive":
-            building_sites = ConstructionSite.objects.filter(is_active=True).order_by(sorting)
-        elif search == "inaktiv" or search == "inaktive":
-            building_sites = ConstructionSite.objects.filter(is_active=False).order_by(sorting)
+        if search == 'aktiv' or search == 'aktive':
+            return ConstructionSite.objects.filter(is_active=True).order_by(sorting)
+        elif search == 'inaktiv' or search == 'inaktive':
+            return ConstructionSite.objects.filter(is_active=False).order_by(sorting)
         else:
-            building_sites = ConstructionSite.objects.filter(name__icontains=search).order_by(sorting)
+            return ConstructionSite.objects.filter(name__icontains=search).order_by(ordering)
 
-    else:
-        building_sites = ConstructionSite.objects.all().order_by(sorting)
+    def get_context_data(self, **kwargs):
+        context = super(ConstructionSiteListView, self).get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search')
+        context['ordering'] = self.request.GET.get('ordering')
+        return context
 
-    context = {'building_sites': building_sites,
-               'search': search}
-
-    if sorting[0] != '-':
-        context[sorting + '_sorting'] = '-'
-
-    return render(request, 'building_site_list.html', context)
-
-@login_required
-def event_list(request):
-    tool_id = request.GET.get('tool_id')
-    tool = get_object_or_404(Tool, id = tool_id)
-
-    context = {'events': Event.objects.filter(tool=tool).order_by('start_date')}
-
-    return render(request, 'event_list.html', context)
-
-@login_required
-def loan_list(request):
-    loaner_id = request.GET.get('loaner_id')
-    object_type = request.GET.get('object_type')
-    print object_type
+class EventListView(ListView):
+    template_name = 'event_list.html'
     
-    if object_type == 'employee':
-        employee = get_object_or_404(Employee, id = loaner_id)
-        context = {'loans': Event.objects.filter(employee=employee).order_by('-start_date')}
-    elif object_type == 'building_site':
-        construction_site = get_object_or_404(ConstructionSite, id = loaner_id)
-        context = {'loans': Event.objects.filter(construction_site=construction_site).order_by('-start_date')}
+    def get_queryset(self):
+        tool_id = self.request.GET.get('tool_id')
+        tool = get_object_or_404(Tool, id = tool_id)
 
-    return render(request, 'loan_list.html', context)
+        return Event.objects.filter(tool=tool).order_by('start_date')
 
-@login_required
-def simple_tool_list(request):
-    show_model = request.GET.get('show_model')
+class LoanListView(ListView):
+    template_name = 'loan_list.html'
 
-    if show_model == 'true':
-        category_id = request.GET.get('category_id')
-        category = get_object_or_404(ToolCategory, id = category_id)
-        context = {'tools': Tool.objects.filter(model__category=category).order_by('name'),
-                   'show_model': True}
-    else:
-        model_id = request.GET.get('model_id')
-        model = get_object_or_404(ToolModel, id = model_id)
-        context = {'tools': Tool.objects.filter(model=model).order_by('name'),
-                   'show_model': False}
+    def get_queryset(self):
+        loaner_id = self.request.GET.get('loaner_id')
+        object_type = self.request.GET.get('object_type')
+    
+        if object_type == 'employee':
+            employee = get_object_or_404(Employee, id = loaner_id)
+            return Event.objects.filter(employee=employee).order_by('-start_date')
+        elif object_type == 'building_site':
+            construction_site = get_object_or_404(ConstructionSite, id = loaner_id)
+            return Event.objects.filter(construction_site=construction_site).order_by('-start_date')
+
+class SimpleToolListView(ListView):
+    template_name = 'simple_tool_list.html'
+
+    def get_queryset(self):
+        show_model = self.request.GET.get('show_model')
         
-    return render(request, 'simple_tool_list.html', context)
+        if show_model == 'true':
+            category_id = self.request.GET.get('category_id')
+            category = get_object_or_404(ToolCategory, id = category_id)
+            return Tool.objects.filter(model__category=category).order_by('name')
+        else:
+            model_id = self.request.GET.get('model_id')
+            model = get_object_or_404(ToolModel, id = model_id)
+            return Tool.objects.filter(model=model).order_by('name')
+
+    def get_context_data(self, **kwargs):
+        context = super(SimpleToolListView, self).get_context_data(**kwargs)
+
+        show_model = self.request.GET.get('show_model')
+
+        if show_model == 'true':
+            context['show_model'] = True
+        else:
+            context['show_model'] = False
+        return context
 
 @login_required
 def tool_banner(request):

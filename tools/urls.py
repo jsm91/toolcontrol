@@ -3,6 +3,10 @@ from django.conf.urls import patterns, include, url
 from tools.models import ConstructionSite, Employee, Tool, ToolCategory
 from tools.models import ToolModel
 
+from tools.views import CategoryListView, ConstructionSiteListView 
+from tools.views import EventListView, EmployeeListView, LoanListView
+from tools.views import ModelListView, SimpleToolListView, ToolListView
+
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -18,15 +22,16 @@ urlpatterns = patterns('tools.views',
     url(r'^model_object/$', 'model_object', name='model_object'),
 
     # AJAX requests for lists
-    url(r'^tool_list/$', 'tool_list', name='tool_list'),
-    url(r'^model_list/$', 'model_list', name='model_list'),
-    url(r'^category_list/$', 'category_list', name='category_list'),
-    url(r'^employee_list/$', 'employee_list', name='employee_list'),
-    url(r'^building_site_list/$', 'building_site_list', 
+    url(r'^tool_list/$', ToolListView.as_view(), name='tool_list'),
+    url(r'^model_list/$', ModelListView.as_view(), name='model_list'),
+    url(r'^category_list/$', CategoryListView.as_view(), name='category_list'),
+    url(r'^employee_list/$', EmployeeListView.as_view(), name='employee_list'),
+    url(r'^building_site_list/$', ConstructionSiteListView.as_view(),
         name='building_site_list'),
-    url(r'^event_list/$', 'event_list', name='event_list'),
-    url(r'^loan_list/$', 'loan_list', name='loan_list'),
-    url(r'^simple_tool_list/$', 'simple_tool_list', name='simple_tool_list'),
+    url(r'^event_list/$', EventListView.as_view(), name='event_list'),
+    url(r'^loan_list/$', LoanListView.as_view(), name='loan_list'),
+    url(r'^simple_tool_list/$', SimpleToolListView.as_view(), 
+        name='simple_tool_list'),
 
     # AJAX requests for banners
     url(r'^tool_banner/$', 'tool_banner', name='tool_banner'),

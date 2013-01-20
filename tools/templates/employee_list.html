@@ -9,44 +9,85 @@
   <tr>
     <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
     <th>
-      <a class="set_sorting" href="#" id="{{ name_sorting }}name">
-	Navn
-      </a>
+      {% if ordering == "-name" %}
+        <a class="set_ordering" href="#" id="name">
+	  Navn
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-name">
+	  Navn
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ email_sorting }}email">
-	Email
-      </a>
+      {% if ordering == "-email" %}
+        <a class="set_ordering" href="#" id="email">
+	  Email
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-email">
+	  Email
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ phone_number_sorting }}phone_number">
-	Telefonnummer
-      </a>
+      {% if ordering == "-phone_number" %}
+        <a class="set_ordering" href="#" id="phone_number">
+	  Telefonnummer
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-phone_number">
+	  Telefonnummer
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ is_active_sorting }}is_active"
-	 title="Aktivitet">
-	A
-      </a>
+      {% if ordering == "-is_active" %}
+        <a class="set_ordering" href="#" id="is_active">
+	  A
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-is_active">
+	  A
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ is_office_admin_sorting }}is_office_admin" title="Kontoradmin">
-	KA
-      </a>
+      {% if ordering == "-is_office_admin" %}
+        <a class="set_ordering" href="#" id="is_office_admin">
+	  KA
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-is_office_admin">
+	  KA
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ is_tool_admin_sorting }}is_tool_admin" ttle="Værktøjsadmin">
-	VA
-      </a>
+      {% if ordering == "-is_tool_admin" %}
+        <a class="set_ordering" href="#" id="is_tool_admin">
+	  VA
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-is_tool_admin">
+	  VA
+	</a>
+      {% endif %}
     </th>
     <th>
-      <a class="set_sorting" href="#" id="{{ is_loan_flagged_sorting }}is_loan_flagged" title="Låneflag">
-	LF
-      </a>
+      {% if ordering == "-is_loan_flagged" %}
+        <a class="set_ordering" href="#" id="is_loan_flagged">
+	  LF
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-is_loan_flagged">
+	  LF
+	</a>
+      {% endif %}
     </th>
     <th class="functions">Funktioner</th>
   </tr>
-  {% for employee in employees %}
+  {% for employee in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ employee.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
 	       name="{{ employee.id }}"></td>

@@ -318,6 +318,28 @@ $(document).ready(function() {
 	return false;
     });
 
+    // Click order link
+    $(document).on("click", "a.set_ordering", function() {
+	$('body').append('<div id="mask"></div>');
+	$('body').append('<img id="loader" src="/static/ajax-loader.gif">');
+	$('#mask').fadeIn('fast');
+
+	var object_type = $("table#index_navigation td.selected").attr("id");
+	var search = $("input#search").val();
+	var ordering = $(this).attr("id");
+
+	$("div#content").load("/"+object_type+"_list/",
+			      "search="+search+"&ordering="+ordering,
+			      function() {
+				  $("#loader").remove();
+				  $('#mask').fadeOut('fast', function() {
+				      $('#mask').remove();
+				  });
+			      });
+
+	return false;
+    });
+
     // Handle edits
     $(document).on("click", "a.edit", function() {
 	var object_type = $(this).attr("id");
