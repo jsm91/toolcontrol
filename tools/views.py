@@ -14,6 +14,7 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils import simplejson
 from django.views.generic import ListView
+from django.views.generic.edit import FormView
 
 from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
 from tools.forms import ForgotPasswordForm, LoanForm, SettingsForm
@@ -127,23 +128,19 @@ def stats(request):
 
     return render(request, 'stats.html', context_dictionary)
 
-@login_required
-def index(request):
-    if request.POST:
-        logger.info('%s is creating many tools' % request.user)
-        add_many_form = CreateManyToolsForm(request.POST)
-        if add_many_form.is_valid():
-            add_many_form.save()
-            logger.info('Many tools created successfully')
-            add_many_form = CreateManyToolsForm()
-        else:
-            logger.info('Many tools not created')
-    else:
-        add_many_form = CreateManyToolsForm()
+class IndexView(FormView):
+    template_name = 'index.html'
+    form_class = CreateManyToolsForm
+    success_url = '/'
 
-    context = {'employees': Employee.objects.filter(is_active=True).order_by('name'),
-               'add_many_form': add_many_form}
-    return render(request, 'index.html', context)
+    def form_valid(self, form):
+        form.save()
+        logger.info('Many tools created successfully')
+        return super(IndexView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        logger.info('Many tools not created (%s)', form.errors)
+        return super(IndexView, self).form_invalid(form)
 
 class ToolListView(ListView):
     template_name = 'tool_list.html'
@@ -287,6 +284,7 @@ class SimpleToolListView(ListView):
             context['show_model'] = True
         else:
             context['show_model'] = False
+
         return context
 
 @login_required
@@ -296,7 +294,7 @@ def tool_banner(request):
 
 @login_required
 def model_banner(request):
-    if not request.user.is_tool_admin and not request.user.is_office_admin:
+    if not request.user.is_admin():
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
@@ -304,7 +302,7 @@ def model_banner(request):
 
 @login_required
 def category_banner(request):
-    if not request.user.is_tool_admin and not request.user.is_office_admin:
+    if not request.user.is_admin():
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}

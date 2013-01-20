@@ -13,7 +13,7 @@ class NewForm(forms.Form):
     def as_new_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
         return self._html_output(
-            normal_row = '<tr%(html_class_attr)s><th>%(label)s %(help_text)s</th><td>%(errors)s%(field)s</td></tr>',
+            normal_row = '<tr%(html_class_attr)s><th>%(label)s %(help_text)s</th><td>%(errors)s %(field)s</td></tr>',
             error_row = '<tr><td colspan="2">%s</td></tr>',
             row_ender = '</td></tr>',
             help_text_html = '<img src="/static/Icon_Info.svg" title="%s">',
@@ -23,7 +23,7 @@ class NewModelForm(forms.ModelForm):
     def as_new_table(self):
         "Returns this form rendered as HTML <tr>s -- excluding the <table></table>."
         return self._html_output(
-            normal_row = '<tr%(html_class_attr)s><th>%(label)s %(help_text)s</th><td>%(errors)s%(field)s</td></tr>',
+            normal_row = '<tr%(html_class_attr)s><th>%(label)s %(help_text)s %(errors)s</th><td>%(field)s</td></tr>',
             error_row = '<tr><td colspan="2">%s</td></tr>',
             row_ender = '</td></tr>',
             help_text_html = '<img src="/static/Icon_Info.svg" title="%s">',
@@ -204,6 +204,7 @@ class CreateManyToolsForm(NewForm):
     buy_date = forms.DateTimeField(label = "Indkøbsdato")
 
     def __init__(self, *args, **kwargs):
+        print "Now in init"
         super(CreateManyToolsForm, self).__init__(*args, **kwargs)
         self.fields['buy_date'].initial = datetime.datetime.now()
         try:
@@ -215,6 +216,7 @@ class CreateManyToolsForm(NewForm):
             self.fields['service_interval'].initial = self.fields['model'].initial.service_interval
 
     def save(self, force_insert=False, force_update=False, commit=True):
+        print "Now in save"
         zeros = len(self.cleaned_data['start_index']) - 1
         if not self.cleaned_data['price']:
             price = self.cleaned_data['model'].price
@@ -234,6 +236,7 @@ class CreateManyToolsForm(NewForm):
                         secondary_name = self.cleaned_data['secondary_name'],
                         buy_date = self.cleaned_data['buy_date'])
             tool.save()
+            print 'Saving %s' % tool.name
             event = Event(event_type = "Oprettelse", tool = tool)
             event.save()
 
@@ -247,6 +250,7 @@ class CreateManyToolsForm(NewForm):
         return out
 
     def clean_start_index(self):
+        print "Now in clean_start_index"
         data = self.cleaned_data['start_index']
         try:
             int(data)
@@ -255,6 +259,7 @@ class CreateManyToolsForm(NewForm):
         return data
 
     def clean(self):
+        print "Now in clean"
         cleaned_data = super(CreateManyToolsForm, self).clean()
         start_index = cleaned_data.get("start_index")
         end_index = cleaned_data.get("end_index")

@@ -1,100 +1,100 @@
 {% extends "base.html" %}
 
 {% block sidebar %}
-<table id="index_navigation">
-  <tr><td id="tool" class="selected">Værktøj</td></tr>
-  {% if user.is_admin %}
-    <tr><td id="model">Modeller</td></tr>
-    <tr><td id="category">Kategorier</td></tr>
-  {% endif %}
-  {% if user.is_office_admin %}
-    <tr><td id="employee">Medarbejdere</td></tr>
-    <tr><td id="building_site">Byggepladser</td></tr>
-  {% endif %}
-</table>
+  <table id="index_navigation">
+    <tr><td id="tool" class="selected">Værktøj</td></tr>
+    {% if user.is_admin %}
+      <tr><td id="model">Modeller</td></tr>
+      <tr><td id="category">Kategorier</td></tr>
+    {% endif %}
+    {% if user.is_office_admin %}
+      <tr><td id="employee">Medarbejdere</td></tr>
+      <tr><td id="building_site">Byggepladser</td></tr>
+    {% endif %}
+  </table>
 {% endblock %}
 
 {% block content %}
-<div id="banner">
-  <div id="banner_left">Banner hentes...</div>
-  <div id="banner_right">
-    {% if user.is_admin %}
-      <a href="#" class="print">
-	<img src="{{ STATIC_URL }}Icon_Print.svg">
-      </a>
-      <a href="#" id="add" class="popup">
-	<img src="{{ STATIC_URL }}Icon_Plus.svg">
-      </a>
-    {% endif %}
-    <input type="text" id="search" placeholder="Søg">
+  <div id="banner">
+    <div id="banner_left">Banner hentes...</div>
+    <div id="banner_right">
+      {% if user.is_admin %}
+	<a href="#" class="print">
+	  <img src="{{ STATIC_URL }}Icon_Print.svg">
+	</a>
+	<a href="#" id="add" class="popup">
+	  <img src="{{ STATIC_URL }}Icon_Plus.svg">
+	</a>
+      {% endif %}
+      <input type="text" id="search" placeholder="Søg">
+    </div>
+    <div id="banner_clear"></div>
   </div>
-  <div id="banner_clear"></div>
-</div>
-<div id="content">Indhold hentes...</div>
+  <div id="content">Indhold hentes...</div>
 {% endblock %}
 
 {% block popups %}
-<div class="popup" id="add">
-  Der er ikke valgt noget indhold
-</div>
-
-<div class="popup" id="loan">
-  {% for loaner in loaners %}
-  <a href="#{{ loaner.id }}" class="loan">{{ loaner.name }}</a><br>
-  {% endfor %}
-</div>
-
-<div class="popup" id="delete">
-  <form method="POST" action="/object_delete/" id="delete">
-    <input type="hidden" id="id" name="id" value="0">		
-    {% csrf_token %}
-    <table>
-      <tr>
-	<td class="text">Er du sikker på, at du vil slette?</td>
-      </tr>
-      <tr>
-	<td class="bottom">
-	  <input type="submit" value="Slet">
-	</td>
-      </tr>
-    </table>
-  </form>
-</div>
-
-<div class="popup" id="add_many">
-  <form method="POST" action="/">
-    <table>
+  <div class="popup" id="add">
+    Der er ikke valgt noget indhold
+  </div>
+  
+  <div class="popup" id="loan">
+    {% for loaner in loaners %}
+      <a href="#{{ loaner.id }}" class="loan">{{ loaner.name }}</a><br>
+    {% endfor %}
+  </div>
+  
+  <div class="popup" id="delete">
+    <form method="POST" action="/object_delete/" id="delete">
+      <input type="hidden" id="id" name="id" value="0">		
       {% csrf_token %}
-      {{ add_many_form.as_new_table }}
-      <tr>
-    	<td class="bottom" colspan="2">
-	      <input type="submit" value="Gem">
-    	</td>
-      </tr>
-    </table>
-  </form>
-</div>
+      <table>
+	<tr>
+	  <td class="text">Er du sikker på, at du vil slette?</td>
+	</tr>
+	<tr>
+	  <td class="bottom">
+	    <input type="submit" value="Slet">
+	  </td>
+	</tr>
+      </table>
+    </form>
+  </div>
+  
+  <div class="popup" id="add_many">
+    <form method="POST" action="/">
+      <table>
+	{% csrf_token %}
+	{{ form.as_new_table }}
+	<tr>
+    	  <td class="bottom" colspan="2">
+	    <input type="submit" value="Gem">
+    	  </td>
+	</tr>
+      </table>
+    </form>
+  </div>
 {% endblock %}
 
 {% block menu %}
-<div class="menu_item" id="">
-  <img src="/static/Icon_Administration.svg" alt="Ikon for administration">
-  Administration
-</div>
-<div id="menu_hidden">
-  {% if user.is_admin %}
-  <div class="menu_item" id="stats">
-    <img src="/static/Icon_Stats.svg" alt="Ikon for statistik">
-    Statistik
+  <div class="menu_item" id="">
+    <img src="/static/Icon_Administration.svg" alt="Ikon for administration">
+    Administration
   </div>
-  {% endif %}
-  <div class="menu_item" id="settings">
-    <img src="/static/Icon_Settings.svg" alt="Ikon for indstillinger">
-    Indstillinger
+  <div id="menu_hidden">
+    {% if user.is_admin %}
+      <div class="menu_item" id="stats">
+	<img src="/static/Icon_Stats.svg" alt="Ikon for statistik">
+	Statistik
+      </div>
+    {% endif %}
+    <div class="menu_item" id="settings">
+      <img src="/static/Icon_Settings.svg" alt="Ikon for indstillinger">
+      Indstillinger
+    </div>
+    <div class="menu_item" id="logout">
+      <img src="/static/Icon_Logout.svg" alt="Ikon for log ud">
+      Log ud
+    </div>
   </div>
-  <div class="menu_item" id="logout">
-    <img src="/static/Icon_Logout.svg" alt="Ikon for log ud">
-    Log ud
-  </div>
-</div>
 {% endblock %}

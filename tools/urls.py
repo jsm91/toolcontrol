@@ -4,15 +4,16 @@ from tools.models import ConstructionSite, Employee, Tool, ToolCategory
 from tools.models import ToolModel
 
 from tools.views import CategoryListView, ConstructionSiteListView 
-from tools.views import EventListView, EmployeeListView, LoanListView
-from tools.views import ModelListView, SimpleToolListView, ToolListView
+from tools.views import EventListView, EmployeeListView, IndexView
+from tools.views import LoanListView, ModelListView, SimpleToolListView
+from tools.views import ToolListView
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
 urlpatterns = patterns('tools.views',
-    url(r'^$', 'index', name='index'),
+    url(r'^$', IndexView.as_view(), name='index'),
     url(r'^login/$', 'login_view', name='login'),
     url(r'^logout/$', 'logout_view', name='logout'),
     url(r'^stats/$', 'stats', name='stats'),
