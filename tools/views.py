@@ -15,8 +15,8 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import simplejson
 
 from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
-from tools.forms import ForgotPasswordForm, LoanForm, SettingsForm, ToolForm
-from tools.forms import ToolCategoryForm, ToolModelForm
+from tools.forms import ForgotPasswordForm, LoanForm, SettingsForm
+from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
 
 from tools.models import ConstructionSite, Event, Employee, Tool, ForgotPasswordToken
 from tools.models import ToolCategory, ToolModel
@@ -604,7 +604,6 @@ def building_site_form(request):
 @login_required
 def loan_form(request):
 	if request.POST:
-		print request.POST
 		logger.info('%s is loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
 		loan_form = LoanForm(request.POST)
 		if loan_form.is_valid():
@@ -613,7 +612,6 @@ def loan_form(request):
 			response = {'response': 'Værktøj udlånt'}
 		else:
 			logger.info('Tools not loaned')
-			print loan_form
 			response = {'response': 'Værktøj ikke udlånt'}
 			
 		return HttpResponse(simplejson.dumps(response), 
