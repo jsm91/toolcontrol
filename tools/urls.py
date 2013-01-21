@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-
+from django.contrib.auth.decorators import login_required
 from tools.models import ConstructionSite, Employee, Tool, ToolCategory
 from tools.models import ToolModel
 
@@ -13,7 +13,7 @@ from tools.views import ToolListView
 # admin.autodiscover()
 
 urlpatterns = patterns('tools.views',
-    url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^$', login_required(IndexView.as_view()), name='index'),
     url(r'^login/$', 'login_view', name='login'),
     url(r'^logout/$', 'logout_view', name='logout'),
     url(r'^stats/$', 'stats', name='stats'),
@@ -23,15 +23,22 @@ urlpatterns = patterns('tools.views',
     url(r'^model_object/$', 'model_object', name='model_object'),
 
     # AJAX requests for lists
-    url(r'^tool_list/$', ToolListView.as_view(), name='tool_list'),
-    url(r'^model_list/$', ModelListView.as_view(), name='model_list'),
-    url(r'^category_list/$', CategoryListView.as_view(), name='category_list'),
-    url(r'^employee_list/$', EmployeeListView.as_view(), name='employee_list'),
-    url(r'^building_site_list/$', ConstructionSiteListView.as_view(),
+    url(r'^tool_list/$', 
+        login_required(ToolListView.as_view()), name='tool_list'),
+    url(r'^model_list/$', 
+        login_required(ModelListView.as_view()), name='model_list'),
+    url(r'^category_list/$', 
+        login_required(CategoryListView.as_view()), name='category_list'),
+    url(r'^employee_list/$', 
+        login_required(EmployeeListView.as_view()), name='employee_list'),
+    url(r'^building_site_list/$', 
+        login_required(ConstructionSiteListView.as_view()), 
         name='building_site_list'),
-    url(r'^event_list/$', EventListView.as_view(), name='event_list'),
-    url(r'^loan_list/$', LoanListView.as_view(), name='loan_list'),
-    url(r'^simple_tool_list/$', SimpleToolListView.as_view(), 
+    url(r'^event_list/$', 
+        login_required(EventListView.as_view()), name='event_list'),
+    url(r'^loan_list/$', 
+        login_required(LoanListView.as_view()), name='loan_list'),
+    url(r'^simple_tool_list/$', login_required(SimpleToolListView.as_view()), 
         name='simple_tool_list'),
 
     # AJAX requests for banners
