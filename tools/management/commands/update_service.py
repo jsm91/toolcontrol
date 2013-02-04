@@ -42,5 +42,6 @@ class Command(BaseCommand):
             for tool in tools_to_service:
                 message += '%s\n' % tool.name
 
-            if tools_to_service:
+            if (tools_to_service and employee.name != 'Henrik' and 
+                employee.name != 'Jacob Møller'):
                 employee.send_sms(message)
