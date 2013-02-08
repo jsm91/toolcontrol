@@ -85,5 +85,6 @@ urlpatterns = patterns('tools.views',
 
     # QR codes
     url(r'^tools/(?P<pk>\d+)/qr$', 'qr_code', name='qr_code'),
+    url(r'^tools/(?P<pk>\d+)/qr_text$', 'qr_text', name='qr_text'),
     url(r'^tools/(?P<pk>\d+)/qr_action$', 'qr_action', name='qr_action'),
 )

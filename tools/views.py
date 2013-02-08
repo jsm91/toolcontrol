@@ -1115,6 +1115,11 @@ def qr_code(request, pk):
     img.save(response, 'PNG')
     return response
 
+def qr_text(request, pk):
+    tool = get_object_or_404(Tool, id=pk)
+    context = {'tool': tool}
+    return render(request, 'qr/qr.html', context)
+
 def qr_action(request, pk):
     if request.user.is_authenticated():
         if request.user.is_admin():
