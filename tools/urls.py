@@ -82,4 +82,8 @@ urlpatterns = patterns('tools.views',
     # Forgot password
     url(r'^forgot_password/$', 'forgot_password', name='forgot_password'),
     url(r'^reset_password/(?P<token>\w+)$', 'reset_password', name='reset_password'),
+
+    # QR codes
+    url(r'^tools/(?P<pk>\d+)/qr$', 'qr_code', name='qr_code'),
+    url(r'^tools/(?P<pk>\d+)/qr_action$', 'qr_action', name='qr_action'),
 )
