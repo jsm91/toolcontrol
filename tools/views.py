@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime, logging
+import datetime, logging, qrcode
 logger = logging.getLogger(__name__)
 
 from django.contrib.auth import login, logout, get_user_model
@@ -17,7 +17,7 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
 from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
-from tools.forms import ForgotPasswordForm, LoanForm, SettingsForm
+from tools.forms import ForgotPasswordForm, LoanForm, QRLoanForm, SettingsForm
 from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
 
 from tools.models import ConstructionSite, Event, Employee, Tool, ForgotPasswordToken
@@ -1108,3 +1108,64 @@ def model_object(request):
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype='application/json')
+
+def qr_code(request, pk):
+    img = qrcode.make('http://skou.toolcontrol.dk/tools/%s/qr_action' % pk)
+    response = HttpResponse(mimetype='image/png')
+    img.save(response, 'PNG')
+    return response
+
+def qr_action(request, pk):
+    if request.user.is_authenticated():
+        if request.user.is_admin():
+            tool = get_object_or_404(Tool, id=pk)
+            if tool.location == 'Lager':
+                if request.POST:
+                    form = QRLoanForm(tool=tool, data=request.POST)
+                    if form.is_valid():
+                        form.save()
+                        context = {'message': 'Værktøjet blev udlånt'}
+                        return render(request, 'qr/success.html', context)
+                else:
+                    form = QRLoanForm(tool=tool)
+            
+                context = {'form': form}
+                return render(request, 'qr/form.html', context)
+
+            elif tool.location == 'Udlånt' or tool.location == 'Reparation':
+                tool.end_loan()
+                context = {'message': 'Værktøjet blev afleveret'}
+                return render(request, 'qr/success.html', context)
+            else:
+                context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet'}
+                return render(request, 'qr/success.html', context)
+
+        else:
+            tool = get_object_or_404(Tool, id=pk)
+            if tool.location == 'Lager':
+                tool.loan(request.user) 
+                context = {'message': 'Værktøjet blev udlånt til %s' % request.user}
+                return render(request, 'qr/success.html', context)
+            elif tool.location == 'Udlånt' or tool.location == 'Reparation':
+                if tool.employee == request.user:
+                    tool.end_loan()
+                    context = {'message': 'Værktøjet blev afleveret'}
+                else:
+                    context = {'message': 'Du har ikke rettigheder til at aflevere værktøj udlånt til andre'}
+                return render(request, 'qr/success.html', context)
+            else:
+                context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet'}
+                return render(request, 'qr/success.html', context)
+
+    else:
+        if request.POST:
+            authentication_form = AuthenticationForm(data=request.POST)
+            if authentication_form.is_valid():
+                user = authentication_form.get_user()
+                login(request, user)
+                return HttpResponseRedirect('/tools/%s/qr_action' % pk)
+        else:
+            authentication_form = AuthenticationForm()
+
+        context_dictionary = {'authentication_form': authentication_form}
+        return render(request, 'qr/login.html', context_dictionary)

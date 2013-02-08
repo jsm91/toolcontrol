@@ -43,8 +43,6 @@ class LoanForm(NewModelForm):
         construction_site = cleaned_data.get('construction_site')
 
         if not(employee or construction_site):
-        	print employee
-        	print construction_site
         	raise forms.ValidationError('Enten medarbejder eller byggeplads er påkrævet')
 
         return cleaned_data
@@ -56,6 +54,30 @@ class LoanForm(NewModelForm):
         for tool_id in tool_ids:
             tool = get_object_or_404(Tool, id = tool_id)
             tool.loan(cd['employee'], cd['construction_site'])
+
+class QRLoanForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ['employee', 'construction_site',]
+
+    def __init__(self, tool, *args, **kwargs):
+        super(QRLoanForm, self).__init__(*args, **kwargs)
+        self.tool = tool
+
+    def clean(self):
+        cleaned_data = super(QRLoanForm, self).clean()
+
+        employee = cleaned_data.get('employee')
+        construction_site = cleaned_data.get('construction_site')
+
+        if not(employee or construction_site):
+        	raise forms.ValidationError('Enten medarbejder eller byggeplads er påkrævet')
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        cd = self.cleaned_data
+        self.tool.loan(cd['employee'], cd['construction_site'])
 
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField()
