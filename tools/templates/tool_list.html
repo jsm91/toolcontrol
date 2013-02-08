@@ -127,6 +127,9 @@
 	<a href="#{{ tool.id }}" id="{{ tool.name }}" class="delete">
 	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
 	</a>
+	<a href="{% url 'qr_code' tool.id %}">
+	  <img src="{{ STATIC_URL }}Icon_QR.svg">
+	</a>
       {% endif %}
     </td>
   </tr>
