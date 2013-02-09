@@ -111,11 +111,14 @@ $(document).ready(function() {
 	$.post("/"+object_type+"_form/", $(this).serialize(), function(data) {
 	    // Reload the page
 	    if(object_type == "loan") {
-		    $("div#content").load("/tool_list/");
+		$("div#content").load("/tool_list/");
+	    }
+	    else if(object_type == "container_loan") {
+		$("div#content").load("/container_tool_list/");
 	    }
 	    else {
-		    $("div#content").load("/"+object_type+"_list/");
-		}
+		$("div#content").load("/"+object_type+"_list/");
+	    }
 	    set_message(data.response);
 	});
 
@@ -164,6 +167,29 @@ $(document).ready(function() {
 
 	    $(popupBox).load("/loan_form/", function() {
 		$("input#id_tools").attr("value", object_ids.toString());
+	    //Set the center alignment padding + border
+	    var popMargTop = ($(popupBox).height() + 24) / 2; 
+	    var popMargLeft = ($(popupBox).width() + 24) / 2; 
+	    
+	    $(popupBox).css({ 
+		'margin-top' : -popMargTop,
+		'margin-left' : -popMargLeft
+	    });
+
+	    });
+
+            //Fade in the popup
+	    $(popupBox).fadeIn('slow');
+	    
+	    // Add the mask to body
+	    $('body').append('<div id="mask"></div>');
+	    $('#mask').fadeIn('fast');
+	}
+	else if (action == "container_loan") {
+	    var popupBox = "div.popup#loan";
+
+	    $(popupBox).load("/container_loan_form/", function() {
+		$("input#id_containers").attr("value", object_ids.toString());
 	    //Set the center alignment padding + border
 	    var popMargTop = ($(popupBox).height() + 24) / 2; 
 	    var popMargLeft = ($(popupBox).width() + 24) / 2; 
@@ -271,6 +297,26 @@ $(document).ready(function() {
 				 function() {
 				     $("tr#"+category+".tools").show();
 				     $("tr#"+category+".tools div").slideDown();
+				 });
+	}
+	return false;
+    });
+
+    // Show tools for a container
+    $(document).on("click", "a.show_container_tools", function() {
+	var container = $(this).attr("id");
+	if($("tr#"+container+".tools").is(":visible")) {
+	    $("tr#"+container+".tools div").slideUp(function() {
+		$("tr#"+container+".tools").hide();
+	    });
+	}
+	else {
+	    $("tr#" + container + 
+	      ".tools div").load("/simple_tool_list/", "container_id="+container+
+				 "&show_model=true",
+				 function() {
+				     $("tr#"+container+".tools").show();
+				     $("tr#"+container+".tools div").slideDown();
 				 });
 	}
 	return false;

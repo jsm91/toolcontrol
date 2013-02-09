@@ -1,0 +1,78 @@
+{% if search %}
+<div class="search_banner">
+  <img src="{{ STATIC_URL }}Icon_Info.svg">
+  <span>Viser søgeresultater for {{ search }}</span>
+</div>
+{% endif %}
+
+<table>
+  <tr>
+    <th class="object_checkbox"><input type="checkbox" class="mark_all"></th>
+    <th>
+      {% if ordering == "-name" %}
+        <a class="set_ordering" href="#" id="name">
+	  Navn
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-name">
+	  Navn
+	</a>
+      {% endif %}
+    </th>
+    <th>
+      {% if ordering == "-is_active" %}
+        <a class="set_ordering" href="#" id="location__name">
+	  Placering
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-location__name">
+	  Placering
+	</a>
+      {% endif %}
+    </th>
+    <th>
+      {% if ordering == "-is_active" %}
+        <a class="set_ordering" href="#" id="is_active">
+	  Aktiv
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-is_active">
+	  Aktiv
+	</a>
+      {% endif %}
+    </th>
+    <th class="functions">Funktioner</th>
+  </tr>
+  {% for container in object_list %}
+  <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ container.id }}">
+    <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
+	       name="{{ container.id }}"></td>
+    <td>{{ container.name }}</td>
+    <td>{{ container.location.name }}</td>
+    <td>
+      {% if container.is_active %}
+      <img src="{{ STATIC_URL }}Icon_True.svg">
+      {% endif %}
+    </td>
+    <td class="functions">
+      <a href="#" id="{{ container.id }}" class="show_container_tools">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
+      <a href="#{{ container.id }}" id="container" class="edit">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="#{{ container.id }}" id="{{ container.name }}" 
+	 class="delete">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
+    </td>
+  </tr>
+  <tr class="tools" id="{{ container.id }}">
+    <td colspan="5">
+      <div>
+	Værktøj ikke hentet korrekt
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

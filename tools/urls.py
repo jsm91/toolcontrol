@@ -1,12 +1,12 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.auth.decorators import login_required
-from tools.models import ConstructionSite, Employee, Tool, ToolCategory
-from tools.models import ToolModel
+from tools.models import Container, ConstructionSite, Employee, Tool
+from tools.models import ToolCategory, ToolModel
 
-from tools.views import CategoryListView, ConstructionSiteListView 
-from tools.views import EventListView, EmployeeListView, IndexView
-from tools.views import LoanListView, ModelListView, SimpleToolListView
-from tools.views import ToolListView
+from tools.views import CategoryListView, ContainerListView 
+from tools.views import ConstructionSiteListView, EventListView
+from tools.views import EmployeeListView, IndexView, LoanListView
+from tools.views import ModelListView, SimpleToolListView, ToolListView
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -23,6 +23,8 @@ urlpatterns = patterns('tools.views',
     url(r'^model_object/$', 'model_object', name='model_object'),
 
     # AJAX requests for lists
+    url(r'^container_list/$', 
+        login_required(ContainerListView.as_view()), name='container_list'),
     url(r'^tool_list/$', 
         login_required(ToolListView.as_view()), name='tool_list'),
     url(r'^model_list/$', 
@@ -42,6 +44,7 @@ urlpatterns = patterns('tools.views',
         name='simple_tool_list'),
 
     # AJAX requests for banners
+    url(r'^container_banner/$', 'container_banner', name='container_banner'),
     url(r'^tool_banner/$', 'tool_banner', name='tool_banner'),
     url(r'^model_banner/$', 'model_banner', name='model_banner'),
     url(r'^category_banner/$', 'category_banner', name='category_banner'),
@@ -50,15 +53,19 @@ urlpatterns = patterns('tools.views',
         name='building_site_banner'),
 
     # AJAX requests for forms
+    url(r'^container_form/$', 'container_form', name='container_form'),
     url(r'^tool_form/$', 'tool_form', name='tool_form'),
     url(r'^model_form/$', 'model_form', name='model_form'),
     url(r'^category_form/$', 'category_form', name='category_form'),
     url(r'^employee_form/$', 'employee_form', name='employee_form'),
     url(r'^loan_form/$', 'loan_form', name='loan_form'),
+    url(r'^container_loan_form/$', 'container_loan_form', 
+        name='container_loan_form'),
     url(r'^building_site_form/$', 'building_site_form', 
         name='building_site_form'),
 
     # AJAX requests for actions
+    url(r'^container_action/$', 'container_action', name='container_action'),
     url(r'^tool_action/$', 'tool_action', name='tool_action'),
     url(r'^model_action/$', 'model_action', name='model_action'),
     url(r'^category_action/$', 'category_action', name='category_action'),
@@ -67,6 +74,8 @@ urlpatterns = patterns('tools.views',
         name='building_site_action'),
 
     # AJAX requests for deletes
+    url(r'^container_delete/$', 'delete', 
+        {'class_to_delete': Container}, name='container_delete'),
     url(r'^tool_delete/$', 'delete', 
         {'class_to_delete': Tool}, name='tool_delete'),
     url(r'^model_delete/$', 'delete', 

@@ -16,12 +16,13 @@ from django.utils import simplejson
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
-from tools.forms import BuildingSiteForm, CreateManyToolsForm, EmployeeForm 
-from tools.forms import ForgotPasswordForm, LoanForm, QRLoanForm, SettingsForm
-from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
+from tools.forms import BuildingSiteForm, ContainerForm, ContainerLoanForm
+from tools.forms import CreateManyToolsForm, EmployeeForm, ForgotPasswordForm
+from tools.forms import LoanForm, QRLoanForm, SettingsForm, ToolForm
+from tools.forms import ToolCategoryForm, ToolModelForm
 
-from tools.models import ConstructionSite, Event, Employee, Tool, ForgotPasswordToken
-from tools.models import ToolCategory, ToolModel
+from tools.models import ConstructionSite, Container, Event, Employee, Tool
+from tools.models import ForgotPasswordToken, ToolCategory, ToolModel
 
 from toolcontrol.enums import TOOL_FAILURES
 from toolcontrol.utils import handle_loan_messages
@@ -141,6 +142,22 @@ class IndexView(FormView):
     def form_invalid(self, form):
         logger.info('Many tools not created (%s)', form.errors)
         return super(IndexView, self).form_invalid(form)
+
+class ContainerListView(ListView):
+    template_name = 'container_list.html'
+
+    def get_queryset(self):
+        search = self.request.GET.get('search', '')
+        ordering = self.request.GET.get('ordering', 'name')
+
+        return Container.objects.filter(Q(name__icontains=search) |
+                                        Q(location__name__icontains=search)).select_related('location').order_by(ordering)
+
+    def get_context_data(self, **kwargs):
+        context = super(ContainerListView, self).get_context_data(**kwargs)
+        context['search'] = self.request.GET.get('search')
+        context['ordering'] = self.request.GET.get('ordering')
+        return context
 
 class ToolListView(ListView):
     template_name = 'tool_list.html'
@@ -267,9 +284,14 @@ class SimpleToolListView(ListView):
         show_model = self.request.GET.get('show_model')
         
         if show_model == 'true':
-            category_id = self.request.GET.get('category_id')
-            category = get_object_or_404(ToolCategory, id = category_id)
-            return Tool.objects.filter(model__category=category).order_by('name')
+            if self.request.GET.get('category_id'):
+                category_id = self.request.GET.get('category_id')
+                category = get_object_or_404(ToolCategory, id = category_id)
+                return Tool.objects.filter(model__category=category).order_by('name')
+            elif self.request.GET.get('container_id'):
+                container_id = self.request.GET.get('container_id')
+                container = get_object_or_404(Container, id = container_id)
+                return Tool.objects.filter(container=container).order_by('name')
         else:
             model_id = self.request.GET.get('model_id')
             model = get_object_or_404(ToolModel, id = model_id)
@@ -286,6 +308,11 @@ class SimpleToolListView(ListView):
             context['show_model'] = False
 
         return context
+
+@login_required
+def container_banner(request):
+    context = {}
+    return render(request, 'container_banner.html', context)
 
 @login_required
 def tool_banner(request):
@@ -323,6 +350,54 @@ def building_site_banner(request):
 
     context = {}
     return render(request, 'building_site_banner.html', context)
+
+@login_required
+def container_form(request):
+    if request.POST:
+        container_id = request.POST.get('id', 0)
+
+        # Edit an existing container
+        if container_id != 0:
+            container = get_object_or_404(Container, id = container_id)
+            logger.info('%s is editing a container (%s)' % (request.user, container.name))
+            container_form = ContainerForm(data = request.POST, 
+                                           instance = container)
+            if container_form.is_valid():
+                container_form.save()
+                logger.info('container successfully edited')
+                response = {'response': 'Container redigeret'}
+            else:
+                logger.info('container not edited')
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+
+        else:
+            logger.info('%s is creating a container (%s)' % (request.user, request.POST.get('name')))
+            container_form = ContainerForm(request.POST)
+            if container_form.is_valid():
+                container_form.save()
+                logger.info('container successfully created')
+                response = {'response': 'Container oprettet'}
+            else:
+                logger.info('container not created')
+                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+            
+    container_id = request.GET.get('id')
+
+    if container_id:
+        container = get_object_or_404(Container, id = container_id)
+        container_form = ContainerForm(instance=container)
+        context = {'form': container_form,
+                   'object_type': 'container',
+                   'id': container.id}
+    else:
+        container_form = ContainerForm()
+        context = {'form': container_form,
+                   'object_type': 'container'}
+
+    return render(request, 'form.html', context)
 
 @login_required
 def tool_form(request):
@@ -600,6 +675,26 @@ def loan_form(request):
 	return render(request, 'form.html', context)
 
 @login_required
+def container_loan_form(request):
+    if request.POST:
+        logger.info('%s is container_loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
+        container_loan_form = ContainerLoanForm(request.POST)
+        if container_loan_form.is_valid():
+            container_loan_form.save()
+            logger.info('Tools container_loaned')
+            response = {'response': 'Værktøj udlånt'}
+        else:
+            logger.info('Tools not container_loaned')
+            response = {'response': 'Værktøj ikke udlånt'}
+            
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+	
+    container_loan_form = ContainerLoanForm()
+    context = {'form': container_loan_form, 'object_type': 'container_loan'}
+    return render(request, 'form.html', context)
+
+@login_required
 def tool_action(request):
     action = request.POST.get('action')
     object_ids = request.POST.get('object_ids', '')
@@ -852,6 +947,48 @@ def model_action(request):
             logger.info('Model with id %s deleted' % object_id)
             response = {'response': 'Model(ler) slettet'}
 
+    return HttpResponse(simplejson.dumps(response), 
+                        mimetype="application/json")
+
+@login_required
+def container_action(request):
+    action = request.POST.get('action')
+    object_ids = request.POST.get('object_ids', '')
+
+    logger.info('Container action started by %s: %s on containers %s' % (request.user, action, object_ids))
+
+    if object_ids != '':
+        object_ids = object_ids.split(',')
+    else:
+        logger.info('No containers selected')
+        response = {'response': 'Ingen containere valgt'}        
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+
+    for object_id in object_ids:
+        try:
+            container = get_object_or_404(Container, id = object_id)
+        except Http404:
+            logger.error('Container with id %s not found' % object_id)
+        if action == 'delete':
+            container.delete()
+            logger.info('Container with id %s deleted' % object_id)
+            response = {'response': 'Container(e) slettet'}
+        elif action == 'make_inactive':
+            container.is_active = False
+            logger.info('Container with id %s marked as inactive' % object_id)
+            container.save()
+            response = {'response': 'Container(e) markeret som inaktiv(e)'}
+        elif action == 'make_active':
+            container.is_active = True
+            logger.info('Container with id %s marked as active' % object_id)
+            container.save()
+            response = {'response': 'Container(e) markeret som aktiv(e)'}
+        elif action == 'return':
+            container.end_loan()
+            logger.info('Container with id %s returned' % object_id)
+            response = {'response': 'Container(e) markeret som afleveret'}
+        
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")
 

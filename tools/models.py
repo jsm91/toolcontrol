@@ -13,6 +13,51 @@ from django.db.models import Sum
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
+class ConstructionSite(models.Model):
+    name = models.CharField('Navn', max_length=200)
+    is_active = models.BooleanField('Aktiv', default=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Container(models.Model):
+    name = models.CharField(max_length=255)
+    location = models.ForeignKey(ConstructionSite, null=True, default=None)
+    is_active = models.BooleanField()
+
+    def __unicode__(self):
+        return self.name
+
+    def loan(self, construction_site):
+        if self.location == None:
+            container_loan = ContainerLoan(container=self,
+                                           construction_site=construction_site)
+            container_loan.save()
+
+            for tool in self.tool_set.filter(location='Lager'):
+                tool.loan(construction_site=construction_site)
+
+            self.location = construction_site
+            self.save()
+
+    def end_loan(self):
+        if self.location != None:
+            container_loan = self.containerloan_set.filter(end_date__isnull=True)[0]
+            container_loan.end_date = datetime.datetime.now()
+            container_loan.save()
+
+            for tool in self.tool_set.filter(construction_site=self.location):
+                tool.end_loan()
+
+            self.location = None
+            self.save()
+
+class ContainerLoan(models.Model):
+    container = models.ForeignKey(Container)
+    construction_site = models.ForeignKey(ConstructionSite)
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+
 class EmployeeManager(BaseUserManager):
     def create_user(self, name, email, phone_number, password=None):
         employee = self.model(name=name, email=email, 
@@ -33,8 +78,8 @@ class EmployeeManager(BaseUserManager):
 
 class Employee(AbstractBaseUser):
     name = models.CharField('Navn', max_length=200, unique=True, db_index=True)
-    email = models.EmailField('Email', max_length=255, blank=True)
-    phone_number = models.IntegerField('Telefonnummer', null=True)
+    email = models.EmailField('Email', max_length=255, blank=True, null=True)
+    phone_number = models.IntegerField('Telefonnummer', blank=True, null=True)
 
     is_active = models.BooleanField('Aktiv', default=True)
     is_office_admin = models.BooleanField('Kontoradmin', default=False)
@@ -56,45 +101,44 @@ class Employee(AbstractBaseUser):
 
     def send_mail(self, subject, message):
         logger.debug('Sending mail to %s with content %s' % (self.name, message))
-        try:
-            send_mail(subject, message, 'ToolControl <kontor@toolcontrol.dk>', 
-                      [self.email])
-            logger.debug('Mail successfully sent')
-        except Exception, e:
-            logger.error('Mail not sent: %s' % e)
+        if self.email:
+            try:
+                send_mail(subject, message, 'ToolControl <kontor@toolcontrol.dk>', 
+                          [self.email])
+                logger.debug('Mail successfully sent')
+            except Exception, e:
+                logger.error('Mail not sent: %s' % e)
+        else:
+            logger.debug('Mail not sent, user has no email')
 
     def send_sms(self, message):
         logger.debug('Sending SMS to %s with content %s' % (self.name, message))
-        params = urllib.urlencode({'username': 'hromby', 
-                                   'password': 'IRMLVJ',
-                                   'recipient': self.phone_number,
-                                   'message': message.encode('utf-8'),
-                                   'utf8': 1,
-                                   'from': 'ToolControl',})
+        if self.phone_number:
+            params = urllib.urlencode({'username': 'hromby', 
+                                       'password': 'IRMLVJ',
+                                       'recipient': self.phone_number,
+                                       'message': message.encode('utf-8'),
+                                       'utf8': 1,
+                                       'from': 'ToolControl',})
 
-        f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
-        content = f.read()
-        pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
-        match = pattern.search(content)
+            f = urllib.urlopen("http://cpsms.dk/sms?%s" % params)
+            content = f.read()
+            pattern = re.compile("<(?P<status>.+?)>(?P<message>.+?)</.+?>")
+            match = pattern.search(content)
+            
+            if match.group('status') == 'succes':
+                logger.debug('SMS gateway returned "%s: %s"' % (match.group('status'),
+                                                                match.group('message')))
+            else:
+                logger.error('SMS gateway returned "%s: %s"' % (match.group('status'),
+                                                                match.group('message')))
 
-        if match.group('status') == 'succes':
-            logger.debug('SMS gateway returned "%s: %s"' % (match.group('status'),
-                                                            match.group('message')))
+            return match.group('status'), match.group('message')
         else:
-            logger.error('SMS gateway returned "%s: %s"' % (match.group('status'),
-                                                            match.group('message')))
-
-        return match.group('status'), match.group('message')
+            logger.debug('SMS not sent, user has no phone number')
 
     def get_finished_loans(self):
         return self.event_set.filter(end_date=None)
-
-class ConstructionSite(models.Model):
-    name = models.CharField('Navn', max_length=200)
-    is_active = models.BooleanField('Aktiv', default=True)
-
-    def __unicode__(self):
-        return self.name
 
 class ForgotPasswordToken(models.Model):
     token = models.CharField(max_length=200)
@@ -156,6 +200,8 @@ class Tool(models.Model):
 
     employee = models.ForeignKey(Employee, null=True)
     construction_site = models.ForeignKey(ConstructionSite, null=True)
+
+    container = models.ForeignKey(Container, null=True, blank=True)
 
     invoice_number = models.IntegerField('Bilagsnummer', null=True, blank=True)
     secondary_name = models.CharField('Sekundært navn', max_length=200, 

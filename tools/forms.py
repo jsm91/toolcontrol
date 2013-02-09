@@ -6,8 +6,9 @@ import datetime
 from django import forms
 from django.shortcuts import get_object_or_404
 
-from tools.models import Event, ForgotPasswordToken, ConstructionSite, Employee, Tool
-from tools.models import ToolCategory, ToolModel
+from tools.models import Container, ContainerLoan, ConstructionSite, Employee
+from tools.models import Event, ForgotPasswordToken, Tool, ToolCategory
+from tools.models import ToolModel
 
 class NewForm(forms.Form):
     def as_new_table(self):
@@ -132,6 +133,26 @@ class ToolModelForm(NewModelForm):
         model = ToolModel
         exclude = ['number_of_tools', 'total_price']
 
+class ContainerForm(NewModelForm):
+    class Meta:
+        model = Container
+        exclude = ['location',]
+
+class ContainerLoanForm(NewModelForm):
+    containers = forms.CharField(widget=forms.HiddenInput)
+
+    class Meta:
+        model = ContainerLoan
+        fields = ['construction_site',]
+
+    def save(self, commit=True):
+        cd = self.cleaned_data
+        container_ids = cd['containers'].split(',')
+
+        for container_id in container_ids:
+            container = get_object_or_404(Container, id = container_id)
+            container.loan(cd['construction_site'])
+
 class ToolForm(NewModelForm):
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all().order_by('name'),
                                    empty_label=None,
@@ -157,6 +178,16 @@ class EmployeeForm(NewModelForm):
         model = Employee
         exclude = ['password', 'last_login', 'is_loan_flagged', 'is_employee',
                    'sms_loan_threshold', 'email_loan_threshold',]
+
+    def clean(self):
+        cleaned_data = super(EmployeeForm, self).clean()
+        phone_number = cleaned_data.get('phone_number')
+        email = cleaned_data.get('email')
+
+        if not phone_number and not email:
+            raise forms.ValidationError('Enten email eller telefonnummer er påkfrævet')
+
+        return cleaned_data
 
     def save(self, commit=True):
         employee = super(EmployeeForm, self).save(commit=False)
@@ -214,6 +245,7 @@ class CreateManyToolsForm(NewForm):
                                    help_text="Højeste indeksnummer")
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all(), 
                                    empty_label=None)
+    container = forms.ModelChoiceField(queryset=Container.objects.filter(is_active=True))
     service_interval = forms.IntegerField(label="Serviceinterval", 
                                           required=False,
                                           help_text = 'Antal måneder mellem service for denne slags værktøj')
@@ -226,7 +258,6 @@ class CreateManyToolsForm(NewForm):
     buy_date = forms.DateTimeField(label = "Indkøbsdato")
 
     def __init__(self, *args, **kwargs):
-        print "Now in init"
         super(CreateManyToolsForm, self).__init__(*args, **kwargs)
         self.fields['buy_date'].initial = datetime.datetime.now()
         try:
@@ -238,7 +269,6 @@ class CreateManyToolsForm(NewForm):
             self.fields['service_interval'].initial = self.fields['model'].initial.service_interval
 
     def save(self, force_insert=False, force_update=False, commit=True):
-        print "Now in save"
         zeros = len(self.cleaned_data['start_index']) - 1
         if not self.cleaned_data['price']:
             price = self.cleaned_data['model'].price
@@ -256,9 +286,9 @@ class CreateManyToolsForm(NewForm):
                         model = self.cleaned_data['model'],
                         invoice_number = self.cleaned_data['invoice_number'],
                         secondary_name = self.cleaned_data['secondary_name'],
-                        buy_date = self.cleaned_data['buy_date'])
+                        buy_date = self.cleaned_data['buy_date'],
+                        container = self.cleaned_data['container'])
             tool.save()
-            print 'Saving %s' % tool.name
             event = Event(event_type = "Oprettelse", tool = tool)
             event.save()
 
@@ -281,7 +311,6 @@ class CreateManyToolsForm(NewForm):
         return data
 
     def clean(self):
-        print "Now in clean"
         cleaned_data = super(CreateManyToolsForm, self).clean()
         start_index = cleaned_data.get("start_index")
         end_index = cleaned_data.get("end_index")

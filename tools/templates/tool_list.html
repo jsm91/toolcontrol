@@ -43,6 +43,17 @@
       {% endif %}
     </th>
     <th>
+      {% if ordering == "-container__name" %}
+        <a class="set_ordering" href="#" id="container__name">
+	  Container
+	</a>
+      {% else %}
+        <a class="set_ordering" href="#" id="-container__name">
+	  Container
+	</a>
+      {% endif %}
+    </th>
+    <th>
       {% if ordering == "-last_service" %}
         <a class="set_ordering" href="#" id="last_service">
 	  Seneste service
@@ -109,6 +120,7 @@
     </td>
     <td>{{ tool.model.name }}</td>
     <td>{{ tool.model.category.name }}</td>
+    <td>{{ tool.container.name }}</td>
     <td id="last_service">{{ tool.last_service|date:"DATE_FORMAT" }}</td>
     <td>{{ tool.buy_date|date:"DATE_FORMAT" }}</td>
     <td>{{ tool.end_date|date:"DATE_FORMAT" }}</td>
