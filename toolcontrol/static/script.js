@@ -122,7 +122,6 @@ $(document).ready(function() {
 	    set_message(data.response);
 	});
 
-
 	// Close the popup
 	$('#mask').fadeOut('fast', function() {
 	    $('#mask').remove();

@@ -90,8 +90,11 @@
   {% for employee in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ employee.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
-	       name="{{ employee.id }}"></td>
-    <td>{{ employee.name }}</td>
+				       name="{{ employee.id }}"
+				       id="checkbox_{{ employee.id }}"></td>
+    <td>
+      <label for="checkbox_{{ employee.id }}">{{ employee.name }}</label>
+    </td>
     <td>{{ employee.email|default_if_none:"Ikke oplyst" }}</td>
     <td>{{ employee.phone_number|default_if_none:"Ikke oplyst" }}</td>
     <td>

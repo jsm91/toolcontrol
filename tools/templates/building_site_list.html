@@ -35,8 +35,11 @@
   {% for building_site in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ building_site.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
-	       name="{{ building_site.id }}"></td>
-    <td>{{ building_site.name }}</td>
+				       name="{{ building_site.id }}"
+				       id="checkbox_{{ building_site.id }}"></td>
+    <td>
+      <label for="checkbox_{{ building_site.id }}">{{ building_site.name }}</label>
+    </td>
     <td>
       {% if building_site.is_active %}
       <img src="{{ STATIC_URL }}Icon_True.svg">

@@ -63,8 +63,9 @@
   {% for model in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ model.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
-	       name="{{ model.id }}"></td>
-    <td>{{ model.name }}</td>
+				       name="{{ model.id }}" 
+				       id="checkbox_{{ model.id }}"></td>
+    <td><label for="checkbox_{{ model.id }}">{{ model.name }}</label></td>
     <td>{{ model.category.name }}</td>
     <td>{{ model.service_interval }} måneder</td>
     <td>{{ model.price }} kr.</td>

@@ -353,8 +353,6 @@ def building_site_banner(request):
 
 @login_required
 def form(request, class_name, form_name):
-    print request.POST
-
     if request.POST:
         obj_id = request.POST.get('id')
 
@@ -647,6 +645,7 @@ def qr_text(request, pk):
     context = {'tool': tool}
     return render(request, 'qr/qr.html', context)
 
+@login_required
 def qr_action(request, pk):
     if request.user.is_authenticated():
         if request.user.is_admin():

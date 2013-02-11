@@ -46,8 +46,11 @@
   {% for container in object_list %}
   <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ container.id }}">
     <td class="object_checkbox"><input type="checkbox" class="object_checkbox"
-	       name="{{ container.id }}"></td>
-    <td>{{ container.name }}</td>
+				       name="{{ container.id }}"
+				       id="checkbox_{{ container.id }}"></td>
+    <td>
+      <label for="checkbox_{{ container.id }}">{{ container.name }}</label>
+    </td>
     <td>{{ container.location.name }}</td>
     <td>
       {% if container.is_active %}

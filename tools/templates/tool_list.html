@@ -109,11 +109,11 @@
       <tr class="object_line {% cycle 'row1' 'row2' %}" id="{{ tool.id }}">
     {% endif %}
     <td class="object_checkbox">
-      <input type="checkbox" class="object_checkbox"
-	       name="{{ tool.id }}">
+      <input type="checkbox" class="object_checkbox" 
+	     id="checkbox_{{ tool.id }}" name="{{ tool.id }}">
     </td>
     <td>
-      {{ tool.name }}
+      <label for="checkbox_{{ tool.id }}">{{ tool.name }}</label>
       {% if tool|check_for_service %}
         <img src="{{ STATIC_URL }}Icon_Warning.svg" title="Værktøjet skal serviceres">
       {% endif %}
