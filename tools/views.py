@@ -24,8 +24,8 @@ from tools.forms import ToolCategoryForm, ToolModelForm
 from tools.models import ConstructionSite, Container, Event, Employee, Tool
 from tools.models import ForgotPasswordToken, ToolCategory, ToolModel
 
-from toolcontrol.enums import TOOL_FAILURES
-from toolcontrol.utils import handle_loan_messages
+from toolcontrol.enums import TOOL_FAILURES, verbose_action
+from toolcontrol.utils import handle_loan_messages, pretty_concatenate
 
 def login_view(request):
     if request.POST:
@@ -695,441 +695,77 @@ def container_loan_form(request):
     return render(request, 'form.html', context)
 
 @login_required
-def tool_action(request):
+def action(request, class_name):
     action = request.POST.get('action')
-    object_ids = request.POST.get('object_ids', '')
+    object_ids = request.POST.get('object_ids')
 
-    logger.info('Tool action started by %s: %s on tools %s' % (request.user,
-                                                               action, 
-                                                               object_ids))
+    logger.info('Action started by %s: %s on %s (%s)' % (request.user,
+                                                         action, object_ids,
+                                                         class_name.__name__))
 
-    if object_ids != '':
+    if object_ids:
         object_ids = object_ids.split(',')
     else:
-        response = {'response': 'Intet værktøj valgt'}        
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-
-    if action == 'loan':
-        employee_id = request.POST.get('employee_id')
-        try:
-            employee = get_object_or_404(Employee, id = employee_id)
-        except Http404:
-            logger.error('Employee with id %s not found' % employee_id)
-            raise Http404
-    elif action == 'loan_single':
-        employee = request.user
-
-    success_tools = []
-    success_tool_ids = []
-    failure_tools = {}
-
-    for object_id in object_ids:
-        try:
-            tool = get_object_or_404(Tool, id = object_id)
-        except Http404:
-            logger.error('Tool with id %s not found' % object_id)
-        if action == 'service':
-            if tool.service():
-                success_tools.append(tool.name)
-                success_tool_ids.append(tool.id)
-                logger.info('Tool with id %s serviced' % tool.id)
-            else:
-                try:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
-                except KeyError:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
-                logger.info('Tool with id %s not serviced (not in store)' % tool.id)
-        elif action == 'scrap':
-            if tool.scrap():
-                success_tools.append(tool.name)
-                logger.info('Tool with id %s scrapped' % tool.id)
-            else:
-                try:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
-                except KeyError:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
-                logger.info('Tool with id %s not scrapped (not in store)' % tool.id)
-        elif action == 'lost':
-            if tool.lost():
-                success_tools.append(tool.name)
-                logger.info('Tool with id %s marked as lost' % tool.id)
-            else:
-                try:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
-                except KeyError:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
-                logger.info('Tool with id %s not marked as lost (not in store)' % tool.id)
-        elif action == 'repair':
-            if tool.repair():
-                success_tools.append(tool.name)
-                logger.info('Tool with id %s repaired' % tool.id)
-            else:
-                try:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
-                except KeyError:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
-                logger.info('Tool with id %s not repaired (not in store)' % tool.id)
-        elif action == 'return':
-            if request.user.is_admin() or tool.loaned_to == request.user or tool.location == 'Lager' or tool.location == 'Reparation' or tool.location == 'Kasseret' or tool.location == 'Bortkommet':
-                if tool.end_loan():
-                    success_tools.append(tool.name)
-                    logger.info('Tool with id %s returned' % tool.id)
-                else:
-                    try:
-                        failure_tools[TOOL_FAILURES.NOT_ON_LOAN].append(tool.name)
-                    except KeyError:
-                        failure_tools[TOOL_FAILURES.NOT_ON_LOAN] = [tool.name]
-                    logger.info('Tool with id %s not returned (in store)' % tool.id)
-            else:
-                try:
-                    failure_tools[TOOL_FAILURES.NO_RIGHTS].append(tool.name)
-                except KeyError:
-                    failure_tools[TOOL_FAILURES.NO_RIGHTS] = [tool.name]
-                    logger.warning('Tool with id %s not returned (no rights)' % tool.id)
-        elif action == 'delete':
-            tool_name = tool.name
-            logger.warning('Tool with id %s deleted' % tool.id)
-            tool.delete()
-            success_tools.append(tool_name)
-        elif action == 'loan' or action == 'loan_single':
-            if tool.loan(employee):
-                success_tools.append(tool.name)
-                logger.info('Tool with id %s loaned to %s' % (tool.id, employee.name))
-            else:
-                try:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE].append(tool.name)
-                except KeyError:
-                    failure_tools[TOOL_FAILURES.NOT_IN_STORE] = [tool.name]
-                logger.info('Tool with id %s not loaned to %s (not in store)' % (tool.id, employee.name))
-
-    # Generate success string
-    success_string = ''
-    for tool_name in success_tools:
-        if tool_name == success_tools[0]:
-            success_string = tool_name
-        elif tool_name == success_tools[-1]:
-            success_string += ' og ' + tool_name
-        else:
-            success_string += ', ' + tool_name
-
-    # Generate failure string and append action to success string
-    failure_string = ''
-    if action == 'service':
-        for key, val in failure_tools.items():
-            for tool_name in failure_tools[key]:
-                if tool_name == failure_tools[key][0]:
-                    failure_string = tool_name
-                elif tool_name == failure_tools[key][-1]:
-                    failure_string += ' og ' + tool_name
-                else:
-                    failure_string += ', ' + tool_name
-            if failure_tools.items():
-                if key == TOOL_FAILURES.NOT_IN_STORE:
-                    failure_string += ' blev ikke serviceret (værktøj ikke på lager)<br>'
-        if success_tools:
-            success_string += ' blev serviceret<br>'
-
-    elif action == 'scrap':
-        for key, val in failure_tools.items():
-            for tool_name in failure_tools[key]:
-                if tool_name == failure_tools[key][0]:
-                    failure_string = tool_name
-                elif tool_name == failure_tools[key][-1]:
-                    failure_string += ' og ' + tool_name
-                else:
-                    failure_string += ', ' + tool_name
-            if failure_tools.items():
-                if key == TOOL_FAILURES.NOT_IN_STORE:
-                    failure_string += ' blev ikke kasseret (værktøj ikke på lager)<br>'
-        if success_tools:
-            success_string += ' blev kasseret<br>'
-
-    elif action == 'lost':
-        for key, val in failure_tools.items():
-            for tool_name in failure_tools[key]:
-                if tool_name == failure_tools[key][0]:
-                    failure_string = tool_name
-                elif tool_name == failure_tools[key][-1]:
-                    failure_string += ' og ' + tool_name
-                else:
-                    failure_string += ', ' + tool_name
-            if failure_tools.items():
-                if key == TOOL_FAILURES.NOT_IN_STORE:
-                    failure_string += ' blev ikke markeret som bortkommet (værktøj ikke på lager)<br>'
-        if success_tools:
-            success_string += ' blev markeret som bortkommet<br>'
-
-    elif action == 'repair':
-        for key, val in failure_tools.items():
-            for tool_name in failure_tools[key]:
-                if tool_name == failure_tools[key][0]:
-                    failure_string = tool_name
-                elif tool_name == failure_tools[key][-1]:
-                    failure_string += ' og ' + tool_name
-                else:
-                    failure_string += ', ' + tool_name
-            if failure_tools.items():
-                if key == TOOL_FAILURES.NOT_IN_STORE:
-                    failure_string += ' blev ikke repareret (værktøj ikke på lager)<br>'
-        if success_tools:
-            success_string += ' blev repareret<br>'
-
-    elif action == 'return':
-        for key, val in failure_tools.items():
-            for tool_name in failure_tools[key]:
-                if tool_name == failure_tools[key][0]:
-                    failure_string += tool_name
-                elif tool_name == failure_tools[key][-1]:
-                    failure_string += ' og ' + tool_name
-                else:
-                    failure_string += ', ' + tool_name
-            if failure_tools.items():
-                if key == TOOL_FAILURES.NOT_ON_LOAN:
-                    failure_string += ' blev ikke afleveret (værktøj ikke udlånt)<br>'
-                elif key == TOOL_FAILURES.NO_RIGHTS:
-                    failure_string += ' blev ikke afleveret (ikke udlånt til dig)<br>'
-        if success_tools:
-            success_string += ' blev afleveret<br>'
-
-    elif action == 'delete':
-        if success_tools:
-            success_string += ' blev slettet<br>'
-
-    elif action == 'loan' or action == 'loan_single':
-        for key, val in failure_tools.items():
-            for tool_name in failure_tools[key]:
-                if tool_name == failure_tools[key][0]:
-                    failure_string = tool_name
-                elif tool_name == failure_tools[key][-1]:
-                    failure_string += ' og ' + tool_name
-                else:
-                    failure_string += ', ' + tool_name
-            if failure_tools.items():
-                if key == TOOL_FAILURES.NOT_IN_STORE:
-                    failure_string += ' blev ikke udlånt (værktøj ikke på lager)<br>'
-        if success_tools:
-            success_string += ' blev udlånt<br>'
-
-    response = {'response': success_string + failure_string,
-                'success_tool_ids': success_tool_ids}
-
-    if action == 'loan' or action == 'loan_single':
-        handle_loan_messages(success_tools, employee)
-
-    return HttpResponse(simplejson.dumps(response), 
-                        mimetype="application/json")
-
-@login_required
-def model_action(request):
-    action = request.POST.get('action')
-    object_ids = request.POST.get('object_ids', '')
-
-    logger.info('Model action started by %s: %s on models %s' % (request.user,
-                                                                 action, 
-                                                                 object_ids))
-
-    if object_ids != '':
-        object_ids = object_ids.split(',')
-    else:
-        logger.info('No models selected')
-        response = {'response': 'Ingen modeller valgt'}        
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-
-    for object_id in object_ids:
-        try:
-            model = get_object_or_404(ToolModel, id = object_id)
-        except Http404:
-            logger.error('Model with id %s not found' % object_id)
-        if action == 'delete':
-            model.delete()
-            logger.info('Model with id %s deleted' % object_id)
-            response = {'response': 'Model(ler) slettet'}
-
-    return HttpResponse(simplejson.dumps(response), 
-                        mimetype="application/json")
-
-@login_required
-def container_action(request):
-    action = request.POST.get('action')
-    object_ids = request.POST.get('object_ids', '')
-
-    logger.info('Container action started by %s: %s on containers %s' % (request.user, action, object_ids))
-
-    if object_ids != '':
-        object_ids = object_ids.split(',')
-    else:
-        logger.info('No containers selected')
-        response = {'response': 'Ingen containere valgt'}        
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-
-    for object_id in object_ids:
-        try:
-            container = get_object_or_404(Container, id = object_id)
-        except Http404:
-            logger.error('Container with id %s not found' % object_id)
-        if action == 'delete':
-            container.delete()
-            logger.info('Container with id %s deleted' % object_id)
-            response = {'response': 'Container(e) slettet'}
-        elif action == 'make_inactive':
-            container.is_active = False
-            logger.info('Container with id %s marked as inactive' % object_id)
-            container.save()
-            response = {'response': 'Container(e) markeret som inaktiv(e)'}
-        elif action == 'make_active':
-            container.is_active = True
-            logger.info('Container with id %s marked as active' % object_id)
-            container.save()
-            response = {'response': 'Container(e) markeret som aktiv(e)'}
-        elif action == 'return':
-            container.end_loan()
-            logger.info('Container with id %s returned' % object_id)
-            response = {'response': 'Container(e) markeret som afleveret'}
-        
-    return HttpResponse(simplejson.dumps(response), 
-                        mimetype="application/json")
-
-@login_required
-def category_action(request):
-    action = request.POST.get('action')
-    object_ids = request.POST.get('object_ids', '')
-
-    logger.info('Category action started by %s: %s on categories %s' % (request.user, action, object_ids))
-
-    if object_ids != '':
-        object_ids = object_ids.split(',')
-    else:
-        logger.info('No categories selected')
-        response = {'response': 'Ingen kategorier valgt'}        
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-
-    for object_id in object_ids:
-        try:
-            category = get_object_or_404(ToolCategory, id = object_id)
-        except Http404:
-            logger.error('Category with id %s not found' % object_id)
-        if action == 'delete':
-            category.delete()
-            logger.info('Category with id %s deleted' % object_id)
-            response = {'response': 'Kategori(er) slettet'}
-
-    return HttpResponse(simplejson.dumps(response), 
-                        mimetype="application/json")
-
-@login_required
-def construction_site_action(request):
-    action = request.POST.get('action')
-    object_ids = request.POST.get('object_ids', '')
-
-    logger.info('Construction site action started by %s: %s on sites %s' % (request.user, action, object_ids))
-
-    if object_ids != '':
-        object_ids = object_ids.split(',')
-    else:
-        logger.info('No employees selected')
-        response = {'response': 'Ingen byggepladser valgt'}
+        logger.info('No objects chosen')
+        response = {'response': 'Ingen objekter valgt'}
         return HttpResponse(simplejson.dumps(response),
-                            mimetype='application/json')
+                            content_type='application/json')
+
+    success_objects = []
+    failure_objects = []
 
     for object_id in object_ids:
-        try:
-            construction_site = get_object_or_404(ConstructionSite, 
-                                                  id = object_id)
-        except Http404:
-            logger.error('Construction site with id %s not found', object_id)
+        obj = get_object_or_404(class_name, pk = object_id)
+        obj_name = obj.name
 
-        if action == 'delete':
-            logger.warning('Construction site with id %s deleted' % object_id)
-            construction_site.delete()
-            response = {'response': 'Byggeplads(er) slettet'}
-        elif action == 'make_inactive':
-            construction_site.is_active = False
-            logger.info('Construction site with id %s marked as inactive' % object_id)
-            construction_site.save()
-            response = {'response': 'Byggeplads(er) markeret som inaktiv(e)'}
-        elif action == 'make_active':
-            construction_site.is_active = True
-            logger.info('Construction site with id %s marked as active' % object_id)
-            construction_site.save()
-            response = {'response': 'Byggeplads(er) markeret som aktiv(e)'}
-            
-    return HttpResponse(simplejson.dumps(response), 
-                        mimetype="application/json")
+        if action == 'loan_single':
+            if obj.loan(request.user):
+                logger.info('Action on %s successful' % obj_name)
+                success_objects.append(obj_name)
+            else:
+                logger.info('Action on %s not successful' % obj_name)
+                failure_objects.append(obj_name)
+        else:
+            action_function = getattr(obj, action)
+            if action == 'end_loan':
+                if (request.user.is_admin() or 
+                    (isinstance(obj, Tool) and request.user == obj.employee)):
+                    if obj.end_loan():
+                        logger.info('Action on %s successful' % obj_name)
+                        success_objects.append(obj_name)
+                    else:
+                        logger.info('Action on %s not successful' % obj_name)
+                        failure_objects.append(obj_name)
+                else:
+                    logger.info('Action on %s not successful' % obj_name)
+                    failure_objects.append(obj_name)
+            else:
+                if action_function() or action == 'delete':
+                    logger.info('Action on %s successful' % obj_name)
+                    success_objects.append(obj_name)
+                else:
+                    logger.info('Action on %s not successful' % obj_name)
+                    failure_objects.append(obj_name)
 
-@login_required
-def employee_action(request):
-    action = request.POST.get('action')
-    object_ids = request.POST.get('object_ids', '')
+    logger.info('No more objects')
 
-    logger.info('Employee action started by %s: %s on employees %s' % (request.user,
-                                                                   action, 
-                                                                   object_ids))
+    string = ''
 
-    if object_ids != '':
-        object_ids = object_ids.split(',')
-    else:
-        logger.info('No employees selected')
-        response = {'response': 'Ingen medarbejdere valgt'}        
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
+    if success_objects:
+        string += (pretty_concatenate(success_objects) + ' blev ' + 
+                   verbose_action[action])
+        if failure_objects:
+            string += '<br>'
 
-    for object_id in object_ids:
-        try:
-            employee = get_object_or_404(Employee, id = object_id)
-        except Http404:
-            logger.error('Employee with id %s not found' % object_id)
+    if failure_objects:
+        string += (pretty_concatenate(failure_objects) + ' blev ikke ' + 
+                   verbose_action[action])
 
-        if action == 'delete':
-            logger.warning('Employee with id %s deleted' % object_id)
-            employee.delete()
-            response = {'response': 'Medarbejder(e) slettet'}
-        elif action == 'make_inactive':
-            employee.is_active = False
-            logger.info('Employee with id %s marked as inactive' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) markeret som inaktiv(e)'}
-        elif action == 'make_active':
-            employee.is_active = True
-            logger.info('Employee with id %s marked as active' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) markeret som aktiv(e)'}
-        elif action == 'set_office_admin':
-            employee.is_office_admin = True
-            logger.info('Employee with id %s marked as office admin' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) markeret som kontoradmin'}
-        elif action == 'remove_office_admin':
-            employee.is_office_admin = False
-            logger.info('Employee with id %s removed as office admin' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) fjernet som kontoradmin'}
-        elif action == 'set_tool_admin':
-            employee.is_tool_admin = True
-            logger.info('Employee with id %s marked as tool admin' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) markeret som værktøjsadmin'}
-        elif action == 'remove_tool_admin':
-            employee.is_tool_admin = False
-            logger.info('Employee with id %s removed as tool admin' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) fjernet som værktøjsadmin'}
-        elif action == 'set_loan_flag':
-            employee.is_loan_flagged = True
-            logger.info('Employee with id %s marked as loan flagged' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) markeret med låneflag'}
-        elif action == 'remove_loan_flag':
-            employee.is_loan_flagged = False
-            logger.info('Employee with id %s removed as loan flagged' % object_id)
-            employee.save()
-            response = {'response': 'Medarbejder(e) fik fjernet låneflag'}
+    response = {'response': string,
+                'success_objects': success_objects}
 
     return HttpResponse(simplejson.dumps(response), 
-                        mimetype="application/json")
+                        content_type="application/json")
 
 @login_required
 def delete(request, class_to_delete):
@@ -1139,10 +775,8 @@ def delete(request, class_to_delete):
                                                              object_id))
 
     if not request.user.is_admin():
-        logger.error('%s does not have rights to delete' % (class_to_delete.__name__, 
-                                                            object_id))
+        logger.error('%s does not have rights to delete' % (request.user))
         raise Http404
-
     try:
         object_to_delete = get_object_or_404(class_to_delete, id = object_id)
     except Http404:

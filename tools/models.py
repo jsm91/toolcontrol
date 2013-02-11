@@ -17,6 +17,22 @@ class ConstructionSite(models.Model):
     name = models.CharField('Navn', max_length=200)
     is_active = models.BooleanField('Aktiv', default=True)
 
+    def make_active(self):
+        if self.is_active:
+            return False
+        
+        self.is_active = True
+        self.save()
+        return True
+
+    def make_inactive(self):
+        if not self.is_active:
+            return False
+        
+        self.is_active = False
+        self.save()
+        return True
+
     def __unicode__(self):
         return self.name
 
@@ -24,6 +40,22 @@ class Container(models.Model):
     name = models.CharField(max_length=255)
     location = models.ForeignKey(ConstructionSite, null=True, default=None)
     is_active = models.BooleanField()
+
+    def make_active(self):
+        if self.is_active:
+            return False
+        
+        self.is_active = True
+        self.save()
+        return True
+
+    def make_inactive(self):
+        if not self.is_active:
+            return False
+        
+        self.is_active = False
+        self.save()
+        return True
 
     def __unicode__(self):
         return self.name
@@ -40,6 +72,10 @@ class Container(models.Model):
             self.location = construction_site
             self.save()
 
+            return True
+        else:
+            return False
+
     def end_loan(self):
         if self.location != None:
             container_loan = self.containerloan_set.filter(end_date__isnull=True)[0]
@@ -51,6 +87,10 @@ class Container(models.Model):
 
             self.location = None
             self.save()
+
+            return True
+        else:
+            return False
 
 class ContainerLoan(models.Model):
     container = models.ForeignKey(Container)
@@ -98,6 +138,70 @@ class Employee(AbstractBaseUser):
 
     def is_admin(self):
         return self.is_tool_admin or self.is_office_admin
+
+    def make_active(self):
+        if self.is_active:
+            return False
+        
+        self.is_active = True
+        self.save()
+        return True
+
+    def make_inactive(self):
+        if not self.is_active:
+            return False
+        
+        self.is_active = False
+        self.save()
+        return True
+
+    def make_office_admin(self):
+        if self.is_office_admin:
+            return False
+        
+        self.is_office_admin = True
+        self.save()
+        return True
+
+    def make_not_office_admin(self):
+        if not self.is_office_admin:
+            return False
+        
+        self.is_office_admin = False
+        self.save()
+        return True
+
+    def make_tool_admin(self):
+        if self.is_tool_admin:
+            return False
+        
+        self.is_tool_admin = True
+        self.save()
+        return True
+
+    def make_not_tool_admin(self):
+        if not self.is_tool_admin:
+            return False
+        
+        self.is_tool_admin = False
+        self.save()
+        return True
+
+    def make_loan_flagged(self):
+        if self.is_loan_flagged:
+            return False
+        
+        self.is_loan_flagged = True
+        self.save()
+        return True
+
+    def make_not_loan_flagged(self):
+        if not self.is_loan_flagged:
+            return False
+        
+        self.is_loan_flagged = False
+        self.save()
+        return True
 
     def send_mail(self, subject, message):
         logger.debug('Sending mail to %s with content %s' % (self.name, message))
@@ -223,7 +327,7 @@ class Tool(models.Model):
         else:
             return self.location
 
-    def service(self):
+    def service(self, **kwargs):
         if self.location == 'Lager':
             event = Event(event_type='Service', tool=self)
             event.save()

@@ -46,3 +46,16 @@ def check_for_service(tool):
     # Find out whether the time between last service and now is bigger than
     # the max service interval
     return now - tool.last_service > service_interval
+
+def pretty_concatenate(names):
+    string = ''
+
+    for name in names:
+        if name == names[0]:
+            string = name
+        elif name == names[-1]:
+            string += ' og ' + name
+        else:
+            string += ', ' + name
+
+    return string
