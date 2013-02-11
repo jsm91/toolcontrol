@@ -17,6 +17,7 @@ td {
 }
 
 input, select {
+    font: 16pt/24pt "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
     width: 100%;
     height: 50px;
 }
