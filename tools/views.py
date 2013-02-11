@@ -1266,7 +1266,8 @@ def qr_action(request, pk):
                     form = QRLoanForm(tool=tool, data=request.POST)
                     if form.is_valid():
                         form.save()
-                        context = {'message': 'Værktøjet blev udlånt'}
+                        context = {'message': 'Værktøjet blev udlånt',
+                                   'status': 'success'}
                         return render(request, 'qr/success.html', context)
                 else:
                     form = QRLoanForm(tool=tool)
@@ -1276,27 +1277,33 @@ def qr_action(request, pk):
 
             elif tool.location == 'Udlånt' or tool.location == 'Reparation':
                 tool.end_loan()
-                context = {'message': 'Værktøjet blev afleveret'}
+                context = {'message': 'Værktøjet blev afleveret',
+                           'status': 'success'}
                 return render(request, 'qr/success.html', context)
             else:
-                context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet'}
+                context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet',
+                           'status': 'failure'}
                 return render(request, 'qr/success.html', context)
 
         else:
             tool = get_object_or_404(Tool, id=pk)
             if tool.location == 'Lager':
                 tool.loan(request.user) 
-                context = {'message': 'Værktøjet blev udlånt til %s' % request.user}
+                context = {'message': 'Værktøjet blev udlånt til %s' % request.user,
+                           'status': 'success'}
                 return render(request, 'qr/success.html', context)
             elif tool.location == 'Udlånt' or tool.location == 'Reparation':
                 if tool.employee == request.user:
                     tool.end_loan()
-                    context = {'message': 'Værktøjet blev afleveret'}
+                    context = {'message': 'Værktøjet blev afleveret',
+                               'status': 'success'}
                 else:
-                    context = {'message': 'Du har ikke rettigheder til at aflevere værktøj udlånt til andre'}
+                    context = {'message': 'Du har ikke rettigheder til at aflevere værktøj udlånt til andre',
+                               'status': 'failure'}
                 return render(request, 'qr/success.html', context)
             else:
-                context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet'}
+                context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet',
+                           'status': 'failure'}
                 return render(request, 'qr/success.html', context)
 
     else:

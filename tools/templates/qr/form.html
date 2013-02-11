@@ -1,5 +1,39 @@
-<form method='POST'>
-  {% csrf_token %}
-  {{ form.as_p }}
-  <input type='submit' value='Udlån!'>
-</form>
+{% extends "qr/base.html" %}
+
+{% block content %}
+<table>
+  <form method='POST'>
+    {% csrf_token %}
+    <tr>
+      <td>
+	Vælg medarbejder og/eller placering for udlånet.
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<select name="employee" id="id_employee">
+	  <option value="">Vælg medarbejder...</option>
+	  {% for option in form.employee.field.choices.queryset %}
+	    <option value="{{ option.id }}">{{ option }}</option>
+	  {% endfor %}
+	</select>
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<select name="construction_site" id="id_construction_site">
+	  <option value="">Vælg placering...</option>
+	  {% for option in form.construction_site.field.choices.queryset %}
+	    <option value="{{ option.id }}">{{ option }}</option>
+	  {% endfor %}
+	</select>
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<input type='submit' value='Login!'>
+      </td>
+    </tr>
+  </form>
+</table>
+{% endblock %}

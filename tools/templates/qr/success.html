@@ -1,1 +1,23 @@
-{{ message }}
+{% extends "qr/base.html" %}
+
+{% block content %}
+<table>
+  <form method='POST'>
+    {% csrf_token %}
+    <tr>
+      <td>
+	{% if status == "success" %}
+	  <img src="{{ STATIC_URL }}Icon_True.svg">
+	{% else %}
+	  <img src="{{ STATIC_URL }}Icon_Warning.svg">
+	{% endif %}
+      </td>
+    </tr>
+    <tr>
+      <td>
+	{{ message }}
+      </td>
+    </tr>
+  </form>
+</table>
+{% endblock %}

@@ -1,5 +1,31 @@
-<form method='POST'>
-  {% csrf_token %}
-  {{ authentication_form.as_p }}
-  <input type='submit' value='Login!'>
-</form>
+{% extends "qr/base.html" %}
+
+{% block content %}
+<table>
+  <form method='POST'>
+    {% csrf_token %}
+    <tr>
+      <td>
+	Du skal logge ind for at benytte QR-scanning i ToolControl. Benyt formularen herunder.
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<input type="text" name="username" id="id_username" 
+	       placeholder="Brugernavn">
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<input type="password" name="password" id="id_password" 
+	       placeholder="Kodeord">
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<input type='submit' value='Login!'>
+      </td>
+    </tr>
+  </form>
+</table>
+{% endblock %}

@@ -1,0 +1,31 @@
+body {
+    background-image: url("/static/linen_bg_tile.jpg");
+}
+
+table {
+    width: 100%;
+    font: 16pt/24pt "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+    color: #ffffff;
+    border-spacing:1;
+}
+
+td {
+    text-align: center;
+    background: rgba(20,20,20,0.5); 
+    color:white;
+    padding:10px;
+}
+
+input, select {
+    width: 100%;
+    height: 50px;
+}
+
+select {
+    text-align: center;
+    padding-top:10px;
+}
+
+img {
+    width: 50%;
+}
