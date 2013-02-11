@@ -37,6 +37,11 @@ class LoanForm(NewModelForm):
         model = Event
         fields = ['employee', 'construction_site',]
 
+    def __init__(self, *args, **kwargs):
+        super(LoanForm, self).__init__(*args, **kwargs)
+        self.fields['employee'].empty_label = 'Vælg medarbejder...'
+        self.fields['construction_site'].empty_label = 'Vælg byggeplads...'
+
     def clean(self):
         cleaned_data = super(LoanForm, self).clean()
 
@@ -64,6 +69,8 @@ class QRLoanForm(forms.ModelForm):
     def __init__(self, tool, *args, **kwargs):
         super(QRLoanForm, self).__init__(*args, **kwargs)
         self.tool = tool
+        self.fields['employee'].empty_label = 'Vælg medarbejder...'
+        self.fields['construction_site'].empty_label = 'Vælg byggeplads...'
 
     def clean(self):
         cleaned_data = super(QRLoanForm, self).clean()
