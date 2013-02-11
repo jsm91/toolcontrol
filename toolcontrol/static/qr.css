@@ -23,6 +23,7 @@ input, select {
     border:none;
     padding:5px;
     background-color:#FFFFFF;
+    display:inline-block;
 }
 
 select {
