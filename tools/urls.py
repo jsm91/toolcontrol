@@ -3,6 +3,9 @@ from django.contrib.auth.decorators import login_required
 from tools.models import Container, ConstructionSite, Employee, Tool
 from tools.models import ToolCategory, ToolModel
 
+from tools.forms import BuildingSiteForm, ContainerForm, EmployeeForm
+from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
+
 from tools.views import CategoryListView, ContainerListView 
 from tools.views import ConstructionSiteListView, EventListView
 from tools.views import EmployeeListView, IndexView, LoanListView
@@ -53,15 +56,25 @@ urlpatterns = patterns('tools.views',
         name='building_site_banner'),
 
     # AJAX requests for forms
-    url(r'^container_form/$', 'container_form', name='container_form'),
-    url(r'^tool_form/$', 'tool_form', name='tool_form'),
-    url(r'^model_form/$', 'model_form', name='model_form'),
-    url(r'^category_form/$', 'category_form', name='category_form'),
-    url(r'^employee_form/$', 'employee_form', name='employee_form'),
+    url(r'^container_form/$', 'form', 
+        {'class_name': Container, 'form_name': ContainerForm}, 
+         name='container_form'),
+    url(r'^tool_form/$', 'form',
+        {'class_name': Tool, 'form_name': ToolForm}, name='tool_form'),
+    url(r'^model_form/$', 'form', 
+        {'class_name': ToolModel, 'form_name': ToolModelForm}, 
+        name='model_form'),
+    url(r'^category_form/$', 'form', 
+        {'class_name': ToolCategory, 'form_name': ToolCategoryForm}, 
+        name='category_form'),
+    url(r'^employee_form/$', 'form', 
+        {'class_name': Employee, 'form_name': EmployeeForm}, 
+        name='employee_form'),
     url(r'^loan_form/$', 'loan_form', name='loan_form'),
     url(r'^container_loan_form/$', 'container_loan_form', 
         name='container_loan_form'),
-    url(r'^building_site_form/$', 'building_site_form', 
+    url(r'^building_site_form/$', 'form', 
+        {'class_name': ConstructionSite, 'form_name': BuildingSiteForm}, 
         name='building_site_form'),
 
     # AJAX requests for actions

@@ -14,6 +14,8 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 class ConstructionSite(models.Model):
+    verbose_name = 'building_site'
+
     name = models.CharField('Navn', max_length=200)
     is_active = models.BooleanField('Aktiv', default=True)
 
@@ -37,6 +39,8 @@ class ConstructionSite(models.Model):
         return self.name
 
 class Container(models.Model):
+    verbose_name = 'container'
+
     name = models.CharField(max_length=255)
     location = models.ForeignKey(ConstructionSite, null=True, default=None)
     is_active = models.BooleanField()
@@ -117,6 +121,8 @@ class EmployeeManager(BaseUserManager):
         return employee
 
 class Employee(AbstractBaseUser):
+    verbose_name = 'employee'
+
     name = models.CharField('Navn', max_length=200, unique=True, db_index=True)
     email = models.EmailField('Email', max_length=255, blank=True, null=True)
     phone_number = models.IntegerField('Telefonnummer', blank=True, null=True)
@@ -249,6 +255,8 @@ class ForgotPasswordToken(models.Model):
     user = models.ForeignKey(Employee)
 
 class ToolCategory(models.Model):
+    verbose_name = 'category'
+
     name = models.CharField('Navn', max_length=200)
 
     def total_price(self):
@@ -268,6 +276,8 @@ class ToolCategory(models.Model):
         return self.name
 
 class ToolModel(models.Model):
+    verbose_name = 'model'
+
     name = models.CharField('Navn', max_length=200)
     category = models.ForeignKey(ToolCategory)
     service_interval = models.IntegerField('Serviceinterval', default=6)
@@ -287,6 +297,8 @@ class ToolModel(models.Model):
         return self.name
 
 class Tool(models.Model):
+    verbose_name = 'tool'
+
     LOCATION_CHOICES = (
         ('Lager', 'Lager'),
         ('Udlånt', 'Udlånt'),
@@ -316,6 +328,7 @@ class Tool(models.Model):
     end_date = models.DateTimeField('Ophørsdato',
                                     null=True, blank=True)
 
+    
     def get_location(self):
         if self.location == 'Udlånt':
             if self.employee and self.construction_site:
@@ -327,7 +340,7 @@ class Tool(models.Model):
         else:
             return self.location
 
-    def service(self, **kwargs):
+    def service(self):
         if self.location == 'Lager':
             event = Event(event_type='Service', tool=self)
             event.save()

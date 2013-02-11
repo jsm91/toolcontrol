@@ -352,305 +352,61 @@ def building_site_banner(request):
     return render(request, 'building_site_banner.html', context)
 
 @login_required
-def container_form(request):
-    if request.POST:
-        container_id = request.POST.get('id', 0)
+def form(request, class_name, form_name):
+    print request.POST
 
-        # Edit an existing container
-        if container_id != 0:
-            container = get_object_or_404(Container, id = container_id)
-            logger.info('%s is editing a container (%s)' % (request.user, container.name))
-            container_form = ContainerForm(data = request.POST, 
-                                           instance = container)
-            if container_form.is_valid():
-                container_form.save()
-                logger.info('container successfully edited')
-                response = {'response': 'Container redigeret'}
+    if request.POST:
+        obj_id = request.POST.get('id')
+
+        if obj_id is not None:
+            obj = get_object_or_404(class_name, id = obj_id)
+            logger.info('%s is editing a %s (%s)' % (request.user, 
+                                                     class_name.__name__,
+                                                     obj.name))
+            form = form_name(data = request.POST, instance = obj)
+
+            if form.is_valid():
+                form.save()
+                logger.info('%s edited successfully' % class_name.__name__)
+                form = form_name()
+
+                response = {'response': 'Objekt redigeret'}
             else:
-                logger.info('container not edited')
+                logger.info('%s not edited' % class_name.__name__)
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
 
         else:
-            logger.info('%s is creating a container (%s)' % (request.user, request.POST.get('name')))
-            container_form = ContainerForm(request.POST)
-            if container_form.is_valid():
-                container_form.save()
-                logger.info('container successfully created')
-                response = {'response': 'Container oprettet'}
-            else:
-                logger.info('container not created')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+            logger.info('%s is creating a %s (%s)' % (request.user,
+                                                      class_name.__name__,
+                                                      request.POST.get('name')))
+            form = form_name(request.POST)
+            if form.is_valid():
+                obj = form.save()
+                logger.info('%s successfully created' % class_name.__name__)
 
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-            
-    container_id = request.GET.get('id')
-
-    if container_id:
-        container = get_object_or_404(Container, id = container_id)
-        container_form = ContainerForm(instance=container)
-        context = {'form': container_form,
-                   'object_type': 'container',
-                   'id': container.id}
-    else:
-        container_form = ContainerForm()
-        context = {'form': container_form,
-                   'object_type': 'container'}
-
-    return render(request, 'form.html', context)
-
-@login_required
-def tool_form(request):
-    if request.POST:
-        tool_id = request.POST.get('id', 0)
-
-        # Edit an existing tool
-        if tool_id != 0:
-            tool = get_object_or_404(Tool, id = tool_id)
-            logger.info('%s is editing a tool (%s)' % (request.user, tool.name))
-            tool_form = ToolForm(data = request.POST, instance = tool)
-
-            if tool_form.is_valid():
-                new_tool = tool_form.save()
-                logger.info('Tool edited successfully')
-                tool_form = ToolForm()
-
-                response = {'response': 'Værktøj redigeret'}
-            else:
-                logger.info('Tool not edited')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        # Create new tool
-        else:
-            logger.info('%s is creating a tool (%s)' % (request.user,
-                                                        request.POST.get('name')))
-            tool_form = ToolForm(request.POST)
-            if tool_form.is_valid():
-                tool = tool_form.save()
-                logger.info('Tool successfully created')
-                event = Event(event_type="Oprettelse", tool=tool)
-                event.save()
+                if isinstance(obj, Tool):
+                    event = Event(event_type="Oprettelse", tool=obj)
+                    event.save()
                 
-                response = {'response': 'Værktøj oprettet'}
+                response = {'response': 'Objekt oprettet'}
             else:
-                logger.info('Tool not created')
+                logger.info('%s not created' % class_name.__name__)
                 response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
 
-    tool_id = request.GET.get('id')
+    obj_id = request.GET.get('id')
 
-    if tool_id:
-        tool = get_object_or_404(Tool, id = tool_id)
-        tool_form = ToolForm(instance=tool)
-        context = {'form': tool_form,
-                   'object_type': 'tool',
-                   'id': tool.id}
+    if obj_id:
+        obj = get_object_or_404(class_name, id = obj_id)
+        form = form_name(instance=obj)
+        context = {'form': form,
+                   'object_type': obj.verbose_name,
+                   'id': obj.id}
     else:
-        tool_form = ToolForm()
-        context = {'form': tool_form,
-                   'object_type': 'tool'}
-
-    return render(request, 'form.html', context)
-
-@login_required
-def model_form(request):
-    if request.POST:
-        model_id = request.POST.get('id', 0)
-
-        # Edit an existing model
-        if model_id != 0:
-            model = get_object_or_404(ToolModel, id = model_id)
-            logger.info('%s is editing a model (%s)' % (request.user, model.name))
-            model_form = ToolModelForm(data = request.POST, instance = model)
-
-            if model_form.is_valid():
-                new_model = model_form.save()
-                logger.info('Model successfully edited')
-                model_form = ToolModelForm()
-
-                response = {'response': 'Model redigeret'}
-            else:
-                logger.info('Model not edited')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        else:
-            logger.info('%s is creating a model (%s)' % (request.user, request.POST.get('name')))
-            model_form = ToolModelForm(request.POST)
-            if model_form.is_valid():
-                model = model_form.save()
-                logger.info('Model successfully created')
-                model_form = ToolModelForm()
-            
-                response = {'response': 'Model oprettet'}
-            else:
-                logger.info('Model not created')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-
-
-    model_id = request.GET.get('id')
-
-    if model_id:
-        model = get_object_or_404(ToolModel, id = model_id)
-        model_form = ToolModelForm(instance=model)
-        context = {'form': model_form,
-                   'object_type': 'model',
-                   'id': model.id}
-    else:
-        model_form = ToolModelForm()
-        context = {'form': model_form,
-                   'object_type': 'model'}
-
-    return render(request, 'form.html', context)
-
-@login_required
-def category_form(request):
-    if request.POST:
-        category_id = request.POST.get('id', 0)
-
-        # Edit an existing category
-        if category_id != 0:
-            category = get_object_or_404(ToolCategory, id = category_id)
-            logger.info('%s is editing a category (%s)' % (request.user, category.name))
-            category_form = ToolCategoryForm(data = request.POST, 
-                                             instance = category)
-            if category_form.is_valid():
-                category_form.save()
-                logger.info('Category successfully edited')
-                response = {'response': 'Kategori redigeret'}
-            else:
-                logger.info('Category not edited')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        else:
-            logger.info('%s is creating a category (%s)' % (request.user, request.POST.get('name')))
-            category_form = ToolCategoryForm(request.POST)
-            if category_form.is_valid():
-                category_form.save()
-                logger.info('Category successfully created')
-                response = {'response': 'Kategori oprettet'}
-            else:
-                logger.info('Category not created')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-            
-    category_id = request.GET.get('id')
-
-    if category_id:
-        category = get_object_or_404(ToolCategory, id = category_id)
-        category_form = ToolCategoryForm(instance=category)
-        context = {'form': category_form,
-                   'object_type': 'category',
-                   'id': category.id}
-    else:
-        category_form = ToolCategoryForm()
-        context = {'form': category_form,
-                   'object_type': 'category'}
-
-    return render(request, 'form.html', context)
-
-@login_required
-def employee_form(request):
-    if request.POST:
-        employee_id = request.POST.get('id', 0)
-
-        # Edit an existing employee
-        if employee_id != 0:
-            employee = get_object_or_404(Employee, id = employee_id)
-            logger.info('%s is editing an employee (%s)' % (request.user, employee.name))
-            employee_form = EmployeeForm(data = request.POST, 
-                                         instance = employee)
-            if employee_form.is_valid():
-                employee_form.save()
-                logger.info('Employee successfully created')
-                response = {'response': 'Medarbejder redigeret'}
-            else:
-                logger.info('Employee not created')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        else:
-            logger.debug('%s is creating a new employee: %s, %s, %s' %
-                         (request.user,
-                          request.POST.get('name'),
-                          request.POST.get('email'),
-                          request.POST.get('phone_number')))
-            employee_form = EmployeeForm(request.POST)
-            if employee_form.is_valid():
-                employee_form.save()
-                logger.debug('Employee successfully created')
-                response = {'response': 'Medarbejder oprettet'}
-            else:
-                logger.debug('Employee not created')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-            
-    employee_id = request.GET.get('id')
-
-    if employee_id:
-        employee = get_object_or_404(Employee, id = employee_id)
-        employee_form = EmployeeForm(instance=employee)
-        context = {'form': employee_form,
-                   'object_type': 'employee',
-                   'id': employee.id}
-    else:
-        employee_form = EmployeeForm()
-        context = {'form': employee_form,
-                   'object_type': 'employee'}
-
-    return render(request, 'form.html', context)
-
-@login_required
-def building_site_form(request):
-    if request.POST:
-        building_site_id = request.POST.get('id', 0)
-
-        # Edit an existing building_site
-        if building_site_id != 0:
-            building_site = get_object_or_404(ConstructionSite, id = building_site_id)
-            logger.info('%s is editing a building site (%s)' % (request.user, building_site.name))
-            building_site_form = BuildingSiteForm(data = request.POST, 
-                                         instance = building_site)
-            if building_site_form.is_valid():
-                building_site_form.save()
-                logger.info('Building site successfully edited')
-                response = {'response': 'Byggeplads redigeret'}
-            else:
-                logger.info('Building site not edited')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        else:
-            logger.info('%s is creating a building site (%s)' % (request.user, request.POST.get('name')))
-            building_site_form = BuildingSiteForm(request.POST)
-            if building_site_form.is_valid():
-                building_site_form.save()
-                logger.info('Building site successfully created')
-                response = {'response': 'Byggeplads oprettet'}
-            else:
-                logger.info('Building site not created')
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
-
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-            
-    building_site_id = request.GET.get('id')
-
-    if building_site_id:
-        building_site = get_object_or_404(ConstructionSite, id = building_site_id)
-        building_site_form = BuildingSiteForm(instance=building_site)
-        context = {'form': building_site_form,
-                   'object_type': 'building_site',
-                   'id': building_site.id}
-    else:
-        building_site_form = BuildingSiteForm()
-        context = {'form': building_site_form,
-                   'object_type': 'building_site'}
+        form = form_name()
+        context = {'form': form,
+                   'object_type': class_name.verbose_name}
 
     return render(request, 'form.html', context)
 
