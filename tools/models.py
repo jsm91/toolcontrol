@@ -140,7 +140,6 @@ class Employee(AbstractBaseUser):
     objects = EmployeeManager()
     
     USERNAME_FIELD = 'name'
-    REQUIRED_FIELDS = ['email', 'phone_number']
 
     def is_admin(self):
         return self.is_tool_admin or self.is_office_admin

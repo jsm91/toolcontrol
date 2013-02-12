@@ -107,6 +107,7 @@ $(document).ready(function() {
 
     // Creating or editing an object
     $(document).on("submit", "form.add", function() {
+	alert("Fisk")
 	var object_type = $(this).attr("id");
 	$.post("/"+object_type+"_form/", $(this).serialize(), function(data) {
 	    // Reload the page

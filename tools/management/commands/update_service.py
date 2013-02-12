@@ -27,8 +27,9 @@ class Command(BaseCommand):
                 message += '%s (%s)\n'% (tool.name, tool.get_location())
 
         for admin in Employee.objects.filter(is_tool_admin=True):
-            admin.send_sms(message)
-
+            if admin.name != 'Henrik' and admin.name != 'Jacob Møller':
+                admin.send_sms(message)
+                
         # Send SMS to all loaners who have tools that need service
         for employee in Employee.objects.all():
             tools_to_service = []
