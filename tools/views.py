@@ -494,12 +494,17 @@ def action(request, class_name):
                     logger.info('Action on %s not successful' % obj_name)
                     failure_objects.append(obj_name)
             else:
-                if action_function() or action == 'delete':
-                    logger.info('Action on %s successful' % obj_name)
-                    success_objects.append(obj_name)
+                if request.user.is_admin():
+                    if (action_function() or action == 'delete'):
+                        logger.info('Action on %s successful' % obj_name)
+                        success_objects.append(obj_name)
+                    else:
+                        logger.info('Action on %s not successful' % obj_name)
+                        failure_objects.append(obj_name)
                 else:
-                    logger.info('Action on %s not successful' % obj_name)
-                    failure_objects.append(obj_name)
+                    response = {'response': 'Du har ikke ret til denne handling'}                   
+                    return HttpResponse(simplejson.dumps(response), 
+                                        content_type="application/json")
 
     logger.info('No more objects')
 
