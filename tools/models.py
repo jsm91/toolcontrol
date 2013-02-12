@@ -41,9 +41,10 @@ class ConstructionSite(models.Model):
 class Container(models.Model):
     verbose_name = 'container'
 
-    name = models.CharField(max_length=255)
-    location = models.ForeignKey(ConstructionSite, null=True, default=None)
-    is_active = models.BooleanField()
+    name = models.CharField('Navn', max_length=255)
+    location = models.ForeignKey(ConstructionSite, null=True, default=None,
+                                 verbose_name = 'Placering')
+    is_active = models.BooleanField('Aktiv')
 
     def make_active(self):
         if self.is_active:

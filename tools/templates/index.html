@@ -39,12 +39,6 @@
     Der er ikke valgt noget indhold
   </div>
   
-  <div class="popup" id="loan">
-    {% for loaner in loaners %}
-      <a href="#{{ loaner.id }}" class="loan">{{ loaner.name }}</a><br>
-    {% endfor %}
-  </div>
-  
   <div class="popup" id="delete">
     <form method="POST" action="/object_delete/" id="delete">
       <input type="hidden" id="id" name="id" value="0">		

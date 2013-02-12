@@ -1,13 +1,46 @@
 <form method="POST" class="add" id="{{ object_type }}">
   <table>
     {% csrf_token %}
-    {{ form.as_new_table }}
+    {% for field in form %}
+      {% if not field.is_hidden %}
+        <tr>
+	  <th>
+	    {{ field.label }}
+	    {% if field.help_text %}
+	    <img src="{{ STATIC_URL }}Icon_Info.svg" 
+		 title="{{ field.help_text }}">
+	    {% endif %}
+	    {% if field.field.queryset %}
+	    <img src="{{ STATIC_URL }}Icon_Plus.svg" class="add_inline"
+		 id="{{ field.name }}">
+	    {% endif %}
+	  </th>
+	  <td>
+	    {{ field }}
+	  </td>
+	</tr>
+	{% if field.field.queryset %}
+          <tr class="add_inline" id="{{ field.name }}">
+	    <td colspan="2">
+	      <div>
+		Inline form ikke hentet korrekt
+	      </div>
+	    </td>
+	  </tr>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% for field in form %}
+      {% if field.is_hidden %}
+	{{ field }}
+      {% endif %}
+    {% endfor %}
     <tr>
       <td class="bottom" colspan="2">
 	{% if id %}
 	  <input type="hidden" name="id" value="{{ id }}">
 	{% endif %}
-	<input type="submit" value="Gem">
+	<input class="add" type="submit" value="Gem">
       </td>
     </tr>
   </table>

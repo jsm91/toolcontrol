@@ -410,23 +410,23 @@ def form(request, class_name, form_name):
 
 @login_required
 def loan_form(request):
-	if request.POST:
-		logger.info('%s is loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
-		loan_form = LoanForm(request.POST)
-		if loan_form.is_valid():
-			loan_form.save()
-			logger.info('Tools loaned')
-			response = {'response': 'Værktøj udlånt'}
-		else:
-			logger.info('Tools not loaned')
-			response = {'response': 'Værktøj ikke udlånt'}
+    if request.POST:
+        logger.info('%s is loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
+        loan_form = LoanForm(request.POST)
+        if loan_form.is_valid():
+            loan_form.save()
+            logger.info('Tools loaned')
+            response = {'response': 'Værktøj udlånt'}
+        else:
+            logger.info('Tools not loaned')
+            response = {'response': 'Værktøj ikke udlånt'}
 			
-		return HttpResponse(simplejson.dumps(response), 
+        return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
-	
-	loan_form = LoanForm()
-	context = {'form': loan_form, 'object_type': 'loan'}
-	return render(request, 'form.html', context)
+
+    loan_form = LoanForm()
+    context = {'form': loan_form, 'object_type': 'loan'}
+    return render(request, 'form.html', context)
 
 @login_required
 def container_loan_form(request):
@@ -707,3 +707,22 @@ def qr_action(request, pk):
 
         context_dictionary = {'authentication_form': authentication_form}
         return render(request, 'qr/login.html', context_dictionary)
+
+@login_required
+def inline_form(request, form_name, object_type):
+    if request.POST:
+        form = form_name(request.POST)
+        if form.is_valid():
+            obj = form.save()
+            response = {'response': 'Objekt oprettet',
+                        'value': obj.id,
+                        'name': obj.name}
+        else:
+            response = {'response': 'Et eller flere af de påkrævede felter blev ikke udfyldt korrekt'}
+
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype='application/json')
+
+    context_dictionary = {'form': form_name(),
+                          'object_type': object_type}
+    return render(request, 'inline_form.html', context_dictionary)

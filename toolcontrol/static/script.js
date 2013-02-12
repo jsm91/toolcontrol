@@ -106,22 +106,22 @@ $(document).ready(function() {
     });
 
     // Creating or editing an object
-    $(document).on("submit", "form.add", function() {
-	alert("Fisk")
-	var object_type = $(this).attr("id");
-	$.post("/"+object_type+"_form/", $(this).serialize(), function(data) {
-	    // Reload the page
-	    if(object_type == "loan") {
-		$("div#content").load("/tool_list/");
-	    }
-	    else if(object_type == "container_loan") {
-		$("div#content").load("/container_tool_list/");
-	    }
-	    else {
-		$("div#content").load("/"+object_type+"_list/");
-	    }
-	    set_message(data.response);
-	});
+    $(document).on("click", "input.add", function() {
+	var object_type = $('form.add').attr("id");
+	$.post("/"+object_type+"_form/", $('form.add').serialize(), 
+	       function(data) {
+		   // Reload the page
+		   if(object_type == "loan") {
+		       $("div#content").load("/tool_list/");
+		   }
+		   else if(object_type == "container_loan") {
+		       $("div#content").load("/container_list/");
+		   }
+		   else {
+		       $("div#content").load("/"+object_type+"_list/");
+		   }
+		   set_message(data.response);
+	       });
 
 	// Close the popup
 	$('#mask').fadeOut('fast', function() {
@@ -163,18 +163,19 @@ $(document).ready(function() {
 	});
 
 	if (action == "loan") {
-	    var popupBox = "div.popup#loan";
+	    var popupBox = "div.popup#add";
 
 	    $(popupBox).load("/loan_form/", function() {
 		$("input#id_tools").attr("value", object_ids.toString());
-	    //Set the center alignment padding + border
-	    var popMargTop = ($(popupBox).height() + 24) / 2; 
-	    var popMargLeft = ($(popupBox).width() + 24) / 2; 
-	    
-	    $(popupBox).css({ 
-		'margin-top' : -popMargTop,
-		'margin-left' : -popMargLeft
-	    });
+
+		//Set the center alignment padding + border
+		var popMargTop = ($(popupBox).height() + 24) / 2; 
+		var popMargLeft = ($(popupBox).width() + 24) / 2; 
+		
+		$(popupBox).css({ 
+		    'margin-top' : -popMargTop,
+		    'margin-left' : -popMargLeft
+		});
 
 	    });
 
@@ -186,19 +187,18 @@ $(document).ready(function() {
 	    $('#mask').fadeIn('fast');
 	}
 	else if (action == "container_loan") {
-	    var popupBox = "div.popup#loan";
+	    var popupBox = "div.popup#add";
 
 	    $(popupBox).load("/container_loan_form/", function() {
 		$("input#id_containers").attr("value", object_ids.toString());
-	    //Set the center alignment padding + border
-	    var popMargTop = ($(popupBox).height() + 24) / 2; 
-	    var popMargLeft = ($(popupBox).width() + 24) / 2; 
-	    
-	    $(popupBox).css({ 
-		'margin-top' : -popMargTop,
-		'margin-left' : -popMargLeft
-	    });
-
+		//Set the center alignment padding + border
+		var popMargTop = ($(popupBox).height() + 24) / 2; 
+		var popMargLeft = ($(popupBox).width() + 24) / 2; 
+		
+		$(popupBox).css({ 
+		    'margin-top' : -popMargTop,
+		    'margin-left' : -popMargLeft
+		});
 	    });
 
             //Fade in the popup
@@ -518,4 +518,39 @@ $(document).ready(function() {
 	    }
 	});
     });
+
+    // Inline forms
+    $(document).on('click', 'img.add_inline', function() {
+	var id = $(this).attr("id");
+	if($("tr.add_inline#" + id).is(":visible")) {
+	    $("tr.add_inline#" + id + " div").slideUp(function() {
+		$("tr.add_inline#" + id).hide();
+	    });
+	}
+	else {
+	    $("tr.add_inline#" + id + " div").load("/" + id + "_inline_form/", function() {
+		$("tr.add_inline#" + id).show();
+		$("tr.add_inline#" + id + " div").slideDown();
+	    });
+	}
+	
+    });
+    $(document).on("click", "input.add_inline", function() {
+	var id = $(this).attr("id");
+	$("tr.add_inline#" + id + " div").slideUp(function() {
+	    $("tr.add_inline#" + id).hide();
+	});
+	var vars = $("form.add").serialize();
+	$.post("/" + id + "_inline_form/", vars, function(data) {
+	    $("select#id_" + id).append($("<option></option>")
+					.attr("value", data.value)
+					.text(data.name));
+	    set_message(data.response);
+	});
+
+	return false;
+    });
+
+
+
 });
