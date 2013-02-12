@@ -525,6 +525,7 @@ $(document).ready(function() {
 	if($("tr.add_inline#" + id).is(":visible")) {
 	    $("tr.add_inline#" + id + " div").slideUp(function() {
 		$("tr.add_inline#" + id).hide();
+		$("tr.add_inline#" + id + " div").text("Inline form ikke hentet korrekt")
 	    });
 	}
 	else {
@@ -545,12 +546,10 @@ $(document).ready(function() {
 	    $("select#id_" + id).append($("<option></option>")
 					.attr("value", data.value)
 					.text(data.name));
+	    $("tr.add_inline#" + id + " div").text("Inline form ikke hentet korrekt")
 	    set_message(data.response);
 	});
 
 	return false;
     });
-
-
-
 });

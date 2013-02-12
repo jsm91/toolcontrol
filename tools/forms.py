@@ -122,11 +122,6 @@ class ForgotPasswordForm(forms.Form):
         
 
 class ToolCategoryForm(NewModelForm):
-    def __init__(self, *args, **kwargs):
-        super(ToolCategoryForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['id'] = 'id_category_name'
-
-
     class Meta:
         model = ToolCategory
         fields = ['name',]
@@ -138,7 +133,6 @@ class ToolModelForm(NewModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ToolModelForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['id'] = 'id_model_name'
         self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøj af denne model ikke skal serviceres'
 
 
@@ -147,10 +141,6 @@ class ToolModelForm(NewModelForm):
         exclude = ['number_of_tools', 'total_price']
 
 class ContainerForm(NewModelForm):
-    def __init__(self, *args, **kwargs):
-        super(ContainerForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['id'] = 'id_container_name'
-
     class Meta:
         model = Container
         exclude = ['location',]
@@ -177,8 +167,6 @@ class ToolForm(NewModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ToolForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['id'] = 'id_tool_name'
-
         self.fields['buy_date'].initial = datetime.datetime.now()
         try:
             self.fields['model'].initial = ToolModel.objects.all()[0]
@@ -197,10 +185,6 @@ class EmployeeForm(NewModelForm):
         model = Employee
         exclude = ['password', 'last_login', 'is_loan_flagged', 'is_employee',
                    'sms_loan_threshold', 'email_loan_threshold',]
-
-    def __init__(self, *args, **kwargs):
-        super(EmployeeForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['id'] = 'id_employee_name'
 
     def clean(self):
         cleaned_data = super(EmployeeForm, self).clean()
@@ -237,10 +221,6 @@ class EmployeeForm(NewModelForm):
 class BuildingSiteForm(NewModelForm):
     class Meta:
         model = ConstructionSite
-
-    def __init__(self, *args, **kwargs):
-        super(BuildingSiteForm, self).__init__(*args, **kwargs)
-        self.fields['name'].widget.attrs['id'] = 'id_construction_site_name'
 
     def save(self, commit=True):
         building_site = super(BuildingSiteForm, self).save(commit=False)
