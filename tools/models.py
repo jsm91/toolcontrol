@@ -382,7 +382,7 @@ class Tool(models.Model):
 
         # Check for reservation
         if reservations:
-            reservations = reservation[0]
+            reservation = reservations[0]
             if (employee != reservation.employee and
                 construction_site != reservation.construction_site):
                 return False
