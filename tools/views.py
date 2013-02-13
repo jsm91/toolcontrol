@@ -18,8 +18,8 @@ from django.views.generic.edit import FormView
 
 from tools.forms import BuildingSiteForm, ContainerForm, ContainerLoanForm
 from tools.forms import CreateManyToolsForm, EmployeeForm, ForgotPasswordForm
-from tools.forms import LoanForm, QRLoanForm, SettingsForm, ToolForm
-from tools.forms import ToolCategoryForm, ToolModelForm
+from tools.forms import LoanForm, QRLoanForm, ReservationForm, SettingsForm
+from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
 
 from tools.models import ConstructionSite, Container, Event, Employee, Tool
 from tools.models import ForgotPasswordToken, ToolCategory, ToolModel
@@ -263,6 +263,16 @@ class EventListView(ListView):
 
         return Event.objects.filter(tool=tool).order_by('start_date')
 
+    def get_context_data(self, **kwargs):
+        context = super(EventListView, self).get_context_data(**kwargs)
+
+        tool_id = self.request.GET.get('tool_id')
+        tool = get_object_or_404(Tool, id = tool_id)
+
+        context['reservations'] = tool.reservation_set.filter(end_date__gte=datetime.datetime.now())
+
+        return context
+
 class LoanListView(ListView):
     template_name = 'loan_list.html'
 
@@ -426,6 +436,26 @@ def loan_form(request):
 
     loan_form = LoanForm()
     context = {'form': loan_form, 'object_type': 'loan'}
+    return render(request, 'form.html', context)
+
+@login_required
+def reservation_form(request):
+    if request.POST:
+        logger.info('%s is reservating %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
+        reservation_form = ReservationForm(request.POST)
+        if reservation_form.is_valid():
+            reservation_form.save()
+            logger.info('Tools reserved')
+            response = {'response': 'Værktøj reserveret'}
+        else:
+            logger.info('Tools not reserved')
+            response = {'response': 'Værktøj ikke reserveret'}
+			
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+
+    reservation_form = ReservationForm()
+    context = {'form': reservation_form, 'object_type': 'reservation'}
     return render(request, 'form.html', context)
 
 @login_required

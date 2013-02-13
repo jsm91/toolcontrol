@@ -1,3 +1,15 @@
+{% if reservations %}
+  <table class="reservations">
+    {% for reservation in reservations %}
+      <tr>
+	<td>
+          <img src="{{ STATIC_URL }}Icon_Warning.svg" title="Værktøjet er reserveret">
+	  Værktøjet er reserveret af {{ reservation.reservees }} fra {{ reservation.start_date }} - {{ reservation.end_date }}
+	</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
 <table>
   <tr>
     {% if user.is_admin %}

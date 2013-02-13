@@ -111,7 +111,7 @@ $(document).ready(function() {
 	$.post("/"+object_type+"_form/", $('form.add').serialize(), 
 	       function(data) {
 		   // Reload the page
-		   if(object_type == "loan") {
+		   if(object_type == "loan" || object_type == "reservation") {
 		       $("div#content").load("/tool_list/");
 		   }
 		   else if(object_type == "container_loan") {
@@ -191,6 +191,28 @@ $(document).ready(function() {
 
 	    $(popupBox).load("/container_loan_form/", function() {
 		$("input#id_containers").attr("value", object_ids.toString());
+		//Set the center alignment padding + border
+		var popMargTop = ($(popupBox).height() + 24) / 2; 
+		var popMargLeft = ($(popupBox).width() + 24) / 2; 
+		
+		$(popupBox).css({ 
+		    'margin-top' : -popMargTop,
+		    'margin-left' : -popMargLeft
+		});
+	    });
+
+            //Fade in the popup
+	    $(popupBox).fadeIn('slow');
+	    
+	    // Add the mask to body
+	    $('body').append('<div id="mask"></div>');
+	    $('#mask').fadeIn('fast');
+	}
+	else if (action == "reserve") {
+	    var popupBox = "div.popup#add";
+
+	    $(popupBox).load("/reservation_form/", function() {
+		$("input#id_tools").attr("value", object_ids.toString());
 		//Set the center alignment padding + border
 		var popMargTop = ($(popupBox).height() + 24) / 2; 
 		var popMargLeft = ($(popupBox).width() + 24) / 2; 

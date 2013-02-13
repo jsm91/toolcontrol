@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
 from django.db import models
+from django.db.models import Q
 from django.db.models import Sum
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
@@ -375,6 +376,14 @@ class Tool(models.Model):
     def loan(self, employee=None, construction_site=None):
         if not(employee or construction_site):
             return False
+
+        # Check for reservation
+        if self.is_reserved(datetime.datetime.now()):
+            reservation = Reservation.objects.get(start_date__lte = datetime.datetime.now(), end_date__gte = datetime.datetime.now(), tool = self)
+            if (employee != reservation.employee and
+                construction_site != reservation.construction_site):
+                return False
+
         if self.location == 'Lager':
             event = Event(event_type='Udlån', tool=self,
                           employee=employee, 
@@ -420,6 +429,24 @@ class Tool(models.Model):
         self.last_service = last_service.start_date
         self.save()
 
+    def is_reserved(self, start_date, end_date=None):
+        reservations = self.reservation_set.filter(Q(start_date__lte = start_date, end_date__gte = start_date)|Q(start_date__lte = end_date, end_date__gte = end_date)|Q(start_date__gte = start_date, end_date__lte = end_date))
+
+        if reservations.exists():
+            return reservations.order_by('start_date')
+
+        return False
+
+    def reserve(self, employee, construction_site, start_date, end_date):
+        if self.is_reserved(start_date, end_date):
+            return False
+        
+        reservation = Reservation(tool = self, employee = employee, 
+                                  construction_site = construction_site,
+                                  start_date = start_date, end_date = end_date)
+        reservation.save()
+        return True
+
     def __unicode__(self):
         return self.name
 
@@ -460,6 +487,27 @@ class Event(models.Model):
         elif self.employee:
             return self.employee
         else:
+            return self.construction_site
+
+class Reservation(models.Model):
+    verbose_name = 'reservation'
+    tool = models.ForeignKey(Tool, verbose_name='Værktøj')
+    employee = models.ForeignKey(Employee, verbose_name='Medarbejder',
+                                 null=True, blank=True)
+    construction_site = models.ForeignKey(ConstructionSite, 
+                                          verbose_name='Byggeplads',
+                                          null=True, blank=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    def reservees(self):
+        print self.employee
+        print self.construction_site
+        if self.employee and self.construction_site:
+            return "%s/%s" % (self.employee, self.construction_site)
+        elif self.employee:
+            return self.employee
+        elif self.construction_site:
             return self.construction_site
 
 @receiver(pre_delete, sender=Event)

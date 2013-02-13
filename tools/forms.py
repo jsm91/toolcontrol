@@ -7,8 +7,8 @@ from django import forms
 from django.shortcuts import get_object_or_404
 
 from tools.models import Container, ContainerLoan, ConstructionSite, Employee
-from tools.models import Event, ForgotPasswordToken, Tool, ToolCategory
-from tools.models import ToolModel
+from tools.models import Event, ForgotPasswordToken, Reservation, Tool
+from tools.models import ToolCategory, ToolModel
 
 class NewForm(forms.Form):
     def as_new_table(self):
@@ -325,5 +325,36 @@ class CreateManyToolsForm(NewForm):
         if start_index is not None:
             if int(start_index) > end_index:
                 raise forms.ValidationError('Start-indeks skal være lavere end slut-indeks')
+
+        return cleaned_data
+
+class ReservationForm(NewModelForm):
+    tools = forms.CharField(widget=forms.HiddenInput)
+
+    class Meta:
+        model = Reservation
+        exclude = ['tool']
+
+    def __init__(self, *args, **kwargs):
+        super(ReservationForm, self).__init__(*args, **kwargs)
+        self.fields['start_date'].initial = datetime.datetime.now()
+        self.fields['end_date'].initial = (datetime.datetime.now() + 
+                                           datetime.timedelta(days=7))
+
+    def save(self, commit=True):
+        tool_ids = self.cleaned_data['tools'].split(',')
+
+        for tool_id in tool_ids:
+            tool = get_object_or_404(Tool, id = tool_id)
+            tool.reserve(employee = self.cleaned_data['employee'],
+                         construction_site = self.cleaned_data['construction_site'],
+                         start_date = self.cleaned_data['start_date'],
+                         end_date = self.cleaned_data['end_date'])
+
+    def clean(self):
+        cleaned_data = super(ReservationForm, self).clean()
+
+        if self.cleaned_data['end_date'] < self.cleaned_data['start_date']:
+            raise forms.ValidationError('Slutdato skal være efter startdato')
 
         return cleaned_data

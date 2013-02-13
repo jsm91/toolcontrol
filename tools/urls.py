@@ -1,10 +1,11 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.auth.decorators import login_required
-from tools.models import Container, ConstructionSite, Employee, Tool
-from tools.models import ToolCategory, ToolModel
+from tools.models import Container, ConstructionSite, Employee, Reservation
+from tools.models import Tool, ToolCategory, ToolModel
 
 from tools.forms import BuildingSiteForm, ContainerForm, EmployeeForm
-from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
+from tools.forms import ReservationForm, ToolForm, ToolCategoryForm
+from tools.forms import ToolModelForm
 
 from tools.views import CategoryListView, ContainerListView 
 from tools.views import ConstructionSiteListView, EventListView
@@ -71,6 +72,7 @@ urlpatterns = patterns('tools.views',
         {'class_name': Employee, 'form_name': EmployeeForm}, 
         name='employee_form'),
     url(r'^loan_form/$', 'loan_form', name='loan_form'),
+    url(r'^reservation_form/$', 'reservation_form', name='reservation_form'),
     url(r'^container_loan_form/$', 'container_loan_form', 
         name='container_loan_form'),
     url(r'^building_site_form/$', 'form', 
