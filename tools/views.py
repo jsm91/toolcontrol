@@ -22,7 +22,8 @@ from tools.forms import LoanForm, QRLoanForm, ReservationForm, SettingsForm
 from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
 
 from tools.models import ConstructionSite, Container, Event, Employee, Tool
-from tools.models import ForgotPasswordToken, ToolCategory, ToolModel
+from tools.models import ForgotPasswordToken, Reservation, ToolCategory
+from tools.models import ToolModel
 
 from toolcontrol.enums import TOOL_FAILURES, verbose_action
 from toolcontrol.utils import handle_loan_messages, pretty_concatenate
@@ -615,6 +616,31 @@ def event_delete(request):
         tool.save()
 
     response = {'response': 'Begivenheden blev slettet'}
+
+    return HttpResponse(simplejson.dumps(response), 
+                        mimetype="application/json")
+
+@login_required
+def reservation_delete(request):
+    reservation_id = request.GET.get('id')
+    logger.warning('%s is trying to delete reservation with id %s' % (request.user, reservation_id))
+
+    if not request.user.is_admin():
+        logger.error('Reservation not deleted, user has no rights')
+        response = {'response': 'Du har ikke rettigheder til at slette reservationen'}
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+
+    try:
+        reservation = get_object_or_404(Reservation, id = reservation_id)
+    except Http404:
+        logger.error('Reservation not found' % event_id)
+        raise Http404
+
+    reservation.delete()
+    logger.warning('Reservation deleted')
+
+    response = {'response': 'Reservationen blev slettet'}
 
     return HttpResponse(simplejson.dumps(response), 
                         mimetype="application/json")

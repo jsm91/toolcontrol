@@ -127,6 +127,8 @@ urlpatterns = patterns('tools.views',
     url(r'^building_site_delete/$', 'delete', 
         {'class_to_delete': ConstructionSite}, name='building_site_delete'),
     url(r'^event_delete/$', 'event_delete', name='event_delete'),
+    url(r'^reservation_delete/$', 'reservation_delete', 
+        name='reservation_delete'),
 
     # Forgot password
     url(r'^forgot_password/$', 'forgot_password', name='forgot_password'),

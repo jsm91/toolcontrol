@@ -357,4 +357,8 @@ class ReservationForm(NewModelForm):
         if self.cleaned_data['end_date'] < self.cleaned_data['start_date']:
             raise forms.ValidationError('Slutdato skal være efter startdato')
 
+        if (not self.cleaned_data['employee'] and 
+            not self.cleaned_data['construction_site']):
+            raise forms.ValidationError('Der skal vælges enten en medarbejder eller en byggeplads')
+        
         return cleaned_data
