@@ -378,10 +378,11 @@ class Tool(models.Model):
         if not(employee or construction_site):
             return False
 
-        reservation = self.is_reserved(datetime.datetime.now())
+        reservations = self.is_reserved(datetime.datetime.now())
 
         # Check for reservation
-        if reservation:
+        if reservations:
+            reservations = reservation[0]
             if (employee != reservation.employee and
                 construction_site != reservation.construction_site):
                 return False
