@@ -5,10 +5,12 @@
 	<td>
           <img src="{{ STATIC_URL }}Icon_Warning.svg" title="Værktøjet er reserveret">
 	  Værktøjet er reserveret af {{ reservation.reservees }} fra {{ reservation.start_date }} - {{ reservation.end_date }}
-   	  <a href="#{{ reservation.id }}" id="reservation" 
-	     class="delete_reservation">
-	    <img src="{{ STATIC_URL }}Icon_Delete.svg">
-	  </a>
+	  {% if user.is_admin %}
+     	    <a href="#{{ reservation.id }}" id="reservation" 
+	       class="delete_reservation">
+	      <img src="{{ STATIC_URL }}Icon_Delete.svg">
+	    </a>
+	  {% endif %}
 	</td>
       </tr>
     {% endfor %}

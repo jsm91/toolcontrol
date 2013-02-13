@@ -16,7 +16,7 @@ def check_for_service(value):
         return False
 
     now = timezone.now()
-    service_interval = datetime.timedelta(days=value.service_interval*30*0.9)
+    service_interval = datetime.timedelta(days=value.service_interval*30-7)
 
     # Find out whether the time between last service and now is bigger than
     # the max service interval

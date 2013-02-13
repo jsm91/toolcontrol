@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime, re, urllib
+from itertools import chain
 
 import logging
 logger = logging.getLogger(__name__)
@@ -377,9 +378,10 @@ class Tool(models.Model):
         if not(employee or construction_site):
             return False
 
+        reservation = self.is_reserved(datetime.datetime.now())
+
         # Check for reservation
-        if self.is_reserved(datetime.datetime.now()):
-            reservation = Reservation.objects.get(start_date__lte = datetime.datetime.now(), end_date__gte = datetime.datetime.now(), tool = self)
+        if reservation:
             if (employee != reservation.employee and
                 construction_site != reservation.construction_site):
                 return False
@@ -430,12 +432,20 @@ class Tool(models.Model):
         self.save()
 
     def is_reserved(self, start_date, end_date=None):
-        reservations = self.reservation_set.filter(Q(start_date__lte = start_date, end_date__gte = start_date)|Q(start_date__lte = end_date, end_date__gte = end_date)|Q(start_date__gte = start_date, end_date__lte = end_date))
-
-        if reservations.exists():
-            return reservations.order_by('start_date')
-
-        return False
+        reservations_1 = self.reservation_set.filter(start_date__lte = start_date, end_date__gte = start_date)
+    
+        if end_date:
+            reservations_2 = self.reservation_set.filter(start_date__lte = end_date, end_date__gte = end_date)
+            reservations_3 = self.reservation_set.filter(start_date__gte = start_date, end_date__lte = end_date)
+            if reservations_1.exists() or reservations_2.exists() or reservations_3.exists():
+                return sorted(chain(reservations_1, reservations_2, reservations_3), key = lambda instance: instance.start_date)
+            else:
+                return False
+        else:
+            if reservations_1.exists():
+                return reservations_1.order_by('start_date')
+            else:
+                return False
 
     def reserve(self, employee, construction_site, start_date, end_date):
         if self.is_reserved(start_date, end_date):
