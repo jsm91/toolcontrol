@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    var timeout_id;
+
     $(document).ajaxSend(function(event, xhr, settings) {
 	function getCookie(name) {
             var cookieValue = null;
@@ -108,20 +110,19 @@ $(document).ready(function() {
     // Creating or editing an object
     $(document).on("click", "input.add", function() {
 	var object_type = $('form.add').attr("id");
-	$.post("/"+object_type+"_form/", $('form.add').serialize(), 
-	       function(data) {
-		   // Reload the page
-		   if(object_type == "loan" || object_type == "reservation") {
-		       $("div#content").load("/tool_list/");
-		   }
-		   else if(object_type == "container_loan") {
-		       $("div#content").load("/container_list/");
-		   }
-		   else {
-		       $("div#content").load("/"+object_type+"_list/");
-		   }
-		   set_message(data.response);
-	       });
+	$.post("/"+object_type+"_form/", $('form.add').serialize(), function(data) {
+	    // Reload the page
+	    if(object_type == "loan" || object_type == "reservation") {
+		$("div#content").load("/tool_list/");
+	    }
+	    else if(object_type == "container_loan") {
+		$("div#content").load("/container_list/");
+	    }
+	    else {
+		$("div#content").load("/"+object_type+"_list/");
+	    }
+	    set_message(data.response);
+	});
 
 	// Close the popup
 	$('#mask').fadeOut('fast', function() {
@@ -140,6 +141,7 @@ $(document).ready(function() {
 	    timer = setTimeout(callback, ms);
 	};
     })();
+
     $('input#search').keyup(function() {
 	delay(function(){
 	    var search = $("input#search").val();
@@ -164,10 +166,10 @@ $(document).ready(function() {
 
 	if (action == "loan") {
 	    var popupBox = "div.popup#add";
-
+	    
 	    $(popupBox).load("/loan_form/", function() {
 		$("input#id_tools").attr("value", object_ids.toString());
-
+		
 		//Set the center alignment padding + border
 		var popMargTop = ($(popupBox).height() + 24) / 2; 
 		var popMargLeft = ($(popupBox).width() + 24) / 2; 
@@ -210,7 +212,7 @@ $(document).ready(function() {
 	}
 	else if (action == "reserve") {
 	    var popupBox = "div.popup#add";
-
+	    
 	    $(popupBox).load("/reservation_form/", function() {
 		$("input#id_tools").attr("value", object_ids.toString());
 		//Set the center alignment padding + border
@@ -222,7 +224,7 @@ $(document).ready(function() {
 		    'margin-left' : -popMargLeft
 		});
 	    });
-
+	    
             //Fade in the popup
 	    $(popupBox).fadeIn('slow');
 	    
@@ -231,13 +233,10 @@ $(document).ready(function() {
 	    $('#mask').fadeIn('fast');
 	}
 	else {
-	    $.post("/"+object_type+"_action/", 
-		   "object_ids="+object_ids.toString()+"&action="+action, 
-		   function(data) {
-		       $("div#content").load("/"+object_type+"_list/", 
-					     "search="+search);
-		       set_message(data.response);
-		   });
+	    $.post("/"+object_type+"_action/", "object_ids=" + object_ids.toString() + "&action=" + action, function(data) {
+		$("div#content").load("/"+object_type+"_list/", "search="+search);
+		set_message(data.response);
+	    });
 	}
 	
 	$(this).val("nothing");
@@ -246,19 +245,19 @@ $(document).ready(function() {
     // Show tool history
     $(document).on("click", "a.show_history", function() {
 	var tool = $(this).attr("id");
+
 	if($("tr#"+tool+".history").is(":visible")) {
 	    $("tr#"+tool+".history div").slideUp(function() {
 		$("tr#"+tool+".history").hide();
 	    });
 	}
 	else {
-	    $("tr#" + tool + 
-	      ".history div").load("/event_list/", "tool_id="+tool,
-				   function() {
-				       $("tr#"+tool+".history").show();
-				       $("tr#"+tool+".history div").slideDown();
-				   });
+	    $("tr#" + tool + ".history div").load("/event_list/", "tool_id=" + tool, function() {
+		$("tr#"+tool+".history").show();
+		$("tr#"+tool+".history div").slideDown();
+	    });
 	}
+
 	return false;
     });
 
@@ -273,13 +272,12 @@ $(document).ready(function() {
 	    });
 	}
 	else {
-	    $("tr#" + loaner + 
-	      ".history div").load("/loan_list/", "loaner_id="+loaner+"&object_type="+object_type,
-				   function() {
-				       $("tr#"+loaner+".history").show();
-				       $("tr#"+loaner+".history div").slideDown();
-				   });
+	    $("tr#" + loaner + ".history div").load("/loan_list/", "loaner_id=" + loaner + "&object_type=" + object_type, function() {
+		$("tr#"+loaner+".history").show();
+		$("tr#"+loaner+".history div").slideDown();
+	    });
 	}
+
 	return false;
     });
 
@@ -287,20 +285,19 @@ $(document).ready(function() {
     // Show tools for a model
     $(document).on("click", "a.show_model_tools", function() {
 	var model = $(this).attr("id");
+
 	if($("tr#"+model+".tools").is(":visible")) {
 	    $("tr#"+model+".tools div").slideUp(function() {
 		$("tr#"+model+".tools").hide();
 	    });
 	}
 	else {
-	    $("tr#" + model + 
-	      ".tools div").load("/simple_tool_list/", "model_id="+model+
-				 "&show_model=false",
-				 function() {
-				     $("tr#"+model+".tools").show();
-				     $("tr#"+model+".tools div").slideDown();
-				 });
+	    $("tr#" + model + ".tools div").load("/simple_tool_list/", "model_id=" + model + "&show_model=false", function() {
+		$("tr#"+model+".tools").show();
+		$("tr#"+model+".tools div").slideDown();
+	    });
 	}
+
 	return false;
     });
 
@@ -313,14 +310,12 @@ $(document).ready(function() {
 	    });
 	}
 	else {
-	    $("tr#" + category + 
-	      ".tools div").load("/simple_tool_list/", "category_id="+category+
-				 "&show_model=true",
-				 function() {
-				     $("tr#"+category+".tools").show();
-				     $("tr#"+category+".tools div").slideDown();
-				 });
+	    $("tr#" + category + ".tools div").load("/simple_tool_list/", "category_id=" + category + "&show_model=true", function() {
+		$("tr#"+category+".tools").show();
+		$("tr#"+category+".tools div").slideDown();
+	    });
 	}
+
 	return false;
     });
 
@@ -333,20 +328,19 @@ $(document).ready(function() {
 	    });
 	}
 	else {
-	    $("tr#" + container + 
-	      ".tools div").load("/simple_tool_list/", "container_id="+container+
-				 "&show_model=true",
-				 function() {
-				     $("tr#"+container+".tools").show();
-				     $("tr#"+container+".tools div").slideDown();
-				 });
+	    $("tr#" + container + ".tools div").load("/simple_tool_list/", "container_id=" + container + "&show_model=true", function() {
+		$("tr#"+container+".tools").show();
+		$("tr#"+container+".tools div").slideDown();
+	    });
 	}
 	return false;
     });
 
     // Message handling
     function set_message(message) {
-	$("div#messages").append("<p>"+message+"</p>");
+	clearTimeout(timeout_id);
+
+	$("div#messages").html("<p>"+message+"</p>");
 
 	//Set the center alignment padding + border
 	var popMargTop = ($("div#messages").height() + 20) / 2; 
@@ -358,11 +352,10 @@ $(document).ready(function() {
 	});
 
 	$("div#messages").fadeIn();
-	setTimeout(function() {
-	    $("div#messages").fadeOut(function() {
-		$("div#messages").empty();
-	    });
-	}, 5000);
+
+	timeout_id = setTimeout(function() {
+	    $("div#messages").fadeOut();
+	}, 2000);
     }
 
     // Click sort link
@@ -374,15 +367,13 @@ $(document).ready(function() {
 	var object_type = $("table#index_navigation td.selected").attr("id");
 	var search = $("input#search").val();
 	var sorting = $(this).attr("id");
-	$("div#content").load("/"+object_type+"_list/", 
-			      "search="+search+"&sorting="+sorting,
-			      function() {
-				  $("#loader").remove();
-				  $('#mask').fadeOut('fast', function() {
-				      $('#mask').remove();
-				  });
-			      });
-
+	$("div#content").load("/" + object_type + "_list/", "search=" + search + "&sorting=" + sorting, function() {
+	    $("#loader").remove();
+	    $('#mask').fadeOut('fast', function() {
+		$('#mask').remove();
+	    });
+	});
+	
 	return false;
     });
 
@@ -396,14 +387,12 @@ $(document).ready(function() {
 	var search = $("input#search").val();
 	var ordering = $(this).attr("id");
 
-	$("div#content").load("/"+object_type+"_list/",
-			      "search="+search+"&ordering="+ordering,
-			      function() {
-				  $("#loader").remove();
-				  $('#mask').fadeOut('fast', function() {
-				      $('#mask').remove();
-				  });
-			      });
+	$("div#content").load("/"+object_type+"_list/", "search="+search+"&ordering="+ordering, function() {
+	    $("#loader").remove();
+	    $('#mask').fadeOut('fast', function() {
+		$('#mask').remove();
+	    });
+	});
 
 	return false;
     });
@@ -412,26 +401,25 @@ $(document).ready(function() {
     $(document).on("click", "a.edit", function() {
 	var object_type = $(this).attr("id");
 	var object_id = $(this).attr("href").replace("#","");
-	$("div.popup#add").load("/"+object_type+"_form/", "id="+object_id,
-				function() {
-				    var popupBox = "div.popup#add";
-				    
-				    //Set the center alignment padding + border
-				    var popMargTop = ($(popupBox).height() + 24) / 2; 
-				    var popMargLeft = ($(popupBox).width() + 24) / 2; 
+	$("div.popup#add").load("/"+object_type+"_form/", "id="+object_id, function() {
+	    var popupBox = "div.popup#add";
 	    
-				    $(popupBox).css({ 
-					'margin-top' : -popMargTop,
-					'margin-left' : -popMargLeft
-				    });
-				    
-				    //Fade in the popup
-				    $(popupBox).fadeIn('slow');
-				    
-				    // Add the mask to body
-				    $('body').append('<div id="mask"></div>');
-				    $('#mask').fadeIn('fast');
-				});
+	    //Set the center alignment padding + border
+	    var popMargTop = ($(popupBox).height() + 24) / 2; 
+	    var popMargLeft = ($(popupBox).width() + 24) / 2; 
+	    
+	    $(popupBox).css({ 
+		'margin-top' : -popMargTop,
+		'margin-left' : -popMargLeft
+	    });
+	    
+	    //Fade in the popup
+	    $(popupBox).fadeIn('slow');
+	    
+	    // Add the mask to body
+	    $('body').append('<div id="mask"></div>');
+	    $('#mask').fadeIn('fast');
+	});
 	return false;
     });
 
@@ -474,10 +462,8 @@ $(document).ready(function() {
     $(document).on("click", "a.delete", function() {
 	var object_type = $("table#index_navigation td.selected").attr("id");
 	$("div.popup#delete form").attr("action", "/"+object_type+"_delete/");
-	$("div.popup#delete p").text("Er du sikker på, at du vil slette "+
-				     $(this).attr("id")+"?");
-	$("div.popup#delete input#id").attr("value", 
-					    $(this).attr("href").replace("#",""));
+	$("div.popup#delete p").text("Er du sikker på, at du vil slette " + $(this).attr("id") + "?");
+	$("div.popup#delete input#id").attr("value", $(this).attr("href").replace("#",""));
 	
 	var popupBox = "div.popup#delete";
 	//Set the center alignment padding + border
