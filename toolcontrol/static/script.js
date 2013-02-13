@@ -529,6 +529,18 @@ $(document).ready(function() {
 	return false;
     });
 
+    $(document).on("click", "a.delete_reservation", function() {
+	var object_id = $(this).attr("href").replace("#","");
+	var search = $("input#search").val();
+
+	$.get("/reservation_delete/", "id="+object_id, function(data) {
+	    set_message(data.response);
+	    $("div#content").load("/tool_list/", "search="+search);
+	});
+	return false;
+    });
+
+
     // When adding a tool, if the model is changed, update service and price
     $(document).on("change", "select#id_model", function() {
 	var id = $(this).val();
