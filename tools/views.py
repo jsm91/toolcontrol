@@ -12,6 +12,8 @@ from django.core.urlresolvers import reverse
 from django.db.models import Avg, Sum, Q
 from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.utils import simplejson
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
@@ -25,7 +27,7 @@ from tools.models import ConstructionSite, Container, Event, Employee, Tool
 from tools.models import ForgotPasswordToken, Reservation, ToolCategory
 from tools.models import ToolModel
 
-from toolcontrol.enums import verbose_action
+from toolcontrol.enums import verbose_action, MESSAGES
 from toolcontrol.utils import handle_loan_messages, make_message
 from toolcontrol.utils import pretty_concatenate
 
@@ -380,10 +382,14 @@ def form(request, class_name, form_name):
                 logger.info('%s edited successfully' % class_name.__name__)
                 form = form_name()
 
-                response = {'response': 'Objekt redigeret'}
+                response = {'status': 'success',
+                            'response': 'Objekt redigeret'}
             else:
                 logger.info('%s not edited' % class_name.__name__)
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+                context = {'form': form,
+                           'object_type': class_name.verbose_name}
+                response = {'status': 'failure',
+                            'response': render_to_string('form.html', RequestContext(request, context))}
 
         else:
             logger.info('%s is creating a %s (%s)' % (request.user,
@@ -398,10 +404,15 @@ def form(request, class_name, form_name):
                     event = Event(event_type="Oprettelse", tool=obj)
                     event.save()
                 
-                response = {'response': 'Objekt oprettet'}
+                response = {'status': 'success',
+                            'response': 'Objekt oprettet'}
             else:
                 logger.info('%s not created' % class_name.__name__)
-                response = {'response': 'Et eller flere af de påkrævede felter er ikke udfyldt korrekt'}
+                context = {'form': form,
+                           'object_type': class_name.verbose_name}
+                response = {'status': 'failure',
+                            'response': render_to_string('form.html', RequestContext(request, context))}
+
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
 
@@ -426,10 +437,15 @@ def action_form(request, form_name, object_type):
         form = form_name(request.POST)
         if form.is_valid():
             obj_dict = form.save()
-            response = {'response': make_message(obj_dict)}
+            response = {'status': 'success',
+                        'response': make_message(obj_dict)}
         else:
-            response = {'response': 'Formularen blev ikke udfyldt korrekt'}
-			
+            print form.errors
+            context = {'form': form,
+                       'object_type': object_type}
+            response = {'status': 'failure',
+                        'response': render_to_string('form.html', RequestContext(request, context))}
+		
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
 
@@ -461,6 +477,18 @@ def action(request, class_name):
                 obj_dict[response].append(obj_name)
             except KeyError:
                 obj_dict[response] = [obj_name]
+        elif action == 'delete':
+            if request.user.is_admin():
+                obj.delete()
+                try:
+                    obj_dict[MESSAGES.OBJECT_DELETE_SUCCESS].append(obj_name)
+                except KeyError:
+                    obj_dict[MESSAGES.OBJECT_DELETE_SUCCESS] = [obj_name]
+            else:
+                try:
+                    obj_dict[MESSAGES.OBJECT_DELETE_RIGHTS].append(obj_name)
+                except KeyError:
+                    obj_dict[MESSAGES.OBJECT_DELETE_RIGHTS] = [obj_name]
         else:
             action_function = getattr(obj, action)
             response = action_function(request.user)

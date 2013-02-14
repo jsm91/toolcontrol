@@ -31,7 +31,7 @@ class NewModelForm(forms.ModelForm):
             errors_on_separate_row = False)
     
 class LoanForm(NewModelForm):
-    tools = forms.CharField(widget=forms.HiddenInput)
+    tools = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = Event
@@ -58,6 +58,9 @@ class LoanForm(NewModelForm):
         tool_ids = cd['tools'].split(',')
 
         obj_dict = {}
+
+        if not self.cleaned_data['tools']:
+            return obj_dict
 
         for tool_id in tool_ids:
             tool = get_object_or_404(Tool, id = tool_id)
@@ -154,7 +157,7 @@ class ContainerForm(NewModelForm):
         exclude = ['location',]
 
 class ContainerLoanForm(NewModelForm):
-    containers = forms.CharField(widget=forms.HiddenInput)
+    containers = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = ContainerLoan
@@ -165,6 +168,10 @@ class ContainerLoanForm(NewModelForm):
         container_ids = cd['containers'].split(',')
 
         obj_dict = {}
+
+        if not self.cleaned_data['containers']:
+            return obj_dict
+
         for container_id in container_ids:
             container = get_object_or_404(Container, id = container_id)
             response = container.loan(cd['construction_site'])
@@ -344,7 +351,7 @@ class CreateManyToolsForm(NewForm):
         return cleaned_data
 
 class ReservationForm(NewModelForm):
-    tools = forms.CharField(widget=forms.HiddenInput)
+    tools = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = Reservation
@@ -360,6 +367,9 @@ class ReservationForm(NewModelForm):
         tool_ids = self.cleaned_data['tools'].split(',')
 
         obj_dict = {}
+
+        if not self.cleaned_data['tools']:
+            return obj_dict
 
         for tool_id in tool_ids:
             tool = get_object_or_404(Tool, id = tool_id)

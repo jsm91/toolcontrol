@@ -143,9 +143,15 @@ verbose_messages = {
     MESSAGES.CONTAINER_MAKE_INACTIVE_SUCCESS: ' blev markeret som inaktiv',
     MESSAGES.CONTAINER_MAKE_INACTIVE_INACTIVE: ' blev ikke markeret som inaktiv (allerede inaktiv)',
     MESSAGES.CONTAINER_MAKE_INACTIVE_RIGHTS: ' blev ikke markeret som inaktiv (du har ikke rettigheder til operationen)',
+
+    MESSAGES.OBJECT_DELETE_SUCCESS: ' blev slettet',
+    MESSAGES.OBJECT_DELETE_RIGHTS: ' blev ikke slettet (du har ikke rettigheder til operationen)',
 }
 
 def make_message(obj_dict):
+    if len(obj_dict) == 0:
+        return 'Ingen objekter valgt'
+
     if len(obj_dict) > 1:
         message = '<ul>'
     else:

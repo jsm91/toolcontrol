@@ -294,9 +294,15 @@ div.popup th img {
     vertical-align:middle;
 }
 
+div.popup td.error img {
+    height:12pt;
+    vertical-align:middle;
+}
+
 div.popup td {
     border-bottom:1px solid #FFF;
 }
+
 
 div.popup td.bottom, div.popup td.text {
     border-bottom:none;
@@ -356,5 +362,6 @@ tr.reservation {
 }
 
 tr.reservation img {
-    vertical-align:middle;
+    height:12pt;
 }
+

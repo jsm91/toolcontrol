@@ -97,6 +97,9 @@ class MESSAGES:
     CONTAINER_MAKE_INACTIVE_INACTIVE = 56
     CONTAINER_MAKE_INACTIVE_RIGHTS = 86
 
+    OBJECT_DELETE_SUCCESS = 87
+    OBJECT_DELETE_RIGHTS = 88
+
 verbose_action = {
     'delete': 'slettet',
     'service': 'serviceret',

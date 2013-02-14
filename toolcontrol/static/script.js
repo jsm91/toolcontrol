@@ -111,24 +111,30 @@ $(document).ready(function() {
     $(document).on("click", "input.add", function() {
 	var object_type = $('form.add').attr("id");
 	$.post("/"+object_type+"_form/", $('form.add').serialize(), function(data) {
-	    // Reload the page
-	    if(object_type == "loan" || object_type == "reservation") {
-		$("div#content").load("/tool_list/");
-	    }
-	    else if(object_type == "container_loan") {
-		$("div#content").load("/container_list/");
+	    if(data.status == "success") {
+		// Reload the page
+		if(object_type == "loan" || object_type == "reservation") {
+		    $("div#content").load("/tool_list/");
+		}
+		else if(object_type == "container_loan") {
+		    $("div#content").load("/container_list/");
+		}
+		else {
+		    $("div#content").load("/"+object_type+"_list/");
+		}
+		set_message(data.response);
+		
+		// Close the popup
+		$('#mask').fadeOut('fast', function() {
+		    $('#mask').remove();
+		}); 
+		$('div.popup').fadeOut('slow'); 
 	    }
 	    else {
-		$("div#content").load("/"+object_type+"_list/");
+		var popupBox = "div.popup#add";
+		$(popupBox).html(data.response);
 	    }
-	    set_message(data.response);
 	});
-
-	// Close the popup
-	$('#mask').fadeOut('fast', function() {
-	    $('#mask').remove();
-	}); 
-	$('div.popup').fadeOut('slow'); 
 
 	return false;
     });

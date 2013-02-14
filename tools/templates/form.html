@@ -1,6 +1,14 @@
 <form method="POST" class="add" id="{{ object_type }}">
   <table>
     {% csrf_token %}
+    {% for error in form.non_field_errors %}
+    <tr>
+      <td colspan="2" class="error">
+	<img src="{{ STATIC_URL }}Icon_Warning.svg">
+	{{ error }}
+      </td>
+    </tr>
+    {% endfor %}
     {% for field in form %}
       {% if not field.is_hidden %}
         <tr>
@@ -13,6 +21,10 @@
 	    {% if field.field.queryset %}
 	    <img src="{{ STATIC_URL }}Icon_Plus.svg" class="add_inline"
 		 id="{{ field.name }}">
+	    {% endif %}
+	    {% if field.errors %}
+	    <img src="{{ STATIC_URL }}Icon_Warning.svg"
+		 title="{% for error in field.errors %}{{ error }}{% endfor %}">
 	    {% endif %}
 	  </th>
 	  <td>
