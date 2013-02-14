@@ -53,7 +53,8 @@ verbose_messages = {
     MESSAGES.TOOL_SERVICE_LOAN: ' blev ikke serviceret (værktøj udlånt)',
     MESSAGES.TOOL_SERVICE_SCRAPPED: ' blev ikke serviceret (værktøj kasseret)',
     MESSAGES.TOOL_SERVICE_LOST: ' blev ikke serviceret (værktøj bortkommet)',
-    MESSAGES.TOOL_SERVICE_REPAIR: 'blev ikke serviceret (værktøj til reparation',
+    MESSAGES.TOOL_SERVICE_REPAIR: 'blev ikke serviceret (værktøj til reparation)',
+    MESSAGES.TOOL_SERVICE_RIGHTS: 'blev ikke serviceret (du har ikke rettigheder til operationen)',
 
     MESSAGES.TOOL_LOAN_SUCCESS: ' blev udlånt',
     MESSAGES.TOOL_LOAN_LOAN: ' blev ikke udlånt (værktøj allerede udlånt)',
@@ -73,59 +74,75 @@ verbose_messages = {
     MESSAGES.TOOL_REPAIR_SCRAPPED: ' blev ikke sendt til reparation (værktøj kasseret)',
     MESSAGES.TOOL_REPAIR_LOST: ' blev ikke sendt til reparation (værktøj bortkommet)',
     MESSAGES.TOOL_REPAIR_REPAIR: ' blev ikke sendt til reparation (værktøj allerede til reparation)',
+    MESSAGES.TOOL_REPAIR_RIGHTS: ' blev ikke sendt til reparation (du har ikke rettigheder til operationen)',
 
     MESSAGES.TOOL_RETURN_SUCCESS: ' blev afleveret',
     MESSAGES.TOOL_RETURN_LOST: ' blev ikke afleveret (værktøj kasseret)',
     MESSAGES.TOOL_RETURN_SCRAPPED: ' blev ikke afleveret (værktøj bortkommet)',
     MESSAGES.TOOL_RETURN_STORE: ' blev ikke afleveret (værktøj allerede på lageret)',
+    MESSAGES.TOOL_RETURN_RIGHTS: ' blev ikke afleveret (du har ikke rettigheder til operationen)',
 
     MESSAGES.TOOL_SCRAP_SUCCESS: ' blev kasseret',
     MESSAGES.TOOL_SCRAP_LOAN: ' blev ikke kasseret (værktøj udlånt)',
     MESSAGES.TOOL_SCRAP_SCRAPPED: ' blev ikke kasseret (værktøj allerede kasseret)',
     MESSAGES.TOOL_SCRAP_LOST: ' blev ikke kasseret (værktøj bortkommet)',
     MESSAGES.TOOL_SCRAP_REPAIR: ' blev ikke kasseret (værktøj til reparation)',
+    MESSAGES.TOOL_SCRAP_RIGHTS: ' blev ikke kasseret (du har ikke rettigheder til operationen)',
 
     MESSAGES.TOOL_LOST_SUCCESS: ' blev markeret som bortkommet',
     MESSAGES.TOOL_LOST_LOAN: ' blev ikke markeret som bortkommet (værktøj udlånt)',
     MESSAGES.TOOL_LOST_SCRAPPED: ' blev ikke markeret som bortkommet (værktøj kasseret)',
     MESSAGES.TOOL_LOST_LOST: ' blev ikke markeret som bortkommet (værktøj allerede bortkommet)',
     MESSAGES.TOOL_LOST_REPAIR: ' blev ikke markeret som bortkommet (værktøj til reparation)',
+    MESSAGES.TOOL_LOST_RIGHTS: ' blev ikke markeret som bortkommet (du har ikke rettigheder til operationen)',
 
     MESSAGES.EMPLOYEE_MAKE_ACTIVE_SUCCESS: ' blev markeret som aktiv',
     MESSAGES.EMPLOYEE_MAKE_ACTIVE_ACTIVE: ' blev ikke markeret som aktiv (allerede aktiv)',
+    MESSAGES.EMPLOYEE_MAKE_ACTIVE_RIGHTS: ' blev ikke markeret som aktiv (du har ikke rettigheder til operationen)',
 
     MESSAGES.EMPLOYEE_MAKE_INACTIVE_SUCCESS: ' blev markeret som inaktiv',
     MESSAGES.EMPLOYEE_MAKE_INACTIVE_INACTIVE: ' blev ikke markeret som inaktiv (allerede inaktiv)',
+    MESSAGES.EMPLOYEE_MAKE_INACTIVE_RIGHTS: ' blev ikke markeret som inaktiv (du har ikke rettigheder til operationen)',
 
     MESSAGES.EMPLOYEE_MAKE_ADMIN_SUCCESS: ' blev markeret som administrator',
     MESSAGES.EMPLOYEE_MAKE_ADMIN_ADMIN: ' blev ikke markeret som administrator (allerede administrator)',
+    MESSAGES.EMPLOYEE_MAKE_ADMIN_RIGHTS: ' blev ikke markeret som administrator (du har ikke rettigheder til operationen)',
 
     MESSAGES.EMPLOYEE_REMOVE_ADMIN_SUCCESS: ' blev fjernet som administrator',
     MESSAGES.EMPLOYEE_REMOVE_ADMIN_ADMIN: ' blev ikke fjernet som administrator (allerede ikke administrator)',
+    MESSAGES.EMPLOYEE_REMOVE_ADMIN_RIGHTS: ' blev ikke fjernet som administrator (du har ikke rettigheder til operationen)',
 
     MESSAGES.EMPLOYEE_SET_LOAN_FLAG_SUCCESS: ' blev markeret med låneflag',
     MESSAGES.EMPLOYEE_SET_LOAN_FLAG_FLAGGED: ' blev ikke markeret med låneflag (har allerede låneflag)',
+    MESSAGES.EMPLOYEE_SET_LOAN_FLAG_RIGHTS: ' blev ikke markeret med låneflag (du har ikke rettigheder til operationen)',
 
     MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_SUCCESS: ' fik fjernet låneflag',
     MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_FLAGGED: ' fik ikke fjernet låneflag (havde ikke låneflag)',
+    MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_RIGHTS: ' fik ikke fjernet låneflag (du har ikke rettigheder til operationen)',
 
     MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_SUCCESS: ' blev markeret som aktiv',
     MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_ACTIVE: ' blev ikke markeret som aktiv (allerede aktiv)',
+    MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_RIGHTS: ' blev ikke markeret som aktiv (du har ikke rettigheder til operationen)',
 
     MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_SUCCESS: ' blev markeret som inaktiv',
     MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_INACTIVE: ' blev ikke markeret som inaktiv (allerede inaktiv)',
+    MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_RIGHTS: ' blev ikke markeret som inaktiv (du har ikke rettigheder til operationen)',
 
     MESSAGES.CONTAINER_LOAN_SUCCESS: ' blev udlånt',
     MESSAGES.CONTAINER_LOAN_LOAN: ' blev ikke udlånt (allerede udlånt)',
+    MESSAGES.CONTAINER_LOAN_RIGHTS: ' blev ikke udlånt (du har ikke rettigheder til operationen)',
 
     MESSAGES.CONTAINER_RETURN_SUCCESS: ' blev afleveret',
     MESSAGES.CONTAINER_RETURN_STORE: ' blev ikke afleveret (allerede på lager)',
+    MESSAGES.CONTAINER_RETURN_RIGHTS: ' blev ikke afleveret (du har ikke rettigheder til operationen)',
 
     MESSAGES.CONTAINER_MAKE_ACTIVE_SUCCESS: ' blev markeret som aktiv',
     MESSAGES.CONTAINER_MAKE_ACTIVE_ACTIVE: ' blev ikke markeret som aktiv (allerede aktiv)',
+    MESSAGES.CONTAINER_MAKE_ACTIVE_RIGHTS: ' blev ikke markeret som aktiv (du har ikke rettigheder til operationen)',
 
     MESSAGES.CONTAINER_MAKE_INACTIVE_SUCCESS: ' blev markeret som inaktiv',
     MESSAGES.CONTAINER_MAKE_INACTIVE_INACTIVE: ' blev ikke markeret som inaktiv (allerede inaktiv)',
+    MESSAGES.CONTAINER_MAKE_INACTIVE_RIGHTS: ' blev ikke markeret som inaktiv (du har ikke rettigheder til operationen)',
 }
 
 def make_message(obj_dict):
