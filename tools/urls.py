@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 from tools.models import Container, ConstructionSite, Employee, Reservation
 from tools.models import Tool, ToolCategory, ToolModel
 
-from tools.forms import BuildingSiteForm, ContainerForm, EmployeeForm
-from tools.forms import ReservationForm, ToolForm, ToolCategoryForm
+from tools.forms import BuildingSiteForm, ContainerForm, ContainerLoanForm, EmployeeForm
+from tools.forms import LoanForm, ReservationForm, ToolForm, ToolCategoryForm
 from tools.forms import ToolModelForm
 
 from tools.views import CategoryListView, ContainerListView 
@@ -71,10 +71,6 @@ urlpatterns = patterns('tools.views',
     url(r'^employee_form/$', 'form', 
         {'class_name': Employee, 'form_name': EmployeeForm}, 
         name='employee_form'),
-    url(r'^loan_form/$', 'loan_form', name='loan_form'),
-    url(r'^reservation_form/$', 'reservation_form', name='reservation_form'),
-    url(r'^container_loan_form/$', 'container_loan_form', 
-        name='container_loan_form'),
     url(r'^building_site_form/$', 'form', 
         {'class_name': ConstructionSite, 'form_name': BuildingSiteForm}, 
         name='building_site_form'),
@@ -112,6 +108,14 @@ urlpatterns = patterns('tools.views',
         {'class_name': Employee}, name='employee_action'),
     url(r'^building_site_action/$', 'action', 
         {'class_name': ConstructionSite}, name='building_site_action'),
+  
+    # AJAX requests for action forms
+    url(r'^loan_form/$', 'action_form', {'form_name': LoanForm, 'object_type': 'loan'}, name='loan_form'),
+    url(r'^reservation_form/$', 'action_form', {'form_name': ReservationForm, 'object_type': 'reservation'},
+        name='reservation_form'),
+    url(r'^container_loan_form/$', 'action_form', 
+        {'form_name': ContainerLoanForm, 'object_type': 'container_loan'}, 
+        name='container_loan_form'),
 
     # AJAX requests for deletes
     url(r'^container_delete/$', 'delete', 

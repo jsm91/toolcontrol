@@ -554,13 +554,17 @@ class Tool(models.Model):
 
     def reserve(self, employee, construction_site, start_date, end_date):
         if self.is_reserved(start_date, end_date):
-            return False
+            return MESSAGES.TOOL_RESERVE_RESERVED
+        if self.location == 'Kasseret':
+            return MESSAGES.TOOL_RESERVE_SCRAPPED            
+        elif self.location == 'Bortkommet':
+            return MESSAGES.TOOL_RESERVE_LOST            
         
         reservation = Reservation(tool = self, employee = employee, 
                                   construction_site = construction_site,
                                   start_date = start_date, end_date = end_date)
         reservation.save()
-        return True
+        return MESSAGES.TOOL_RESERVE_SUCCESS
 
     def __unicode__(self):
         return self.name

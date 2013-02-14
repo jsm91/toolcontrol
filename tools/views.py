@@ -421,6 +421,23 @@ def form(request, class_name, form_name):
     return render(request, 'form.html', context)
 
 @login_required
+def action_form(request, form_name, object_type):
+    if request.POST:
+        form = form_name(request.POST)
+        if form.is_valid():
+            obj_dict = form.save()
+            response = {'response': make_message(obj_dict)}
+        else:
+            response = {'response': 'Formularen blev ikke udfyldt korrekt'}
+			
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype="application/json")
+
+    form = form_name()
+    context = {'form': form, 'object_type': object_type}
+    return render(request, 'form.html', context)
+    
+@login_required
 def loan_form(request):
     if request.POST:
         logger.info('%s is loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
@@ -443,7 +460,7 @@ def loan_form(request):
 @login_required
 def reservation_form(request):
     if request.POST:
-        logger.info('%s is reservating %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
+        logger.info('%s is reserving %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
         reservation_form = ReservationForm(request.POST)
         if reservation_form.is_valid():
             obj_dict = reservation_form.save()
