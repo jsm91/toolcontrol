@@ -355,7 +355,7 @@ $(document).ready(function() {
 
 	timeout_id = setTimeout(function() {
 	    $("div#messages").fadeOut();
-	}, 2000);
+	}, 5000);
     }
 
     // Click sort link

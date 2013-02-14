@@ -15,6 +15,8 @@ from django.db.models import Sum
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
+from toolcontrol.enums import MESSAGES
+
 class ConstructionSite(models.Model):
     verbose_name = 'building_site'
 
@@ -348,9 +350,15 @@ class Tool(models.Model):
             event.save()
             self.last_service = event.start_date
             self.save()
-            return True
-        else:
-            return False
+            return MESSAGES.TOOL_SERVICE_SUCCESS
+        elif self.location == 'Udlånt':
+            return MESSAGES.TOOL_SERVICE_LOAN
+        elif self.location == 'Kasseret':
+            return MESSAGES.TOOL_SERVICE_SCRAPPED
+        elif self.location == 'Bortkommet':
+            return MESSAGES.TOOL_SERVICE_LOST
+        elif self.location == 'Reparation':
+            return MESSAGES.TOOL_SERVICE_REPAIR
 
     def scrap(self):
         if self.location == 'Lager':
@@ -406,14 +414,29 @@ class Tool(models.Model):
             event.save()
             self.location = 'Reparation'
             self.save()
-            return True
+            return MESSAGES.TOOL_REPAIR_SUCCESS
+        elif self.location == 'Udlånt':
+            return MESSAGES.TOOL_REPAIR_LOAN
+        elif self.location == 'Kasseret':
+            return MESSAGES.TOOL_REPAIR_SCRAPPED
+        elif self.location == 'Bortkommet':
+            return MESSAGES.TOOL_REPAIR_LOST
+        elif self.location == 'Reparation':
+            return MESSAGES.TOOL_REPAIR_REPAIR
         else:
             return False
 
     def end_loan(self):
         if self.location == 'Udlånt' or self.location == 'Reparation':
             event = self.get_last_event()
-            return event.end()
+            event.end()
+            return MESSAGES.TOOL_RETURN_SUCCESS
+        elif self.location == 'Kasseret':
+            return MESSAGES.TOOL_RETURN_SCRAPPED
+        elif self.location == 'Bortkommet':
+            return MESSAGES.TOOL_RETURN_LOST
+        elif self.location == 'Lager':
+            return MESSAGES.TOOL_RETURN_STORE
         else:
             return False
 

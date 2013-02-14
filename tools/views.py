@@ -25,8 +25,9 @@ from tools.models import ConstructionSite, Container, Event, Employee, Tool
 from tools.models import ForgotPasswordToken, Reservation, ToolCategory
 from tools.models import ToolModel
 
-from toolcontrol.enums import TOOL_FAILURES, verbose_action
-from toolcontrol.utils import handle_loan_messages, pretty_concatenate
+from toolcontrol.enums import verbose_action
+from toolcontrol.utils import handle_loan_messages, make_message
+from toolcontrol.utils import pretty_concatenate
 
 def login_view(request):
     if request.POST:
@@ -496,8 +497,7 @@ def action(request, class_name):
         return HttpResponse(simplejson.dumps(response),
                             content_type='application/json')
 
-    success_objects = []
-    failure_objects = []
+    obj_dict = {}
 
     for object_id in object_ids:
         obj = get_object_or_404(class_name, pk = object_id)
@@ -505,33 +505,29 @@ def action(request, class_name):
 
         if action == 'loan_single':
             if obj.loan(request.user):
-                logger.info('Action on %s successful' % obj_name)
                 success_objects.append(obj_name)
             else:
-                logger.info('Action on %s not successful' % obj_name)
                 failure_objects.append(obj_name)
         else:
             action_function = getattr(obj, action)
             if action == 'end_loan':
                 if (request.user.is_admin() or 
                     (isinstance(obj, Tool) and request.user == obj.employee)):
-                    if obj.end_loan():
-                        logger.info('Action on %s successful' % obj_name)
-                        success_objects.append(obj_name)
-                    else:
-                        logger.info('Action on %s not successful' % obj_name)
-                        failure_objects.append(obj_name)
+                    response = action_function()
+                    try:
+                        obj_dict[response].append(obj_name)
+                    except KeyError:
+                        obj_dict[response] = [obj_name]
                 else:
-                    logger.info('Action on %s not successful' % obj_name)
                     failure_objects.append(obj_name)
             else:
                 if request.user.is_admin():
-                    if (action_function() or action == 'delete'):
-                        logger.info('Action on %s successful' % obj_name)
-                        success_objects.append(obj_name)
-                    else:
-                        logger.info('Action on %s not successful' % obj_name)
-                        failure_objects.append(obj_name)
+                    response = action_function()
+                    try:
+                        obj_dict[response].append(obj_name)
+                    except KeyError:
+                        obj_dict[response] = [obj_name]
+
                 else:
                     response = {'response': 'Du har ikke ret til denne handling'}                   
                     return HttpResponse(simplejson.dumps(response), 
@@ -539,20 +535,7 @@ def action(request, class_name):
 
     logger.info('No more objects')
 
-    string = ''
-
-    if success_objects:
-        string += (pretty_concatenate(success_objects) + ' blev ' + 
-                   verbose_action[action])
-        if failure_objects:
-            string += '<br>'
-
-    if failure_objects:
-        string += (pretty_concatenate(failure_objects) + ' blev ikke ' + 
-                   verbose_action[action])
-
-    response = {'response': string,
-                'success_objects': success_objects}
+    response = {'response': make_message(obj_dict)}
 
     return HttpResponse(simplejson.dumps(response), 
                         content_type="application/json")
