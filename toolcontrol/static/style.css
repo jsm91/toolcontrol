@@ -351,10 +351,10 @@ table.add_inline td, table.add_inline th {
     padding:5px;
 }
 
-table.reservations {
+tr.reservation {
     background-color: #FFFFCC;
-}    
+}
 
-table.reservations img {
+tr.reservation img {
     vertical-align:middle;
 }
