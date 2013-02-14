@@ -720,11 +720,16 @@ def inline_form(request, form_name, object_type):
         form = form_name(request.POST)
         if form.is_valid():
             obj = form.save()
-            response = {'response': 'Objekt oprettet',
+            response = {'status': 'success',
+                        'response': 'Objekt oprettet',
                         'value': obj.id,
                         'name': obj.name}
         else:
-            response = {'response': 'Et eller flere af de påkrævede felter blev ikke udfyldt korrekt'}
+            context = {'form': form,
+                       'object_type': object_type}
+            response = {'status': 'failure',
+                        'response': render_to_string('inline_form.html', 
+                                                     RequestContext(request, context))}
 
         return HttpResponse(simplejson.dumps(response), 
                             mimetype='application/json')

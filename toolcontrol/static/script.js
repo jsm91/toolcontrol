@@ -568,16 +568,21 @@ $(document).ready(function() {
     });
     $(document).on("click", "input.add_inline", function() {
 	var id = $(this).attr("id");
-	$("tr.add_inline#" + id + " div").slideUp(function() {
-	    $("tr.add_inline#" + id).hide();
-	});
-	var vars = $("form.add").serialize();
-	$.post("/" + id + "_inline_form/", vars, function(data) {
-	    $("select#id_" + id).append($("<option></option>")
-					.attr("value", data.value)
-					.text(data.name));
-	    $("tr.add_inline#" + id + " div").text("Inline form ikke hentet korrekt")
-	    set_message(data.response);
+
+	$.post("/"+id+"_inline_form/", $('form.add').serialize(), function(data) {
+	    if(data.status == "success") {
+		$("tr.add_inline#" + id + " div").slideUp(function() {
+		    $("tr.add_inline#" + id).hide();
+		});
+		$("select#id_" + id).append($("<option></option>")
+					    .attr("value", data.value)
+					    .text(data.name));
+		$("tr.add_inline#" + id + " div").text("Inline form ikke hentet korrekt")
+		set_message(data.response);
+	    }
+	    else {
+		$("tr.add_inline#" + id + " div").html(data.response);
+	    }
 	});
 
 	return false;

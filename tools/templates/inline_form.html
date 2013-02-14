@@ -1,9 +1,50 @@
 <table class="add_inline">
-  {{ form.as_new_table }}
+  {% csrf_token %}
+  {% for error in form.non_field_errors %}
+    <tr>
+      <td colspan="2" class="error">
+	<img src="{{ STATIC_URL }}Icon_Warning.svg">
+	{{ error }}
+      </td>
+    </tr>
+  {% endfor %}
+  {% for field in form %}
+    {% if not field.is_hidden %}
+      <tr>
+	<th>
+	  {{ field.label }}
+	  {% if field.help_text %}
+	  <img src="{{ STATIC_URL }}Icon_Info.svg" 
+	       title="{{ field.help_text }}">
+	  {% endif %}
+	  {% if field.errors %}
+	  <img src="{{ STATIC_URL }}Icon_Warning.svg"
+	       title="{% for error in field.errors %}{{ error }}{% endfor %}">
+	  {% endif %}
+	</th>
+	<td>
+	  {{ field }}
+	</td>
+      </tr>
+      {% if field.field.queryset %}
+        <tr class="add_inline" id="{{ field.name }}">
+	  <td colspan="2">
+	    <div>
+	      Inline form ikke hentet korrekt
+	    </div>
+	  </td>
+	</tr>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% for field in form %}
+    {% if field.is_hidden %}
+      {{ field }}
+    {% endif %}
+  {% endfor %}
   <tr>
     <td class="bottom" colspan="2">
-      <input class="add_inline" id="{{ object_type }}" type="submit" 
-	     value="Gem">
+      <input class="add_inline" id="{{ object_type }}" type="submit" value="Gem">
     </td>
   </tr>
 </table>
