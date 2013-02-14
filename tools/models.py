@@ -25,19 +25,19 @@ class ConstructionSite(models.Model):
 
     def make_active(self):
         if self.is_active:
-            return False
+            return MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_ACTIVE
         
         self.is_active = True
         self.save()
-        return True
+        return MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_SUCCESS
 
     def make_inactive(self):
         if not self.is_active:
-            return False
+            return MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_INACTIVE
         
         self.is_active = False
         self.save()
-        return True
+        return MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_SUCCESS
 
     def __unicode__(self):
         return self.name
@@ -52,19 +52,19 @@ class Container(models.Model):
 
     def make_active(self):
         if self.is_active:
-            return False
+            return MESSAGES.CONTAINER_MAKE_ACTIVE_ACTIVE
         
         self.is_active = True
         self.save()
-        return True
+        return MESSAGES.CONTAINER_MAKE_ACTIVE_SUCCESS
 
     def make_inactive(self):
         if not self.is_active:
-            return False
+            return MESSAGES.CONTAINER_MAKE_INACTIVE_INACTIVE
         
         self.is_active = False
         self.save()
-        return True
+        return MESSAGES.CONTAINER_MAKE_INACTIVE_SUCCESS
 
     def __unicode__(self):
         return self.name
@@ -81,9 +81,9 @@ class Container(models.Model):
             self.location = construction_site
             self.save()
 
-            return True
+            return MESSAGES.CONTAINER_LOAN_SUCCESS
         else:
-            return False
+            return MESSAGES.CONTAINER_LOAN_LOAN
 
     def end_loan(self):
         if self.location != None:
@@ -97,9 +97,9 @@ class Container(models.Model):
             self.location = None
             self.save()
 
-            return True
+            return MESSAGES.CONTAINER_RETURN_SUCCESS
         else:
-            return False
+            return MESSAGES.CONTAINER_RETURN_STORE
 
 class ContainerLoan(models.Model):
     container = models.ForeignKey(Container)
@@ -151,67 +151,67 @@ class Employee(AbstractBaseUser):
 
     def make_active(self):
         if self.is_active:
-            return False
+            return MESSAGES.EMPLOYEE_MAKE_ACTIVE_ACTIVE
         
         self.is_active = True
         self.save()
-        return True
+        return MESSAGES.EMPLOYEE_MAKE_ACTIVE_SUCCESS
 
     def make_inactive(self):
         if not self.is_active:
-            return False
+            return MESSAGES.EMPLOYEE_MAKE_INACTIVE_INACTIVE
         
         self.is_active = False
         self.save()
-        return True
+        return MESSAGES.EMPLOYEE_MAKE_INACTIVE_SUCCESS
 
     def make_office_admin(self):
         if self.is_office_admin:
-            return False
+            return MESSAGES.EMPLOYEE_MAKE_ADMIN_ADMIN
         
         self.is_office_admin = True
         self.save()
-        return True
+        return MESSAGES.EMPLOYEE_MAKE_ADMIN_SUCCESS
 
     def make_not_office_admin(self):
         if not self.is_office_admin:
-            return False
+            return MESSAGES.EMPLOYEE_REMOVE_ADMIN_ADMIN
         
         self.is_office_admin = False
         self.save()
-        return True
+        return MESSAGES.EMPLOYEE_REMOVE_ADMIN_SUCCESS
 
     def make_tool_admin(self):
         if self.is_tool_admin:
-            return False
+            return MESSAGES.EMPLOYEE_MAKE_ADMIN_ADMIN
         
         self.is_tool_admin = True
         self.save()
-        return True
+        return MESSAGES.EMPLOYEE_MAKE_ADMIN_SUCCESS
 
     def make_not_tool_admin(self):
         if not self.is_tool_admin:
-            return False
+            return MESSAGES.EMPLOYEE_REMOVE_ADMIN_ADMIN
         
         self.is_tool_admin = False
         self.save()
-        return True
+        return MESSAGES.EMPLOYEE_REMOVE_ADMIN_SUCCESS
 
     def make_loan_flagged(self):
         if self.is_loan_flagged:
-            return False
+            return MESSAGES.SET_LOAN_FLAG_FLAGGED
         
         self.is_loan_flagged = True
         self.save()
-        return True
+        return MESSAGES.SET_LOAN_FLAG_SUCCESS
 
     def make_not_loan_flagged(self):
         if not self.is_loan_flagged:
-            return False
+            return MESSAGES.REMOVE_LOAN_FLAG_FLAGGED
         
         self.is_loan_flagged = False
         self.save()
-        return True
+        return MESSAGES.REMOVE_LOAN_FLAG_SUCCESS
 
     def send_mail(self, subject, message):
         logger.debug('Sending mail to %s with content %s' % (self.name, message))
@@ -367,7 +367,15 @@ class Tool(models.Model):
             self.location = 'Kasseret'
             self.end_date = datetime.datetime.now()
             self.save()
-            return True
+            return MESSAGES.TOOL_SCRAP_SUCCESS
+        elif self.location == 'Udlånt':
+            return MESSAGES.TOOL_SCRAP_LOAN
+        elif self.location == 'Kasseret':
+            return MESSAGES.TOOL_SCRAP_SCRAPPED
+        elif self.location == 'Bortkommet':
+            return MESSAGES.TOOL_SCRAP_LOST
+        elif self.location == 'Reparation':
+            return MESSAGES.TOOL_SCRAP_REPAIR
         else:
             return False
 
@@ -378,13 +386,21 @@ class Tool(models.Model):
             self.location = 'Bortkommet'
             self.end_date = datetime.datetime.now()
             self.save()
-            return True
+            return MESSAGES.TOOL_LOST_SUCCESS
+        elif self.location == 'Udlånt':
+            return MESSAGES.TOOL_LOST_LOAN
+        elif self.location == 'Kasseret':
+            return MESSAGES.TOOL_LOST_SCRAPPED
+        elif self.location == 'Bortkommet':
+            return MESSAGES.TOOL_LOST_LOST
+        elif self.location == 'Reparation':
+            return MESSAGES.TOOL_LOST_REPAIR
         else:
             return False
 
     def loan(self, employee=None, construction_site=None):
         if not(employee or construction_site):
-            return False
+            return MESSAGES.TOOL_LOAN_FAILURE
 
         reservations = self.is_reserved(datetime.datetime.now())
 
@@ -393,7 +409,7 @@ class Tool(models.Model):
             reservation = reservations[0]
             if (employee != reservation.employee and
                 construction_site != reservation.construction_site):
-                return False
+                return MESSAGES.TOOL_LOAN_RESERVED
 
         if self.location == 'Lager':
             event = Event(event_type='Udlån', tool=self,
@@ -404,7 +420,15 @@ class Tool(models.Model):
             self.employee = employee
             self.construction_site = construction_site
             self.save()
-            return True
+            return MESSAGES.TOOL_LOAN_SUCCESS
+        elif self.location == 'Udlånt':
+            return MESSAGES.TOOL_LOAN_LOAN
+        elif self.location == 'Kasseret':
+            return MESSAGES.TOOL_LOAN_SCRAPPED
+        elif self.location == 'Bortkommet':
+            return MESSAGES.TOOL_LOAN_LOST
+        elif self.location == 'Reparation':
+            return MESSAGES.TOOL_LOAN_REPAIR
         else:
             return False
 

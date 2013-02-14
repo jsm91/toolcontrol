@@ -426,9 +426,9 @@ def loan_form(request):
         logger.info('%s is loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
         loan_form = LoanForm(request.POST)
         if loan_form.is_valid():
-            loan_form.save()
+            obj_dict = loan_form.save()
             logger.info('Tools loaned')
-            response = {'response': 'Værktøj udlånt'}
+            response = {'response': make_message(obj_dict)}
         else:
             logger.info('Tools not loaned')
             response = {'response': 'Værktøj ikke udlånt'}
@@ -446,9 +446,10 @@ def reservation_form(request):
         logger.info('%s is reservating %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
         reservation_form = ReservationForm(request.POST)
         if reservation_form.is_valid():
-            reservation_form.save()
+            obj_dict = reservation_form.save()
             logger.info('Tools reserved')
-            response = {'response': 'Værktøj reserveret'}
+            
+            response = {'response': make_message(obj_dict)}
         else:
             logger.info('Tools not reserved')
             response = {'response': 'Værktøj ikke reserveret'}
@@ -466,12 +467,12 @@ def container_loan_form(request):
         logger.info('%s is container_loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
         container_loan_form = ContainerLoanForm(request.POST)
         if container_loan_form.is_valid():
-            container_loan_form.save()
+            obj_dict = container_loan_form.save()
             logger.info('Tools container_loaned')
-            response = {'response': 'Værktøj udlånt'}
+            response = {'response': make_message(obj_dict)}
         else:
             logger.info('Tools not container_loaned')
-            response = {'response': 'Værktøj ikke udlånt'}
+            response = {'response': 'Container ikke udlånt'}
             
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")

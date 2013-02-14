@@ -57,9 +57,17 @@ class LoanForm(NewModelForm):
         cd = self.cleaned_data
         tool_ids = cd['tools'].split(',')
 
+        obj_dict = {}
+
         for tool_id in tool_ids:
             tool = get_object_or_404(Tool, id = tool_id)
-            tool.loan(cd['employee'], cd['construction_site'])
+            response = tool.loan(cd['employee'], cd['construction_site'])
+            try:
+                obj_dict[response].append(tool.name)
+            except KeyError:
+                obj_dict[response] = [tool.name]
+
+        return obj_dict
 
 class QRLoanForm(forms.ModelForm):
     class Meta:
@@ -156,9 +164,19 @@ class ContainerLoanForm(NewModelForm):
         cd = self.cleaned_data
         container_ids = cd['containers'].split(',')
 
+        obj_dict = {}
+        print container_ids
+
         for container_id in container_ids:
             container = get_object_or_404(Container, id = container_id)
-            container.loan(cd['construction_site'])
+            response = container.loan(cd['construction_site'])
+
+            try:
+                obj_dict[response].append(container.name)
+            except KeyError:
+                obj_dict[response] = [container.name]
+
+        return obj_dict
 
 class ToolForm(NewModelForm):
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all().order_by('name'),
@@ -344,12 +362,21 @@ class ReservationForm(NewModelForm):
     def save(self, commit=True):
         tool_ids = self.cleaned_data['tools'].split(',')
 
+        obj_dict = {}
+
         for tool_id in tool_ids:
             tool = get_object_or_404(Tool, id = tool_id)
-            tool.reserve(employee = self.cleaned_data['employee'],
-                         construction_site = self.cleaned_data['construction_site'],
-                         start_date = self.cleaned_data['start_date'],
-                         end_date = self.cleaned_data['end_date'])
+            response = tool.reserve(employee = self.cleaned_data['employee'],
+                                    construction_site = self.cleaned_data['construction_site'],
+                                    start_date = self.cleaned_data['start_date'],
+                                    end_date = self.cleaned_data['end_date'])
+
+            try:
+                obj_dict[response].append(tool.name)
+            except KeyError:
+                obj_dict[response] = [tool.name]
+
+        return obj_dict
 
     def clean(self):
         cleaned_data = super(ReservationForm, self).clean()

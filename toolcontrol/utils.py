@@ -61,6 +61,7 @@ verbose_messages = {
     MESSAGES.TOOL_LOAN_LOST: ' blev ikke udlånt (værktøj bortkommet)',
     MESSAGES.TOOL_LOAN_REPAIR: ' blev ikke udlånt (værktøj til reparation)',
     MESSAGES.TOOL_LOAN_RESERVED: ' blev ikke udlånt (værktøj reserveret)',
+    MESSAGES.TOOL_LOAN_FAILURE: ' blev ikke udlånt (intern fejl)',
 
     MESSAGES.TOOL_RESERVE_SUCCESS: ' blev reserveret',
     MESSAGES.TOOL_RESERVE_RESERVED: ' blev ikke reserveret (allerede reserveret i perioden)',
@@ -78,64 +79,77 @@ verbose_messages = {
     MESSAGES.TOOL_RETURN_SCRAPPED: ' blev ikke afleveret (værktøj bortkommet)',
     MESSAGES.TOOL_RETURN_STORE: ' blev ikke afleveret (værktøj allerede på lageret)',
 
-    MESSAGES.TOOL_SCRAP_SUCCESS: 23,
-    MESSAGES.TOOL_SCRAP_LOAN: 24,
-    MESSAGES.TOOL_SCRAP_SCRAPPED: 25,
-    MESSAGES.TOOL_SCRAP_LOST: 26,
-    MESSAGES.TOOL_SCRAP_REPAIR: 27,
+    MESSAGES.TOOL_SCRAP_SUCCESS: ' blev kasseret',
+    MESSAGES.TOOL_SCRAP_LOAN: ' blev ikke kasseret (værktøj udlånt)',
+    MESSAGES.TOOL_SCRAP_SCRAPPED: ' blev ikke kasseret (værktøj allerede kasseret)',
+    MESSAGES.TOOL_SCRAP_LOST: ' blev ikke kasseret (værktøj bortkommet)',
+    MESSAGES.TOOL_SCRAP_REPAIR: ' blev ikke kasseret (værktøj til reparation)',
 
-    MESSAGES.TOOL_LOST_SUCCESS: 28,
-    MESSAGES.TOOL_LOST_LOAN: 29,
-    MESSAGES.TOOL_LOST_SCRAPPED: 30,
-    MESSAGES.TOOL_LOST_LOST: 31,
-    MESSAGES.TOOL_LOST_REPAIR: 32,
+    MESSAGES.TOOL_LOST_SUCCESS: ' blev markeret som bortkommet',
+    MESSAGES.TOOL_LOST_LOAN: ' blev ikke markeret som bortkommet (værktøj udlånt)',
+    MESSAGES.TOOL_LOST_SCRAPPED: ' blev ikke markeret som bortkommet (værktøj kasseret)',
+    MESSAGES.TOOL_LOST_LOST: ' blev ikke markeret som bortkommet (værktøj allerede bortkommet)',
+    MESSAGES.TOOL_LOST_REPAIR: ' blev ikke markeret som bortkommet (værktøj til reparation)',
 
-    MESSAGES.EMPLOYEE_MAKE_ACTIVE_SUCCESS: 33,
-    MESSAGES.EMPLOYEE_MAKE_ACTIVE_ACTIVE: 34,
+    MESSAGES.EMPLOYEE_MAKE_ACTIVE_SUCCESS: ' blev markeret som aktiv',
+    MESSAGES.EMPLOYEE_MAKE_ACTIVE_ACTIVE: ' blev ikke markeret som aktiv (allerede aktiv)',
 
-    MESSAGES.EMPLOYEE_MAKE_INACTIVE_SUCCESS: 35,
-    MESSAGES.EMPLOYEE_MAKE_INACTIVE_INACTIVE: 36,
+    MESSAGES.EMPLOYEE_MAKE_INACTIVE_SUCCESS: ' blev markeret som inaktiv',
+    MESSAGES.EMPLOYEE_MAKE_INACTIVE_INACTIVE: ' blev ikke markeret som inaktiv (allerede inaktiv)',
 
-    MESSAGES.EMPLOYEE_MAKE_ADMIN_SUCCESS: 37,
-    MESSAGES.EMPLOYEE_MAKE_ADMIN_ADMIN: 38,
+    MESSAGES.EMPLOYEE_MAKE_ADMIN_SUCCESS: ' blev markeret som administrator',
+    MESSAGES.EMPLOYEE_MAKE_ADMIN_ADMIN: ' blev ikke markeret som administrator (allerede administrator)',
 
-    MESSAGES.EMPLOYEE_REMOVE_ADMIN_SUCCESS: 39,
-    MESSAGES.EMPLOYEE_REMOVE_ADMIN_ADMIN: 40,
+    MESSAGES.EMPLOYEE_REMOVE_ADMIN_SUCCESS: ' blev fjernet som administrator',
+    MESSAGES.EMPLOYEE_REMOVE_ADMIN_ADMIN: ' blev ikke fjernet som administrator (allerede ikke administrator)',
 
-    MESSAGES.EMPLOYEE_SET_LOAN_FLAG_SUCCESS: 41,
-    MESSAGES.EMPLOYEE_SET_LOAN_FLAG_FLAGGED: 42,
+    MESSAGES.EMPLOYEE_SET_LOAN_FLAG_SUCCESS: ' blev markeret med låneflag',
+    MESSAGES.EMPLOYEE_SET_LOAN_FLAG_FLAGGED: ' blev ikke markeret med låneflag (har allerede låneflag)',
 
-    MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_SUCCESS: 43,
-    MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_FLAGGED: 44,
+    MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_SUCCESS: ' fik fjernet låneflag',
+    MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_FLAGGED: ' fik ikke fjernet låneflag (havde ikke låneflag)',
 
-    MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_SUCCESS: 45,
-    MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_ACTIVE: 46,
+    MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_SUCCESS: ' blev markeret som aktiv',
+    MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_ACTIVE: ' blev ikke markeret som aktiv (allerede aktiv)',
 
-    MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_SUCCESS: 47,
-    MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_INACTIVE: 48,
+    MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_SUCCESS: ' blev markeret som inaktiv',
+    MESSAGES.CONSTRUCTION_SITE_MAKE_INACTIVE_INACTIVE: ' blev ikke markeret som inaktiv (allerede inaktiv)',
 
-    MESSAGES.CONTAINER_LOAN_SUCCESS: 49,
-    MESSAGES.CONTAINER_LOAN_LOAN: 50,
+    MESSAGES.CONTAINER_LOAN_SUCCESS: ' blev udlånt',
+    MESSAGES.CONTAINER_LOAN_LOAN: ' blev ikke udlånt (allerede udlånt)',
 
-    MESSAGES.CONTAINER_RETURN_SUCCESS: 51,
-    MESSAGES.CONTAINER_RETURN_LOAN: 52,
+    MESSAGES.CONTAINER_RETURN_SUCCESS: ' blev afleveret',
+    MESSAGES.CONTAINER_RETURN_STORE: ' blev ikke afleveret (allerede på lager)',
 
-    MESSAGES.CONTAINER_MAKE_ACTIVE_SUCCESS: 53,
-    MESSAGES.CONTAINER_MAKE_ACTIVE_ACTIVE: 54,
+    MESSAGES.CONTAINER_MAKE_ACTIVE_SUCCESS: ' blev markeret som aktiv',
+    MESSAGES.CONTAINER_MAKE_ACTIVE_ACTIVE: ' blev ikke markeret som aktiv (allerede aktiv)',
 
-    MESSAGES.CONTAINER_MAKE_INACTIVE_SUCCESS: 55,
-    MESSAGES.CONTAINER_MAKE_INACTIVE_INACTIVE: 56,
+    MESSAGES.CONTAINER_MAKE_INACTIVE_SUCCESS: ' blev markeret som inaktiv',
+    MESSAGES.CONTAINER_MAKE_INACTIVE_INACTIVE: ' blev ikke markeret som inaktiv (allerede inaktiv)',
 }
 
 def make_message(obj_dict):
-    message = ''
+    print obj_dict
 
-    for i, key in enumerate(obj_dict,start=1):
+    if len(obj_dict) > 1:
+        message = '<ul>'
+    else:
+        message = ''
+
+    for key in obj_dict:
+        if len(obj_dict) > 1:
+            message += "<li>"
+
+        print key
+
         message += pretty_concatenate(obj_dict[key])
         message += verbose_messages[key]
 
-        if i != len(obj_dict):
-            message += "<br>"
+        if len(obj_dict) > 1:
+            message += "</li>"
+
+    if len(obj_dict) > 1:
+        message += '</ul>'
 
     return message
 
