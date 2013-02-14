@@ -436,67 +436,6 @@ def action_form(request, form_name, object_type):
     form = form_name()
     context = {'form': form, 'object_type': object_type}
     return render(request, 'form.html', context)
-    
-@login_required
-def loan_form(request):
-    if request.POST:
-        logger.info('%s is loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
-        loan_form = LoanForm(request.POST)
-        if loan_form.is_valid():
-            obj_dict = loan_form.save()
-            logger.info('Tools loaned')
-            response = {'response': make_message(obj_dict)}
-        else:
-            logger.info('Tools not loaned')
-            response = {'response': 'Værktøj ikke udlånt'}
-			
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-
-    loan_form = LoanForm()
-    context = {'form': loan_form, 'object_type': 'loan'}
-    return render(request, 'form.html', context)
-
-@login_required
-def reservation_form(request):
-    if request.POST:
-        logger.info('%s is reserving %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
-        reservation_form = ReservationForm(request.POST)
-        if reservation_form.is_valid():
-            obj_dict = reservation_form.save()
-            logger.info('Tools reserved')
-            
-            response = {'response': make_message(obj_dict)}
-        else:
-            logger.info('Tools not reserved')
-            response = {'response': 'Værktøj ikke reserveret'}
-			
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-
-    reservation_form = ReservationForm()
-    context = {'form': reservation_form, 'object_type': 'reservation'}
-    return render(request, 'form.html', context)
-
-@login_required
-def container_loan_form(request):
-    if request.POST:
-        logger.info('%s is container_loaning %s to %s/%s' % (request.user, request.POST.get('tools'), request.POST.get('employee'), request.POST.get('construction_site')))
-        container_loan_form = ContainerLoanForm(request.POST)
-        if container_loan_form.is_valid():
-            obj_dict = container_loan_form.save()
-            logger.info('Tools container_loaned')
-            response = {'response': make_message(obj_dict)}
-        else:
-            logger.info('Tools not container_loaned')
-            response = {'response': 'Container ikke udlånt'}
-            
-        return HttpResponse(simplejson.dumps(response), 
-                            mimetype="application/json")
-	
-    container_loan_form = ContainerLoanForm()
-    context = {'form': container_loan_form, 'object_type': 'container_loan'}
-    return render(request, 'form.html', context)
 
 @login_required
 def action(request, class_name):
