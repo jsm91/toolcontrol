@@ -146,8 +146,6 @@ verbose_messages = {
 }
 
 def make_message(obj_dict):
-    print obj_dict
-
     if len(obj_dict) > 1:
         message = '<ul>'
     else:
@@ -156,8 +154,6 @@ def make_message(obj_dict):
     for key in obj_dict:
         if len(obj_dict) > 1:
             message += "<li>"
-
-        print key
 
         message += pretty_concatenate(obj_dict[key])
         message += verbose_messages[key]

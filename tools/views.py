@@ -486,14 +486,9 @@ def action(request, class_name):
     action = request.POST.get('action')
     object_ids = request.POST.get('object_ids')
 
-    logger.info('Action started by %s: %s on %s (%s)' % (request.user,
-                                                         action, object_ids,
-                                                         class_name.__name__))
-
     if object_ids:
         object_ids = object_ids.split(',')
     else:
-        logger.info('No objects chosen')
         response = {'response': 'Ingen objekter valgt'}
         return HttpResponse(simplejson.dumps(response),
                             content_type='application/json')
@@ -505,36 +500,18 @@ def action(request, class_name):
         obj_name = obj.name
 
         if action == 'loan_single':
-            if obj.loan(request.user):
-                success_objects.append(obj_name)
-            else:
-                failure_objects.append(obj_name)
+            response = obj.loan(request.user)
+            try:
+                obj_dict[response].append(obj_name)
+            except KeyError:
+                obj_dict[response] = [obj_name]
         else:
             action_function = getattr(obj, action)
-            if action == 'end_loan':
-                if (request.user.is_admin() or 
-                    (isinstance(obj, Tool) and request.user == obj.employee)):
-                    response = action_function()
-                    try:
-                        obj_dict[response].append(obj_name)
-                    except KeyError:
-                        obj_dict[response] = [obj_name]
-                else:
-                    failure_objects.append(obj_name)
-            else:
-                if request.user.is_admin():
-                    response = action_function()
-                    try:
-                        obj_dict[response].append(obj_name)
-                    except KeyError:
-                        obj_dict[response] = [obj_name]
-
-                else:
-                    response = {'response': 'Du har ikke ret til denne handling'}                   
-                    return HttpResponse(simplejson.dumps(response), 
-                                        content_type="application/json")
-
-    logger.info('No more objects')
+            response = action_function(request.user)
+            try:
+                obj_dict[response].append(obj_name)
+            except KeyError:
+                obj_dict[response] = [obj_name]
 
     response = {'response': make_message(obj_dict)}
 

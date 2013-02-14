@@ -165,8 +165,6 @@ class ContainerLoanForm(NewModelForm):
         container_ids = cd['containers'].split(',')
 
         obj_dict = {}
-        print container_ids
-
         for container_id in container_ids:
             container = get_object_or_404(Container, id = container_id)
             response = container.loan(cd['construction_site'])
@@ -327,7 +325,6 @@ class CreateManyToolsForm(NewForm):
         return out
 
     def clean_start_index(self):
-        print "Now in clean_start_index"
         data = self.cleaned_data['start_index']
         try:
             int(data)
