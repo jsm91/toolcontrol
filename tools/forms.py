@@ -290,7 +290,7 @@ class CreateManyToolsForm(NewForm):
     secondary_name = forms.CharField(label = "Sekundært navn", 
                                      required = False)
 
-    buy_date = forms.DateTimeField(label = "Indkøbsdato")
+    buy_date = forms.DateField(label = "Indkøbsdato")
 
     def __init__(self, *args, **kwargs):
         super(CreateManyToolsForm, self).__init__(*args, **kwargs)
