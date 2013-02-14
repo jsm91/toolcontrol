@@ -53,20 +53,6 @@
       </table>
     </form>
   </div>
-  
-  <div class="popup" id="add_many">
-    <form method="POST" action="/">
-      <table>
-	{% csrf_token %}
-	{{ form.as_new_table }}
-	<tr>
-    	  <td class="bottom" colspan="2">
-	    <input type="submit" value="Gem">
-    	  </td>
-	</tr>
-      </table>
-    </form>
-  </div>
 {% endblock %}
 
 {% block menu %}

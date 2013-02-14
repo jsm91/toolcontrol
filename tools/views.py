@@ -732,3 +732,24 @@ def inline_form(request, form_name, object_type):
     context_dictionary = {'form': form_name(),
                           'object_type': object_type}
     return render(request, 'inline_form.html', context_dictionary)
+
+@login_required
+def create_many_tools_form(request):
+    if request.POST:
+        form = CreateManyToolsForm(request.POST)
+        if form.is_valid():
+            form.save()
+            response = {'status': 'success',
+                        'response': 'Værktøj oprettet'}
+        else:
+            context = {'form': form,
+                       'object_type': 'add_many_tools'}
+            response = {'status': 'failure',
+                        'response': render_to_string('form.html', RequestContext(request, context))}
+
+        return HttpResponse(simplejson.dumps(response), 
+                            mimetype='application/json')
+
+    context_dictionary = {'form': CreateManyToolsForm(),
+                          'object_type': 'add_many_tools'}
+    return render(request, 'form.html', context_dictionary)

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from tools.models import Container, ConstructionSite, Employee, Reservation
 from tools.models import Tool, ToolCategory, ToolModel
 
-from tools.forms import BuildingSiteForm, ContainerForm, ContainerLoanForm, EmployeeForm
+from tools.forms import BuildingSiteForm, CreateManyToolsForm, ContainerForm, ContainerLoanForm, EmployeeForm
 from tools.forms import LoanForm, ReservationForm, ToolForm, ToolCategoryForm
 from tools.forms import ToolModelForm
 
@@ -74,6 +74,7 @@ urlpatterns = patterns('tools.views',
     url(r'^building_site_form/$', 'form', 
         {'class_name': ConstructionSite, 'form_name': BuildingSiteForm}, 
         name='building_site_form'),
+    url(r'^add_many_tools_form/$', 'create_many_tools_form', name='add_many_tools_form'),
 
     # AJAX requests for inline forms
     url(r'^container_inline_form/$', 'inline_form', 

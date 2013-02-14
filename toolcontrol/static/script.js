@@ -54,7 +54,12 @@ $(document).ready(function() {
 	var popupBox = "div.popup#"+id;
 
 	if(id == "add") {
-	    var object_type = $("table#index_navigation td.selected").attr("id");
+	    if($(this).attr("href") == "#add_many_tools") {
+		var object_type = "add_many_tools";
+	    }
+	    else {
+		var object_type = $("table#index_navigation td.selected").attr("id");
+	    }
 	    $("div.popup#add").load("/"+object_type+"_form/");
 	}
 
@@ -113,7 +118,7 @@ $(document).ready(function() {
 	$.post("/"+object_type+"_form/", $('form.add').serialize(), function(data) {
 	    if(data.status == "success") {
 		// Reload the page
-		if(object_type == "loan" || object_type == "reservation") {
+		if(object_type == "loan" || object_type == "reservation" || object_type == "add_many_tools") {
 		    $("div#content").load("/tool_list/");
 		}
 		else if(object_type == "container_loan") {
@@ -131,8 +136,7 @@ $(document).ready(function() {
 		$('div.popup').fadeOut('slow'); 
 	    }
 	    else {
-		var popupBox = "div.popup#add";
-		$(popupBox).html(data.response);
+		$("div.popup#add").html(data.response);
 	    }
 	});
 
