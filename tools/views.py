@@ -660,9 +660,14 @@ def qr_action(request, pk):
                 if request.POST:
                     form = QRLoanForm(tool=tool, data=request.POST)
                     if form.is_valid():
-                        form.save()
-                        context = {'message': 'Værktøjet blev udlånt',
-                                   'status': 'success'}
+                        obj_dict = form.save()
+                        context = {'message': make_message(obj_dict)}
+
+                        if MESSAGES.TOOL_LOAN_SUCCESS in obj_dict:
+                            context['status'] = 'success'
+                        else:
+                            context['status'] = 'failure'
+
                         return render(request, 'qr/success.html', context)
                 else:
                     form = QRLoanForm(tool=tool)
@@ -671,7 +676,7 @@ def qr_action(request, pk):
                 return render(request, 'qr/form.html', context)
 
             elif tool.location == 'Udlånt' or tool.location == 'Reparation':
-                tool.end_loan()
+                tool.end_loan(request.user)
                 context = {'message': 'Værktøjet blev afleveret',
                            'status': 'success'}
                 return render(request, 'qr/success.html', context)
@@ -689,7 +694,7 @@ def qr_action(request, pk):
                 return render(request, 'qr/success.html', context)
             elif tool.location == 'Udlånt' or tool.location == 'Reparation':
                 if tool.employee == request.user:
-                    tool.end_loan()
+                    tool.end_loan(request.user)
                     context = {'message': 'Værktøjet blev afleveret',
                                'status': 'success'}
                 else:

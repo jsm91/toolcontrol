@@ -34,3 +34,8 @@ select {
 img {
     width: 50%;
 }
+
+td.error {
+    background: rgba(255,255,204,0.8); 
+    color:#333333;
+}    

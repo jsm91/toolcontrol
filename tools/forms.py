@@ -96,7 +96,12 @@ class QRLoanForm(forms.ModelForm):
 
     def save(self, commit=True):
         cd = self.cleaned_data
-        self.tool.loan(cd['employee'], cd['construction_site'])
+
+        obj_dict = {}
+        response = self.tool.loan(cd['employee'], cd['construction_site'])
+        obj_dict[response] = [self.tool.name]
+
+        return obj_dict
 
 class ForgotPasswordForm(forms.Form):
     email = forms.EmailField()

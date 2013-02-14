@@ -4,6 +4,13 @@
 <table>
   <form method='POST'>
     {% csrf_token %}
+    {% for error in form.non_field_errors %}
+    <tr>
+      <td class="error">
+	{{ error }}
+      </td>
+    </tr>
+    {% endfor %}
     <tr>
       <td>
 	Vælg medarbejder og/eller placering for udlånet.
