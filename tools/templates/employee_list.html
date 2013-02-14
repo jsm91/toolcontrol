@@ -44,33 +44,22 @@
     <th>
       {% if ordering == "-is_active" %}
         <a class="set_ordering" href="#" id="is_active">
-	  A
+	  Aktiv
 	</a>
       {% else %}
         <a class="set_ordering" href="#" id="-is_active">
-	  A
+	  Aktiv
 	</a>
       {% endif %}
     </th>
     <th>
-      {% if ordering == "-is_office_admin" %}
-        <a class="set_ordering" href="#" id="is_office_admin">
-	  KA
+      {% if ordering == "-is_admin" %}
+        <a class="set_ordering" href="#" id="is_admin">
+	  Admin
 	</a>
       {% else %}
-        <a class="set_ordering" href="#" id="-is_office_admin">
-	  KA
-	</a>
-      {% endif %}
-    </th>
-    <th>
-      {% if ordering == "-is_tool_admin" %}
-        <a class="set_ordering" href="#" id="is_tool_admin">
-	  VA
-	</a>
-      {% else %}
-        <a class="set_ordering" href="#" id="-is_tool_admin">
-	  VA
+        <a class="set_ordering" href="#" id="-is_admin">
+	  Admin
 	</a>
       {% endif %}
     </th>
@@ -103,13 +92,8 @@
       {% endif %}
     </td>
     <td>
-      {% if employee.is_office_admin %}
+      {% if employee.is_admin %}
       <img src="{{ STATIC_URL }}Icon_Users.svg">
-      {% endif %}
-    </td>
-    <td>
-      {% if employee.is_tool_admin %}
-      <img src="{{ STATIC_URL }}Icon_Tools.svg">
       {% endif %}
     </td>
     <td>

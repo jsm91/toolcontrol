@@ -259,7 +259,7 @@ class SettingsForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(SettingsForm, self).__init__(*args, **kwargs)
-        if not kwargs['instance'].is_tool_admin:
+        if not kwargs['instance'].is_admin:
             self.fields['sms_loan_threshold'].widget.attrs['disabled'] = 'disabled'
             self.fields['email_loan_threshold'].widget.attrs['disabled'] = 'disabled'
 

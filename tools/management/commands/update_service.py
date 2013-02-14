@@ -26,7 +26,7 @@ class Command(BaseCommand):
             for tool in tools_to_service:
                 message += '%s (%s)\n'% (tool.name, tool.get_location())
 
-        for admin in Employee.objects.filter(is_tool_admin=True):
+        for admin in Employee.objects.filter(is_admin=True):
             if admin.name != 'Henrik' and admin.name != 'Jacob Møller':
                 admin.send_sms(message)
                 

@@ -24,7 +24,7 @@ class ConstructionSite(models.Model):
     is_active = models.BooleanField('Aktiv', default=True)
 
     def make_active(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_RIGHTS
         
         if self.is_active:
@@ -35,7 +35,7 @@ class ConstructionSite(models.Model):
         return MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_SUCCESS
 
     def make_inactive(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
             return MESSAGES.CONSTRUCTION_SITE_MAKE_ACTIVE_RIGHTS
         
         if not self.is_active:
@@ -57,7 +57,7 @@ class Container(models.Model):
     is_active = models.BooleanField('Aktiv')
 
     def make_active(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.CONTAINER_MAKE_ACTIVE_RIGHTS
 
         if self.is_active:
@@ -68,7 +68,7 @@ class Container(models.Model):
         return MESSAGES.CONTAINER_MAKE_ACTIVE_SUCCESS
 
     def make_inactive(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.CONTAINER_MAKE_INACTIVE_RIGHTS
 
         if not self.is_active:
@@ -79,7 +79,7 @@ class Container(models.Model):
         return MESSAGES.CONTAINER_MAKE_INACTIVE_SUCCESS
 
     def loan(self, construction_site, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.CONTAINER_LOAN_RIGHTS
 
         if self.location == None:
@@ -98,7 +98,7 @@ class Container(models.Model):
             return MESSAGES.CONTAINER_LOAN_LOAN
 
     def end_loan(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.CONTAINER_RETURN_RIGHTS
 
         if self.location != None:
@@ -138,8 +138,7 @@ class EmployeeManager(BaseUserManager):
         employee = self.create_employee(name=name, email=email, 
                                         phone_number=phone_number,
                                         password=password)
-        employee.is_office_admin = True
-        employee.is_tool_admin = True
+        employee.is_admin = True
         employee.save(using=self._db)
         return employee
 
@@ -151,8 +150,7 @@ class Employee(AbstractBaseUser):
     phone_number = models.IntegerField('Telefonnummer', blank=True, null=True)
 
     is_active = models.BooleanField('Aktiv', default=True)
-    is_office_admin = models.BooleanField('Kontoradmin', default=False)
-    is_tool_admin = models.BooleanField('Værktøjsadmin', default=False)
+    is_admin = models.BooleanField('Administrator', default=False)
     is_loan_flagged = models.BooleanField('Låneflag', default=False)
 
     sms_loan_threshold = models.IntegerField('Min. udlån ved sms', 
@@ -164,11 +162,8 @@ class Employee(AbstractBaseUser):
     
     USERNAME_FIELD = 'name'
 
-    def is_admin(self):
-        return self.is_tool_admin or self.is_office_admin
-
     def make_active(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.EMPLOYEE_MAKE_ACTIVE_RIGHTS
 
         if self.is_active:
@@ -179,7 +174,7 @@ class Employee(AbstractBaseUser):
         return MESSAGES.EMPLOYEE_MAKE_ACTIVE_SUCCESS
 
     def make_inactive(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.EMPLOYEE_MAKE_INACTIVE_RIGHTS
 
         if not self.is_active:
@@ -189,52 +184,30 @@ class Employee(AbstractBaseUser):
         self.save()
         return MESSAGES.EMPLOYEE_MAKE_INACTIVE_SUCCESS
 
-    def make_office_admin(self, user):
-        if not user.is_admin():
+    def make_admin(self, user):
+        if not user.is_admin:
            return MESSAGES.EMPLOYEE_MAKE_ADMIN_RIGHTS
 
-        if self.is_office_admin:
+        if self.is_admin:
             return MESSAGES.EMPLOYEE_MAKE_ADMIN_ADMIN
         
-        self.is_office_admin = True
+        self.is_admin = True
         self.save()
         return MESSAGES.EMPLOYEE_MAKE_ADMIN_SUCCESS
 
-    def make_not_office_admin(self, user):
-        if not user.is_admin():
+    def make_not_admin(self, user):
+        if not user.is_admin:
            return MESSAGES.EMPLOYEE_REMOVE_ADMIN_RIGHTS
 
-        if not self.is_office_admin:
+        if not self.is_admin:
             return MESSAGES.EMPLOYEE_REMOVE_ADMIN_ADMIN
         
-        self.is_office_admin = False
-        self.save()
-        return MESSAGES.EMPLOYEE_REMOVE_ADMIN_SUCCESS
-
-    def make_tool_admin(self, user):
-        if not user.is_admin():
-           return MESSAGES.EMPLOYEE_MAKE_ADMIN_RIGHTS
-
-        if self.is_tool_admin:
-            return MESSAGES.EMPLOYEE_MAKE_ADMIN_ADMIN
-        
-        self.is_tool_admin = True
-        self.save()
-        return MESSAGES.EMPLOYEE_MAKE_ADMIN_SUCCESS
-
-    def make_not_tool_admin(self, user):
-        if not user.is_admin():
-           return MESSAGES.EMPLOYEE_REMOVE_ADMIN_RIGHTS
-
-        if not self.is_tool_admin:
-            return MESSAGES.EMPLOYEE_REMOVE_ADMIN_ADMIN
-        
-        self.is_tool_admin = False
+        self.is_admin = False
         self.save()
         return MESSAGES.EMPLOYEE_REMOVE_ADMIN_SUCCESS
 
     def make_loan_flagged(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.EMPLOYEE_SET_LOAN_FLAG_RIGHTS
 
         if self.is_loan_flagged:
@@ -245,7 +218,7 @@ class Employee(AbstractBaseUser):
         return MESSAGES.EMPLOYEE_SET_LOAN_FLAG_SUCCESS
 
     def make_not_loan_flagged(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.EMPLOYEE_REMOVE_LOAN_FLAG_RIGHTS
 
         if not self.is_loan_flagged:
@@ -387,7 +360,7 @@ class Tool(models.Model):
             return self.location
 
     def service(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.TOOL_SERVICE_RIGHTS
 
         if self.location == 'Lager':
@@ -406,7 +379,7 @@ class Tool(models.Model):
             return MESSAGES.TOOL_SERVICE_REPAIR
 
     def scrap(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.TOOL_SCRAP_RIGHTS
 
         if self.location == 'Lager':
@@ -428,7 +401,7 @@ class Tool(models.Model):
             return False
 
     def lost(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.TOOL_LOST_RIGHTS
 
         if self.location == 'Lager':
@@ -484,7 +457,7 @@ class Tool(models.Model):
             return False
 
     def repair(self, user):
-        if not user.is_admin():
+        if not user.is_admin:
            return MESSAGES.TOOL_REPAIR_RIGHTS
 
         if self.location == 'Lager':
@@ -505,7 +478,7 @@ class Tool(models.Model):
             return False
 
     def end_loan(self, user):
-        if not user.is_admin() and self.employee != user:
+        if not user.is_admin and self.employee != user:
            return MESSAGES.TOOL_RETURN_RIGHTS
 
         if self.location == 'Udlånt' or self.location == 'Reparation':

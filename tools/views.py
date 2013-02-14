@@ -335,7 +335,7 @@ def tool_banner(request):
 
 @login_required
 def model_banner(request):
-    if not request.user.is_admin():
+    if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
@@ -343,7 +343,7 @@ def model_banner(request):
 
 @login_required
 def category_banner(request):
-    if not request.user.is_admin():
+    if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
@@ -351,7 +351,7 @@ def category_banner(request):
 
 @login_required
 def employee_banner(request):
-    if not request.user.is_office_admin:
+    if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
@@ -359,7 +359,7 @@ def employee_banner(request):
 
 @login_required
 def building_site_banner(request):
-    if not request.user.is_office_admin:
+    if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
     context = {}
@@ -478,7 +478,7 @@ def action(request, class_name):
             except KeyError:
                 obj_dict[response] = [obj_name]
         elif action == 'delete':
-            if request.user.is_admin():
+            if request.user.is_admin:
                 obj.delete()
                 try:
                     obj_dict[MESSAGES.OBJECT_DELETE_SUCCESS].append(obj_name)
@@ -509,7 +509,7 @@ def delete(request, class_to_delete):
                                                              class_to_delete.__name__,
                                                              object_id))
 
-    if not request.user.is_admin():
+    if not request.user.is_admin:
         logger.error('%s does not have rights to delete' % (request.user))
         raise Http404
     try:
@@ -531,7 +531,7 @@ def event_delete(request):
     event_id = request.GET.get('id')
     logger.warning('%s is trying to delete event with id %s' % (request.user,
                                                                 event_id))
-    if not request.user.is_admin():
+    if not request.user.is_admin:
         logger.error('Event not deleted, user has no rights')
         response = {'response': 'Du har ikke rettigheder til at slette begivenheden'}
         return HttpResponse(simplejson.dumps(response), 
@@ -570,7 +570,7 @@ def reservation_delete(request):
     reservation_id = request.GET.get('id')
     logger.warning('%s is trying to delete reservation with id %s' % (request.user, reservation_id))
 
-    if not request.user.is_admin():
+    if not request.user.is_admin:
         logger.error('Reservation not deleted, user has no rights')
         response = {'response': 'Du har ikke rettigheder til at slette reservationen'}
         return HttpResponse(simplejson.dumps(response), 
@@ -654,7 +654,7 @@ def qr_text(request, pk):
 @login_required
 def qr_action(request, pk):
     if request.user.is_authenticated():
-        if request.user.is_admin():
+        if request.user.is_admin:
             tool = get_object_or_404(Tool, id=pk)
             if tool.location == 'Lager':
                 if request.POST:
