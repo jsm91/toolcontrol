@@ -103,7 +103,7 @@ def stats(request):
         lost_tools_ratio = 0
 
     alive_tools = Tool.objects.filter(end_date__isnull=True)
-    timedeltas = [datetime.datetime.now() - tool.buy_date for tool in alive_tools]
+    timedeltas = [datetime.date.today() - tool.buy_date for tool in alive_tools]
     try:
         average_age = (sum(timedeltas, datetime.timedelta(0)) / alive_tools.count()).days
     except ZeroDivisionError:
