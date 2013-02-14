@@ -147,7 +147,7 @@ class Employee(AbstractBaseUser):
     verbose_name = 'employee'
 
     name = models.CharField('Navn', max_length=200, unique=True, db_index=True)
-    email = models.EmailField('Email', max_length=255, blank=True, null=True)
+    email = models.EmailField('Email', max_length=255, blank=True)
     phone_number = models.IntegerField('Telefonnummer', blank=True, null=True)
 
     is_active = models.BooleanField('Aktiv', default=True)
@@ -369,9 +369,9 @@ class Tool(models.Model):
     secondary_name = models.CharField('Sekundært navn', max_length=200, 
                                       null=True, blank=True)
 
-    buy_date = models.DateTimeField('Købsdato', 
+    buy_date = models.DateField('Købsdato', 
                                     default=datetime.datetime.now())
-    end_date = models.DateTimeField('Ophørsdato',
+    end_date = models.DateField('Ophørsdato',
                                     null=True, blank=True)
 
     

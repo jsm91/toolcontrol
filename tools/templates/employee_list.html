@@ -95,7 +95,7 @@
     <td>
       <label for="checkbox_{{ employee.id }}">{{ employee.name }}</label>
     </td>
-    <td>{{ employee.email|default_if_none:"Ikke oplyst" }}</td>
+    <td>{{ employee.email|default:"Ikke oplyst" }}</td>
     <td>{{ employee.phone_number|default_if_none:"Ikke oplyst" }}</td>
     <td>
       {% if employee.is_active %}
