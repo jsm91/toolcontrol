@@ -275,7 +275,7 @@ class CreateManyToolsForm(NewForm):
                                    help_text="Højeste indeksnummer")
     model = forms.ModelChoiceField(queryset=ToolModel.objects.all(), 
                                    empty_label=None)
-    container = forms.ModelChoiceField(queryset=Container.objects.filter(is_active=True))
+    container = forms.ModelChoiceField(queryset=Container.objects.filter(is_active=True), required=False)
     service_interval = forms.IntegerField(label="Serviceinterval", 
                                           required=False,
                                           help_text = 'Antal måneder mellem service for denne slags værktøj')
