@@ -151,6 +151,9 @@ class IndexView(FormView):
         logger.info('Many tools not created (%s)', form.errors)
         return super(IndexView, self).form_invalid(form)
 
+    def get_form(self, form_class):
+        return form_class(customer=self.request.user.customer,**self.get_form_kwargs())
+
 class ContainerListView(ListView):
     template_name = 'container_list.html'
 
@@ -389,12 +392,13 @@ def form(request, class_name, form_name):
             logger.info('%s is editing a %s (%s)' % (request.user, 
                                                      class_name.__name__,
                                                      obj.name))
-            form = form_name(data = request.POST, instance = obj)
+            form = form_name(data = request.POST, instance = obj,
+                             customer = request.user.customer)
 
             if form.is_valid():
-                form.save(customer=request.user.customer)
+                form.save()
                 logger.info('%s edited successfully' % class_name.__name__)
-                form = form_name()
+                form = form_name(customer=request.user.customer)
 
                 response = {'status': 'success',
                             'response': 'Objekt redigeret'}
@@ -409,9 +413,9 @@ def form(request, class_name, form_name):
             logger.info('%s is creating a %s (%s)' % (request.user,
                                                       class_name.__name__,
                                                       request.POST.get('name')))
-            form = form_name(request.POST)
+            form = form_name(data=request.POST, customer=request.user.customer)
             if form.is_valid():
-                obj = form.save(customer=request.user.customer)
+                obj = form.save()
                 logger.info('%s successfully created' % class_name.__name__)
 
                 if isinstance(obj, Tool):
@@ -434,12 +438,12 @@ def form(request, class_name, form_name):
 
     if obj_id:
         obj = get_object_or_404(class_name, id = obj_id)
-        form = form_name(instance=obj)
+        form = form_name(instance=obj, customer=request.user.customer)
         context = {'form': form,
                    'object_type': obj.verbose_name,
                    'id': obj.id}
     else:
-        form = form_name()
+        form = form_name(request.user.customer)
         context = {'form': form,
                    'object_type': class_name.verbose_name}
 
@@ -448,7 +452,8 @@ def form(request, class_name, form_name):
 @login_required
 def action_form(request, form_name, object_type):
     if request.POST:
-        form = form_name(request.POST)
+        form = form_name(data=request.POST,
+                         customer=request.user.customer)
         if form.is_valid():
             obj_dict = form.save()
             response = {'status': 'success',
@@ -463,7 +468,7 @@ def action_form(request, form_name, object_type):
         return HttpResponse(simplejson.dumps(response), 
                             mimetype="application/json")
 
-    form = form_name()
+    form = form_name(customer=request.user.customer)
     context = {'form': form, 'object_type': object_type}
     return render(request, 'form.html', context)
 
@@ -736,7 +741,7 @@ def qr_action(request, pk):
 @login_required
 def inline_form(request, form_name, object_type):
     if request.POST:
-        form = form_name(request.POST)
+        form = form_name(data=request.POST, customer=request.user.customer)
         if form.is_valid():
             obj = form.save()
             response = {'status': 'success',
@@ -753,14 +758,15 @@ def inline_form(request, form_name, object_type):
         return HttpResponse(simplejson.dumps(response), 
                             mimetype='application/json')
 
-    context_dictionary = {'form': form_name(),
+    context_dictionary = {'form': form_name(request.user.customer),
                           'object_type': object_type}
     return render(request, 'inline_form.html', context_dictionary)
 
 @login_required
 def create_many_tools_form(request):
     if request.POST:
-        form = CreateManyToolsForm(request.POST)
+        form = CreateManyToolsForm(data=request.POST, 
+                                   customer=request.user.customer)
         if form.is_valid():
             form.save()
             response = {'status': 'success',
@@ -774,6 +780,6 @@ def create_many_tools_form(request):
         return HttpResponse(simplejson.dumps(response), 
                             mimetype='application/json')
 
-    context_dictionary = {'form': CreateManyToolsForm(),
+    context_dictionary = {'form': CreateManyToolsForm(request.user.customer),
                           'object_type': 'add_many_tools'}
     return render(request, 'form.html', context_dictionary)

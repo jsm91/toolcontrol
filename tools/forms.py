@@ -37,10 +37,13 @@ class LoanForm(NewModelForm):
         model = Event
         fields = ['employee', 'construction_site',]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, customer, *args, **kwargs):
         super(LoanForm, self).__init__(*args, **kwargs)
         self.fields['employee'].empty_label = 'Vælg medarbejder...'
         self.fields['construction_site'].empty_label = 'Vælg byggeplads...'
+        self.fields['employee'].queryset = Employee.objects.filter(customer=
+                                                                   customer)
+        self.fields['construction_site'].queryset = ConstructionSite.objects.filter(customer=customer)
 
     def clean(self):
         cleaned_data = super(LoanForm, self).clean()
@@ -77,11 +80,14 @@ class QRLoanForm(forms.ModelForm):
         model = Event
         fields = ['employee', 'construction_site',]
 
-    def __init__(self, tool, *args, **kwargs):
+    def __init__(self, tool, customer, *args, **kwargs):
         super(QRLoanForm, self).__init__(*args, **kwargs)
         self.tool = tool
         self.fields['employee'].empty_label = 'Vælg medarbejder...'
         self.fields['construction_site'].empty_label = 'Vælg byggeplads...'
+        self.fields['employee'].queryset = Employee.objects.filter(customer=
+                                                                   customer)
+        self.fields['construction_site'].queryset = ConstructionSite.objects.filter(customer=customer)
 
     def clean(self):
         cleaned_data = super(QRLoanForm, self).clean()
@@ -142,20 +148,22 @@ class ToolCategoryForm(NewModelForm):
         model = ToolCategory
         fields = ['name',]
 
-    def save(self, customer, commit=True):
+    def __init__(self, customer, *args, **kwargs):
+        super(ToolCategoryForm, self).__init__(*args, **kwargs)
+        self.customer = customer
+
+    def save(self, commit=True):
         tool_category = super(ToolCategoryForm, self).save(commit=False)
-        tool_category.customer = customer
+        tool_category.customer = self.customer
         tool_category.save()
         return tool_category
 
 class ToolModelForm(NewModelForm):
-    category = forms.ModelChoiceField(queryset=ToolCategory.objects.all().order_by('name'),
-                                      empty_label=None,
-                                      label='Kategori')
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, customer, *args, **kwargs):
         super(ToolModelForm, self).__init__(*args, **kwargs)
         self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøj af denne model ikke skal serviceres'
+        self.fields['category'].queryset = ToolCategory.objects.filter(customer=customer).order_by('name')
+        self.fields['category'].empty_label = None
 
     class Meta:
         model = ToolModel
@@ -164,14 +172,17 @@ class ToolModelForm(NewModelForm):
 class ContainerForm(NewModelForm):
     class Meta:
         model = Container
-        exclude = ['location',]
+        exclude = ['location','customer']
 
-    def save(self, customer, commit=True):
+    def __init__(self, customer, *args, **kwargs):
+        super(ContainerForm, self).__init__(*args, **kwargs)
+        self.customer = customer
+
+    def save(self, commit=True):
         container = super(ContainerForm, self).save(commit=False)
-        container.customer = customer
+        container.customer = self.customer
         container.save()
         return container
-
 
 class ContainerLoanForm(NewModelForm):
     containers = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -179,6 +190,10 @@ class ContainerLoanForm(NewModelForm):
     class Meta:
         model = ContainerLoan
         fields = ['construction_site',]
+
+    def __init__(self, customer, *args, **kwargs):
+        super(ToolModelForm, self).__init__(*args, **kwargs)
+        self.fields['construction_site'].queryset = ConstructionSite.objects.filter(customer=customer)
 
     def save(self, commit=True):
         cd = self.cleaned_data
@@ -201,12 +216,10 @@ class ContainerLoanForm(NewModelForm):
         return obj_dict
 
 class ToolForm(NewModelForm):
-    model = forms.ModelChoiceField(queryset=ToolModel.objects.all().order_by('name'),
-                                   empty_label=None,
-                                   label='Model')
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, customer, *args, **kwargs):
         super(ToolForm, self).__init__(*args, **kwargs)
+        self.fields['model'].queryset = ToolModel.objects.filter(category__customer=customer).order_by('name')
+
         self.fields['buy_date'].initial = datetime.datetime.now()
         try:
             self.fields['model'].initial = ToolModel.objects.all()[0]
@@ -216,6 +229,7 @@ class ToolForm(NewModelForm):
             self.fields['price'].initial = self.fields['model'].initial.price
             self.fields['service_interval'].initial = self.fields['model'].initial.service_interval
         self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøjet ikke skal serviceres'
+
     class Meta:
         model = Tool
         exclude = ['location','employee','construction_site','end_date']
@@ -224,7 +238,11 @@ class EmployeeForm(NewModelForm):
     class Meta:
         model = Employee
         exclude = ['password', 'last_login', 'is_loan_flagged', 'is_employee',
-                   'sms_loan_threshold', 'email_loan_threshold',]
+                   'sms_loan_threshold', 'email_loan_threshold','customer']
+
+    def __init__(self, customer, *args, **kwargs):
+        super(EmployeeForm, self).__init__(*args, **kwargs)
+        self.customer = customer
 
     def clean(self):
         cleaned_data = super(EmployeeForm, self).clean()
@@ -236,7 +254,7 @@ class EmployeeForm(NewModelForm):
 
         return cleaned_data
 
-    def save(self, customer, commit=True):
+    def save(self, commit=True):
         employee = super(EmployeeForm, self).save(commit=False)
 
         if not employee.pk:
@@ -254,7 +272,7 @@ class EmployeeForm(NewModelForm):
             employee.send_mail('Oprettet som bruger', message)
             employee.send_sms(message)
         
-        employee.customer = customer
+        employee.customer = self.customer
 
         if commit:
             employee.save()
@@ -263,10 +281,15 @@ class EmployeeForm(NewModelForm):
 class BuildingSiteForm(NewModelForm):
     class Meta:
         model = ConstructionSite
+        exclude = ['customer',]
 
-    def save(self, customer, commit=True):
+    def __init__(self, customer, *args, **kwargs):
+        super(BuildingSiteForm, self).__init__(*args, **kwargs)
+        self.customer = customer
+
+    def save(self, commit=True):
         building_site = super(BuildingSiteForm, self).save(commit=False)
-        building_site.customer = customer
+        building_site.customer = self.customer
         building_site.save()
         return building_site
 
@@ -292,7 +315,7 @@ class CreateManyToolsForm(NewForm):
                                   help_text="Laveste indeksnummer med foranstillede nuller")
     end_index = forms.IntegerField(label="Slutindeks", 
                                    help_text="Højeste indeksnummer")
-    model = forms.ModelChoiceField(queryset=ToolModel.objects.all(), 
+    model = forms.ModelChoiceField(queryset=ToolModel.objects.all(),
                                    empty_label=None)
     container = forms.ModelChoiceField(queryset=Container.objects.filter(is_active=True), required=False)
     service_interval = forms.IntegerField(label="Serviceinterval", 
@@ -306,8 +329,10 @@ class CreateManyToolsForm(NewForm):
 
     buy_date = forms.DateField(label = "Indkøbsdato")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, customer, *args, **kwargs):
         super(CreateManyToolsForm, self).__init__(*args, **kwargs)
+        self.fields['model'].queryset = ToolModel.objects.filter(category__customer=customer).order_by('name')
+
         self.fields['buy_date'].initial = datetime.datetime.now()
         try:
             self.fields['model'].initial = ToolModel.objects.all()[0]
@@ -376,11 +401,13 @@ class ReservationForm(NewModelForm):
         model = Reservation
         exclude = ['tool']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, customer, *args, **kwargs):
         super(ReservationForm, self).__init__(*args, **kwargs)
         self.fields['start_date'].initial = datetime.datetime.now()
         self.fields['end_date'].initial = (datetime.datetime.now() + 
                                            datetime.timedelta(days=7))
+        self.fields['construction_site'].queryset = ConstructionSite.objects.filter(customer=customer)
+        self.fields['employee'].queryset = Employee.objects.filter(customer=customer)
 
     def save(self, commit=True):
         tool_ids = self.cleaned_data['tools'].split(',')
