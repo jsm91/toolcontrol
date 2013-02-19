@@ -142,6 +142,12 @@ class ToolCategoryForm(NewModelForm):
         model = ToolCategory
         fields = ['name',]
 
+    def save(self, customer, commit=True):
+        tool_category = super(ToolCategoryForm, self).save(commit=False)
+        tool_category.customer = customer
+        tool_category.save()
+        return tool_category
+
 class ToolModelForm(NewModelForm):
     category = forms.ModelChoiceField(queryset=ToolCategory.objects.all().order_by('name'),
                                       empty_label=None,
@@ -151,7 +157,6 @@ class ToolModelForm(NewModelForm):
         super(ToolModelForm, self).__init__(*args, **kwargs)
         self.fields['service_interval'].help_text = 'Antal måneder mellem service. 0 angiver at værktøj af denne model ikke skal serviceres'
 
-
     class Meta:
         model = ToolModel
         exclude = ['number_of_tools', 'total_price']
@@ -160,6 +165,13 @@ class ContainerForm(NewModelForm):
     class Meta:
         model = Container
         exclude = ['location',]
+
+    def save(self, customer, commit=True):
+        container = super(ContainerForm, self).save(commit=False)
+        container.customer = customer
+        container.save()
+        return container
+
 
 class ContainerLoanForm(NewModelForm):
     containers = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -224,7 +236,7 @@ class EmployeeForm(NewModelForm):
 
         return cleaned_data
 
-    def save(self, commit=True):
+    def save(self, customer, commit=True):
         employee = super(EmployeeForm, self).save(commit=False)
 
         if not employee.pk:
@@ -241,6 +253,8 @@ class EmployeeForm(NewModelForm):
 
             employee.send_mail('Oprettet som bruger', message)
             employee.send_sms(message)
+        
+        employee.customer = customer
 
         if commit:
             employee.save()
@@ -250,10 +264,10 @@ class BuildingSiteForm(NewModelForm):
     class Meta:
         model = ConstructionSite
 
-    def save(self, commit=True):
+    def save(self, customer, commit=True):
         building_site = super(BuildingSiteForm, self).save(commit=False)
-        if commit:
-            building_site.save()
+        building_site.customer = customer
+        building_site.save()
         return building_site
 
 class SettingsForm(forms.ModelForm):

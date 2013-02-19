@@ -88,8 +88,10 @@ def settings(request):
 
 @login_required
 def stats(request):
-    lost_tool_count = Tool.objects.filter(location='Bortkommet').count()
-    scrapped_tool_count = Tool.objects.filter(location='Kasseret').count()
+    lost_tool_count = Tool.objects.filter(location='Bortkommet',
+                                          model__category__customer=request.user.customer).count()
+    scrapped_tool_count = Tool.objects.filter(location='Kasseret',
+                                          model__category__customer=request.user.customer).count()
     
     try:
         lost_tools_ratio = (lost_tool_count / 
@@ -102,14 +104,16 @@ def stats(request):
         scrapped_tools_ratio = 0
         lost_tools_ratio = 0
 
-    alive_tools = Tool.objects.filter(end_date__isnull=True)
+    alive_tools = Tool.objects.filter(end_date__isnull=True,
+                                      model__category__customer=request.user.customer)
     timedeltas = [datetime.date.today() - tool.buy_date for tool in alive_tools]
     try:
         average_age = (sum(timedeltas, datetime.timedelta(0)) / alive_tools.count()).days
     except ZeroDivisionError:
         average_age = 0
 
-    dead_tools = Tool.objects.filter(end_date__isnull=False)
+    dead_tools = Tool.objects.filter(end_date__isnull=False,
+                                     model__category__customer=request.user.customer)
     timedeltas = [tool.end_date - tool.buy_date for tool in dead_tools]
     try:
         average_life = (sum(timedeltas, datetime.timedelta(0)) / dead_tools.count()).days
@@ -117,12 +121,12 @@ def stats(request):
         average_life = 0
 
     context_dictionary = {
-        'tool_count': Tool.objects.all().count(),
-        'model_count': ToolModel.objects.all().count(),
-        'category_count': ToolCategory.objects.all().count(),
-        'sum_price_tools': Tool.objects.all().aggregate(Sum('price')),
-        'avg_price_tools': Tool.objects.all().aggregate(Avg('price')),
-        'avg_price_models': ToolModel.objects.all().aggregate(Avg('price')),
+        'tool_count': Tool.objects.filter(model__category__customer=request.user.customer).count(),
+        'model_count': ToolModel.objects.filter(category__customer=request.user.customer).count(),
+        'category_count': ToolCategory.objects.filter(customer=request.user.customer).count(),
+        'sum_price_tools': Tool.objects.filter(model__category__customer=request.user.customer).aggregate(Sum('price')),
+        'avg_price_tools': Tool.objects.filter(model__category__customer=request.user.customer).aggregate(Avg('price')),
+        'avg_price_models': ToolModel.objects.filter(category__customer=request.user.customer).aggregate(Avg('price')),
         'lost_tool_count': lost_tool_count,
         'scrapped_tool_count': scrapped_tool_count,
         'scrapped_tools_ratio': scrapped_tools_ratio,
@@ -155,7 +159,8 @@ class ContainerListView(ListView):
         ordering = self.request.GET.get('ordering', 'name')
 
         return Container.objects.filter(Q(name__icontains=search) |
-                                        Q(location__name__icontains=search)).select_related('location').order_by(ordering)
+                                        Q(location__name__icontains=search),
+                                        customer=self.request.user.customer).select_related('location').order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super(ContainerListView, self).get_context_data(**kwargs)
@@ -177,7 +182,8 @@ class ToolListView(ListView):
                                    Q(construction_site__name__icontains=search) | 
                                    Q(location__iexact=search) |
                                    Q(secondary_name__icontains=search) |
-                                   Q(invoice_number__icontains=search)).select_related('loaned_to').order_by(ordering)
+                                   Q(invoice_number__icontains=search),
+                                   model__category__customer=self.request.user.customer).select_related('loaned_to').order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super(ToolListView, self).get_context_data(**kwargs)
@@ -193,7 +199,8 @@ class ModelListView(ListView):
         ordering = self.request.GET.get('ordering', 'name')
 
         return ToolModel.objects.filter(Q(name__icontains=search) |
-                                        Q(category__name__icontains=search)).order_by(ordering)
+                                        Q(category__name__icontains=search),
+                                        category__customer=self.request.user.customer).order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super(ModelListView, self).get_context_data(**kwargs)
@@ -208,7 +215,8 @@ class CategoryListView(ListView):
         search = self.request.GET.get('search', '')
         ordering = self.request.GET.get('ordering', 'name')
 
-        return ToolCategory.objects.filter(name__icontains=search).order_by(ordering)
+        return ToolCategory.objects.filter(customer=self.request.user.customer,
+                                           name__icontains=search).order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super(CategoryListView, self).get_context_data(**kwargs)
@@ -224,13 +232,16 @@ class EmployeeListView(ListView):
         ordering = self.request.GET.get('ordering', 'name')
 
         if search == 'aktiv' or search == 'inaktive':
-            return Employee.objects.filter(is_active=True).order_by(sorting)
+            return Employee.objects.filter(customer=self.request.user.customer,
+                                           is_active=True).order_by(sorting)
         elif search == 'inaktiv' or search == 'inaktive':
-            return Employee.objects.filter(is_active=False).order_by(sorting)
+            return Employee.objects.filter(customer=self.request.user.customer,
+                                           is_active=False).order_by(sorting)
         else:
             return Employee.objects.filter(Q(name__icontains=search) |
                                            Q(phone_number__icontains=search) |
-                                           Q(email__icontains=search)).order_by(ordering)
+                                           Q(email__icontains=search),
+                                           customer=self.request.user.customer).order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super(EmployeeListView, self).get_context_data(**kwargs)
@@ -246,11 +257,14 @@ class ConstructionSiteListView(ListView):
         ordering = self.request.GET.get('ordering', 'name')
 
         if search == 'aktiv' or search == 'aktive':
-            return ConstructionSite.objects.filter(is_active=True).order_by(sorting)
+            return ConstructionSite.objects.filter(customer=self.request.user.customer,
+                                                   is_active=True).order_by(sorting)
         elif search == 'inaktiv' or search == 'inaktive':
-            return ConstructionSite.objects.filter(is_active=False).order_by(sorting)
+            return ConstructionSite.objects.filter(customer=self.request.user.customer,
+                                                   is_active=False).order_by(sorting)
         else:
-            return ConstructionSite.objects.filter(name__icontains=search).order_by(ordering)
+            return ConstructionSite.objects.filter(customer=self.request.user.customer,
+                                                   name__icontains=search).order_by(ordering)
 
     def get_context_data(self, **kwargs):
         context = super(ConstructionSiteListView, self).get_context_data(**kwargs)
@@ -265,7 +279,7 @@ class EventListView(ListView):
         tool_id = self.request.GET.get('tool_id')
         tool = get_object_or_404(Tool, id = tool_id)
 
-        return Event.objects.filter(tool=tool).order_by('start_date')
+        return tool.event_set.all().order_by('start_date')
 
     def get_context_data(self, **kwargs):
         context = super(EventListView, self).get_context_data(**kwargs)
@@ -378,7 +392,7 @@ def form(request, class_name, form_name):
             form = form_name(data = request.POST, instance = obj)
 
             if form.is_valid():
-                form.save()
+                form.save(customer=request.user.customer)
                 logger.info('%s edited successfully' % class_name.__name__)
                 form = form_name()
 
@@ -397,7 +411,7 @@ def form(request, class_name, form_name):
                                                       request.POST.get('name')))
             form = form_name(request.POST)
             if form.is_valid():
-                obj = form.save()
+                obj = form.save(customer=request.user.customer)
                 logger.info('%s successfully created' % class_name.__name__)
 
                 if isinstance(obj, Tool):

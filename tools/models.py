@@ -16,12 +16,14 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from toolcontrol.enums import MESSAGES
+from admin.models import Customer
 
 class ConstructionSite(models.Model):
     verbose_name = 'building_site'
 
     name = models.CharField('Navn', max_length=200)
     is_active = models.BooleanField('Aktiv', default=True)
+    customer = models.ForeignKey(Customer, verbose_name='Kunde')
 
     def make_active(self, user):
         if not user.is_admin:
@@ -55,6 +57,7 @@ class Container(models.Model):
     location = models.ForeignKey(ConstructionSite, null=True, default=None,
                                  verbose_name = 'Placering')
     is_active = models.BooleanField('Aktiv')
+    customer = models.ForeignKey(Customer, verbose_name='Kunde')
 
     def make_active(self, user):
         if not user.is_admin:
@@ -148,6 +151,7 @@ class Employee(AbstractBaseUser):
     name = models.CharField('Navn', max_length=200, unique=True, db_index=True)
     email = models.EmailField('Email', max_length=255, blank=True)
     phone_number = models.IntegerField('Telefonnummer', blank=True, null=True)
+    customer = models.ForeignKey(Customer, verbose_name='Kunde', null=True, blank=True)
 
     is_active = models.BooleanField('Aktiv', default=True)
     is_admin = models.BooleanField('Administrator', default=False)
@@ -277,6 +281,7 @@ class ToolCategory(models.Model):
     verbose_name = 'category'
 
     name = models.CharField('Navn', max_length=200)
+    customer = models.ForeignKey(Customer, verbose_name='Kunde')
 
     def total_price(self):
         price = Tool.objects.filter(model__category=self).aggregate(Sum('price'))
