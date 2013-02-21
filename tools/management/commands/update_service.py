@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 
 from toolcontrol.utils import check_for_service
 
+from customers.models import Customer
 from tools.models import Employee, Tool
 
 class Command(BaseCommand):
@@ -11,24 +12,25 @@ class Command(BaseCommand):
 
     def handle(self,*args, **options):
         # First, message the admins of the tools that need service
-        tools = Tool.objects.all()
-        tools_to_service = []
+        for customer in Customer.objects.all():
+            tools = Tool.objects.filter(model__category__customer=customer)
+            tools_to_service = []
 
-        for tool in tools:
-            if check_for_service(tool):
-                tools_to_service.append(tool)
+            for tool in tools:
+                if check_for_service(tool):
+                    tools_to_service.append(tool)
         
-        message = 'Daglig serviceopdatering. Følgende værktøj mangler service:\n'
-        
-        if not tools_to_service:
-            message += 'Intet!'
-        else:
-            for tool in tools_to_service:
-                message += '%s (%s)\n'% (tool.name, tool.get_location())
+            message = 'Daglig serviceopdatering. Følgende værktøj mangler service:\n'
+            
+            if not tools_to_service:
+                message += 'Intet!'
+            else:
+                for tool in tools_to_service:
+                    message += '%s (%s)\n'% (tool.name, tool.get_location())
 
-        for admin in Employee.objects.filter(is_admin=True):
-            if admin.name != 'Henrik' and admin.name != 'Jacob Møller':
-                admin.send_sms(message)
+            for admin in Employee.objects.filter(customer=customer, is_admin=True):
+                if admin.name != 'Henrik' and admin.name != 'Jacob Møller':
+                    admin.send_sms(message)
                 
         # Send SMS to all loaners who have tools that need service
         for employee in Employee.objects.all():
