@@ -1,0 +1,36 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  {{ object.name }}<br>
+  {{ object.credit }} kr.<br>
+
+  <h1>Værktøj</h1>
+  {% for tool in tools %}
+    {{ tool.name }}<br>
+  {% endfor %}
+
+  <h1>Modeller</h1>
+  {% for model in models %}
+    {{ model.name }}<br>
+  {% endfor %}
+
+  <h1>Kategorier</h1>
+  {% for category in categories %}
+    {{ category.name }}<br>
+  {% endfor %}
+
+  <h1>Medarbejdere</h1>
+  {% for employee in employees %}
+    {{ employee.name }}<br>
+  {% endfor %}
+
+  <h1>Byggepladser</h1>
+  {% for construction_site in construction_sites %}
+    {{ construction_site.name }}<br>
+  {% endfor %}
+
+  <h1>Containere</h1>
+  {% for container in containers %}
+    {{ container.name }}<br>
+  {% endfor %}
+{% endblock %}

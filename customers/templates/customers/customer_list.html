@@ -1,0 +1,32 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <table border="1">
+    <tr>
+      <th>Kunde-ID</th>
+      <th>Navn</th>
+      <th>Aktiv</th>
+      <th>SMS'er afsendt</th>
+      <th>Kredit</th>
+      <th>Funktioner</th>
+    </tr>
+  {% for customer in object_list %}
+    <tr class="{% if customer.credit < 0 %}customer_in_minus{% endif %} {% if not customer.is_active %}customer_inactive{% endif %}">
+      <td>{{ customer.pk }}</td>
+      <td>
+	<a href="{% url 'customer_detail' customer.pk %}">
+	  {{ customer.name }}
+	</a>
+      </td>
+      <td>{{ customer.is_active }}</td>
+      <td>{{ customer.sms_sent }} stk.</td>
+      <td>{{ customer.credit }} kr.</td>
+      <td>
+	<a href="{% url 'customer_update' customer.pk %}">
+	  Rediger
+	</a>
+      </td>
+    </tr>
+  {% endfor %}
+  </table>
+{% endblock %}

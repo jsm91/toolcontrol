@@ -1,0 +1,14 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    {% if search %}
+    <input type="text" name="search" placeholder="Søg..." value="{{ search }}">
+    {% else %}
+    <input type="text" name="search" placeholder="Søg...">    
+    {% endif %}
+    <input type="submit" value="Søg i log">
+  </form>
+  {{ log|safe }}
+{% endblock %}

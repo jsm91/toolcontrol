@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>ToolControl - admin interface</title>
+  </head>
+  <style type="text/css">
+    tr.customer_inactive {
+      background-color: #CCCCCC;
+    }
+    tr.customer_in_minus {
+      background-color: #FF0000;
+    }
+  </style>
+  <body>
+    <ul>
+      <li><a href="{% url 'admin_index' %}">Forside</a></li>
+      <li><a href="{% url 'customer_list' %}">Kundeliste</a></li>
+      <li><a href="{% url 'customer_create' %}">Ny kunde</a></li>
+      <li><a href="{% url 'log' %}">Logfil</a></li>
+      <li><a href="{% url 'logout' %}">Log ud</a></li>
+    </ul>
+    {% block content %}{% endblock %}
+  </body>
+</html>
