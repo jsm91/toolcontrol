@@ -4,6 +4,14 @@
   {{ object.name }}<br>
   {{ object.credit }} kr.<br>
 
+<a href="#" class="admin_pane" id="tools">Værktøj</a>
+<a href="#" class="admin_pane" id="models">Modeller</a>
+<a href="#" class="admin_pane" id="categories">Kategorier</a>
+<a href="#" class="admin_pane" id="employees">Medarbejdere</a>
+<a href="#" class="admin_pane" id="construction_sites">Byggepladser</a>
+<a href="#" class="admin_pane" id="containers">Containere</a>
+
+<div class="admin_pane" id="tools">
   <h1>Værktøj</h1>
   <table>
     <tr>
@@ -31,7 +39,9 @@
     </tr>
     {% endfor %}
   </table>
+</div>
 
+<div class="admin_pane" id="models">
   <h1>Modeller</h1>
   <table>
     <tr>
@@ -53,7 +63,9 @@
     </tr>
     {% endfor %}
   </table>
+</div>
   
+<div class="admin_pane" id="categories">
   <h1>Kategorier</h1>
   <table>
     <tr>
@@ -71,7 +83,9 @@
     </tr>
     {% endfor %}
   </table>
+</div>
 
+<div class="admin_pane" id="employees">
   <h1>Medarbejdere</h1>
   <table>
     <tr>
@@ -93,7 +107,9 @@
     </tr>
     {% endfor %}
   </table>
+</div>
 
+<div class="admin_pane" id="construction_sites">
   <h1>Byggepladser</h1>
   <table>
     <tr>
@@ -107,7 +123,9 @@
     </tr>
     {% endfor %}
   </table>
+</div>
 
+<div class="admin_pane" id="containers">
   <h1>Containere</h1>
   <table>
     <tr>
@@ -123,4 +141,5 @@
     </tr>
     {% endfor %}
   </table>
+</div>
 {% endblock %}

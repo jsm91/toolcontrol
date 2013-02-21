@@ -4,14 +4,22 @@
   <head>
     <title>ToolControl - admin interface</title>
   </head>
-  <style type="text/css">
-    tr.customer_inactive {
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}script.js"></script>
+    <style type="text/css">
+      tr.customer_inactive {
       background-color: #CCCCCC;
-    }
-    tr.customer_in_minus {
+      }
+      tr.customer_in_minus {
       background-color: #FF0000;
-    }
-  </style>
+      }
+      div.admin_pane#tools {
+      display:block;
+      }
+      div.admin_pane {
+      display:none;
+      }
+    </style>
   <body>
     <ul>
       <li><a href="{% url 'admin_index' %}">Forside</a></li>
