@@ -17,7 +17,7 @@
       <th>Placering</th>
       <th>Pris</th>
     </tr>
-  {% for tool in tools %}
+    {% for tool in tools %}
     <tr>
       <td>{{ tool.name }}</td>
       <td>{{ tool.model.name }}</td>
@@ -29,31 +29,98 @@
       <td>{{ tool.get_location }}</td>
       <td>{{ tool.price }} kr.</td>
     </tr>
-  {% endfor %}
+    {% endfor %}
   </table>
 
   <h1>Modeller</h1>
-  {% for model in models %}
-    {{ model.name }}<br>
-  {% endfor %}
-
+  <table>
+    <tr>
+      <th>Navn</th>
+      <th>Kategori</th>
+      <th>Serviceinterval</th>
+      <th>Pris</th>
+      <th>Samlet pris</th>
+      <th>Antal værktøj</th>
+    </tr>
+    {% for model in models %}
+    <tr>
+      <td>{{ model }}</td>
+      <td>{{ model.category }}</td>
+      <td>{{ model.service_interval }}</td>
+      <td>{{ model.price }}</td>
+      <td>{{ model.total_price }}</td>
+      <td>{{ model.number_of_tools }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  
   <h1>Kategorier</h1>
-  {% for category in categories %}
-    {{ category.name }}<br>
-  {% endfor %}
+  <table>
+    <tr>
+      <th>Navn</th>
+      <th>Antal modeller</th>
+      <th>Antal værktøj</th>
+      <th>Samlet pris</th>
+    </tr>
+    {% for category in categories %}
+    <tr>
+      <td>{{ category }}</td>
+      <td>{{ category.number_of_models }}</td>
+      <td>{{ category.number_of_tools }}</td>
+      <td>{{ category.total_price }}</td>
+    </tr>
+    {% endfor %}
+  </table>
 
   <h1>Medarbejdere</h1>
-  {% for employee in employees %}
-    {{ employee.name }}<br>
-  {% endfor %}
+  <table>
+    <tr>
+      <th>Navn</th>
+      <th>Email</th>
+      <th>Telefonnummer</th>
+      <th>Aktiv</th>
+      <th>Admin</th>
+      <th>Låneflag</th>
+    </tr>
+    {% for employee in employees %}
+    <tr>
+      <td>{{ employee }}</td>
+      <td>{{ employee.email }}</td>
+      <td>{{ employee.phone_number }}</td>
+      <td>{{ employee.is_active }}</td>
+      <td>{{ employee.is_admin }}</td>
+      <td>{{ employee.is_loan_flagged }}</td>
+    </tr>
+    {% endfor %}
+  </table>
 
   <h1>Byggepladser</h1>
-  {% for construction_site in construction_sites %}
-    {{ construction_site.name }}<br>
-  {% endfor %}
+  <table>
+    <tr>
+      <th>Navn</th>
+      <th>Aktiv</th>
+    </tr>
+    {% for construction_site in construction_sites %}
+    <tr>
+      <td>{{ construction_site.name }}</td>
+      <td>{{ construction_site.is_active }}</td>
+    </tr>
+    {% endfor %}
+  </table>
 
   <h1>Containere</h1>
-  {% for container in containers %}
-    {{ container.name }}<br>
-  {% endfor %}
+  <table>
+    <tr>
+      <th>Navn</th>
+      <th>Placering</th>
+      <th>Aktiv</th>
+    </tr>
+    {% for container in containers %}
+    <tr>
+      <td>{{ container }}</td>
+      <td>{{ container.location }}</td>
+      <td>{{ container.is_active }}</td>
+    </tr>
+    {% endfor %}
+  </table>
 {% endblock %}
