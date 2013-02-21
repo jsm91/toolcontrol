@@ -21,7 +21,7 @@ class CreateCustomerForm(forms.ModelForm):
         exclude = ('sms_sent',)
 
     def save(self, commit=True):
-        customer = super(CustomerForm, self).save(commit=commit)
+        customer = super(CreateCustomerForm, self).save(commit=commit)
 
         employee = Employee(name=self.cleaned_data['administrator'],
                             email = self.cleaned_data['email'],
