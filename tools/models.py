@@ -16,7 +16,7 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from toolcontrol.enums import MESSAGES
-from admin.models import Customer
+from customers.models import Customer
 
 class ConstructionSite(models.Model):
     verbose_name = 'building_site'
@@ -262,6 +262,9 @@ class Employee(AbstractBaseUser):
             if match.group('status') == 'succes':
                 logger.debug('SMS gateway returned "%s: %s"' % (match.group('status'),
                                                                 match.group('message')))
+                self.customer.sms_sent += 1
+                self.customer.credit -= self.customer.sms_price
+                self.customer.save()
             else:
                 logger.error('SMS gateway returned "%s: %s"' % (match.group('status'),
                                                                 match.group('message')))

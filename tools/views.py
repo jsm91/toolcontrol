@@ -39,7 +39,12 @@ def login_view(request):
             user = authentication_form.get_user()
             login(request, user)
             logger.info('Login successful')
-            return HttpResponseRedirect(reverse('index'))
+
+            if user.customer == None:
+                return HttpResponseRedirect(reverse('admin_index'))
+            else:
+                return HttpResponseRedirect(reverse('index'))
+
     else:
         authentication_form = AuthenticationForm()
 
