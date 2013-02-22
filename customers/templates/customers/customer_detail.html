@@ -1,15 +1,22 @@
 {% extends "admin_base.html" %}
 
+{% block customers_active %}-active{% endblock %}
+
+{% block sub_top_bar %}
+<a href="#" class="admin_pane" id="initial"><span>Overblik</span></a>
+<a href="#" class="admin_pane" id="tools"><span>Værktøj</span></a>
+<a href="#" class="admin_pane" id="models"><span>Modeller</span></a>
+<a href="#" class="admin_pane" id="categories"><span>Kategorier</span></a>
+<a href="#" class="admin_pane" id="employees"><span>Medarbejdere</span></a>
+<a href="#" class="admin_pane" id="construction_sites"><span>Byggepladser</span></a>
+<a href="#" class="admin_pane" id="containers"><span>Containere</span></a>
+{% endblock %}
+
 {% block content %}
+<div class="admin_pane" id="initial">
   {{ object.name }}<br>
   {{ object.credit }} kr.<br>
-
-<a href="#" class="admin_pane" id="tools">Værktøj</a>
-<a href="#" class="admin_pane" id="models">Modeller</a>
-<a href="#" class="admin_pane" id="categories">Kategorier</a>
-<a href="#" class="admin_pane" id="employees">Medarbejdere</a>
-<a href="#" class="admin_pane" id="construction_sites">Byggepladser</a>
-<a href="#" class="admin_pane" id="containers">Containere</a>
+</div>
 
 <div class="admin_pane" id="tools">
   <h1>Værktøj</h1>
