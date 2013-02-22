@@ -40,8 +40,8 @@
 	Kærvej 1&nbsp;&#183;&nbsp;2610 Rødovre
       </td>
       <td class="activity">
-	<img src="{{ STATIC_URL }}Icon_Login.svg"> {{ customer.logins}} logins seneste måned<br>
-	<img src="{{ STATIC_URL }}Icon_Tools.svg"> {{ customer.events }} udlån seneste måned<br>
+	<img src="{{ STATIC_URL }}Icon_Login.svg"> {{ customer.logins }} logins seneste måned<br>
+	<img src="{{ STATIC_URL }}Icon_Tools.svg"> {{ customer.events }} begivenheder seneste måned<br>
 	{% if customer.tickets %}
 	<img src="{{ STATIC_URL }}Icon_Warning.svg"> <a href="{% url 'ticket_list' %}?customer={{ customer.id }}">{{ customer.tickets }} åbne kuponer</a>
 	{% endif %}
