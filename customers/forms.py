@@ -2,14 +2,39 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.db.models import Q
 
 from customers.models import Customer
-from tools.models import Employee
+from tools.models import Employee, Ticket
 
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         exclude = ('sms_sent',)    
+
+class TicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+
+    def __init__(self, *args, **kwargs):
+        super(TicketForm, self).__init__(*args, **kwargs)
+        print self.initial
+        self.fields['duplicate'].queryset = Ticket.objects.filter(~Q(id=self.initial['id']), duplicate__isnull=True)
+
+    def save(self, commit=True):
+        ticket = super(TicketForm,self).save(commit=commit)
+
+        if ticket.duplicate:
+            for duplicate in ticket.ticket_set.all():
+                duplicate.duplicate = ticket.duplicate
+                duplicate.save()
+
+        return ticket
+
+class CreateTicketForm(forms.ModelForm):
+    class Meta:
+        model = Ticket
+        exclude = ('duplicate', 'is_open',)
 
 class CreateCustomerForm(forms.ModelForm):
     administrator = forms.CharField()

@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.urlresolvers import reverse
 from django.db import models
 
@@ -15,3 +17,20 @@ class Customer(models.Model):
 
     def get_absolute_url(self):
         return reverse('customer_detail', args=[self.pk])
+
+    def __unicode__(self):
+        return self.name
+
+    def events(self):
+        from tools.models import Event
+        return Event.objects.filter(tool__model__category__customer=self, 
+                                    start_date__gte=datetime.datetime.now()-datetime.timedelta(days=30)).count()
+
+    def logins(self):
+        from tools.models import Login
+        return Login.objects.filter(employee__customer=self,
+                                    timestamp__gte=datetime.datetime.now()-datetime.timedelta(days=30)).count()
+
+    def tickets(self):
+        from tools.models import Ticket
+        return Ticket.objects.filter(reported_by=self).count()

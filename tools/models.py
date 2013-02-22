@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import Q
 from django.db.models import Sum
@@ -166,6 +167,10 @@ class Employee(AbstractBaseUser):
     
     USERNAME_FIELD = 'name'
 
+    def mark_login(self):
+        login = Login(employee=self)
+        login.save()
+    
     def make_active(self, user):
         if not user.is_admin:
            return MESSAGES.EMPLOYEE_MAKE_ACTIVE_RIGHTS
@@ -589,6 +594,30 @@ class Event(models.Model):
         else:
             return self.construction_site
 
+class Login(models.Model):
+    employee = models.ForeignKey(Employee)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+class Ticket(models.Model):
+    LEVEL_CHOICES = (('Fejl', 'Fejl'),
+                     ('Forbedring', 'Forbedring'),
+                     ('Spørgsmål', 'Spørgsmål'))
+
+    name = models.CharField(max_length=200)
+    description = models.TextField()
+    created_by = models.ForeignKey(Employee, related_name='tickets_created')
+    reported_by = models.ForeignKey(Customer)
+    duplicate = models.ForeignKey('self', null=True, blank=True)
+    is_open = models.BooleanField(default=True)
+    level = models.CharField(choices=LEVEL_CHOICES, max_length=200)
+    assigned_to = models.ForeignKey(Employee, related_name='tickets_assigned_to')
+
+    def get_absolute_url(self):
+        return reverse('ticket_detail', args=[self.pk])
+
+    def __unicode__(self):
+        return self.name
+
 class Reservation(models.Model):
     verbose_name = 'reservation'
     tool = models.ForeignKey(Tool, verbose_name='Værktøj')
@@ -619,3 +648,4 @@ def pre_delete_event(sender, instance, **kwargs):
         instance.tool.loaned_to = None
         instance.tool.location = 'Lager'
         instance.tool.save()
+

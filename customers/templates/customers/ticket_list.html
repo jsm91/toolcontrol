@@ -1,0 +1,56 @@
+{% extends "admin_base.html" %}
+
+{% block tickets_active %}-active{% endblock %}
+
+{% block sub_top_bar %}
+<a href="{% url 'ticket_list' %}">
+  <span>Liste</span>
+</a>
+<a href="{% url 'ticket_create' %}">
+  <span>Ny kupon</span>
+</a>
+{% endblock %}
+
+{% block content %}
+  {% for ticket in object_list %}
+  <table class="list">
+    <tr>
+      <td class="credit">
+	{% if ticket.ticket_set.count == 0 %}
+	  <div class="positive">
+	    {{ ticket.ticket_set.count }}
+	  </div>
+	{% else %}
+	  {% if ticket.ticket_set.count < 5 %}
+            <div class="neutral">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% else %}
+	    <div class="negative">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% endif %}
+	{% endif %}
+      </td>
+      <td class="info">
+	#{{ ticket.pk }}
+	<a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.name }}</a>
+	{% if ticket.duplicate %}
+	<span class="duplicate">
+	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.duplicate.name }}</a>)
+	</span>
+	{% endif %}<br>
+	Rapporteret af {{ ticket.reported_by }}<br>
+	Tildelt til {{ ticket.assigned_to }}
+      </td>
+      <td class="bools">
+	<img src="{{ STATIC_URL }}Icon_{{ ticket.is_open }}.svg"><br>
+	<a href="{% url 'ticket_update' ticket.pk %}">
+	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg">
+	</a>
+      </td>
+    </tr>
+  </table>
+  <hr>
+  {% endfor %} 
+{% endblock %}

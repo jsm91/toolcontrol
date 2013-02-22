@@ -30,6 +30,11 @@ div#top-bar {
     font-weight:bold;
 }
 
+div#top-bar a {
+    text-decoration:none;
+}
+
+
 div#sub-top-bar {
     height:50px;
     background-color:#DEE3E9;
@@ -110,9 +115,22 @@ div#content table.list td.credit {
     text-align:center;
 }
 
+div#content table.list td.info {
+    width:400px;
+}
+
+div#content table.list td.activity {
+    color:#666666;
+}
+
+div#content table.list td.activity img{
+    vertical-align:middle;
+}
+
 div#content table.list td.credit div {
     color:white;
     font-weight:bold;
+    font-size:11pt;
     width:50px;
     height:50px;
     line-height:50px;
@@ -135,4 +153,8 @@ div#content table.list td.credit div.positive {
 div#content table.list td.bools {
     width: 75px;
     text-align: right;
+}
+
+span.duplicate {
+    color:#666666;
 }

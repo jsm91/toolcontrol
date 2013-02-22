@@ -19,6 +19,11 @@
 	  Kunder
 	</div>
       </a>
+      <a href="{% url 'ticket_list' %}">
+	<div id="menu-link{% block tickets_active %}{% endblock %}">
+	  Kuponer
+	</div>
+      </a>
       <a href="{% url 'logout' %}">
 	<div id="menu-link">
 	  Log ud
@@ -30,6 +35,6 @@
     </div>
     <div id="content">
       {% block content %}{% endblock %}
-    <div>
+    </div>
   </body>
 </html>

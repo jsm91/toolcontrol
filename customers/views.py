@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 
 import codecs
 
-from django.shortcuts import render
-from django.views.generic import DetailView
+from django.shortcuts import get_object_or_404, render
+from django.views.generic import DetailView, ListView
 
 from customers.models import Customer
-from tools.models import Tool, ToolModel
+from tools.models import Ticket, Tool, ToolModel
 
 class CustomerDetail(DetailView):
     model = Customer
@@ -23,6 +23,21 @@ class CustomerDetail(DetailView):
         context['containers'] = self.object.container_set.all()
 
         return context
+
+class TicketList(ListView):
+    template_name = 'customers/ticket_list.html'
+
+    def get_queryset(self):
+        customer_id = self.request.GET.get('customer')
+
+        if customer_id:
+            customer = get_object_or_404(Customer, id=customer_id)
+            return Ticket.objects.filter(reported_by=customer)
+        else:
+            return Ticket.objects.all()
+
+
+
 
 def log(request):
     log = ''

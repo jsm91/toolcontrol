@@ -39,43 +39,21 @@
 	KundeID #{{ customer.id }}<br>
 	Kærvej 1&nbsp;&#183;&nbsp;2610 Rødovre
       </td>
+      <td class="activity">
+	<img src="{{ STATIC_URL }}Icon_Login.svg"> {{ customer.logins}} logins seneste måned<br>
+	<img src="{{ STATIC_URL }}Icon_Tools.svg"> {{ customer.events }} udlån seneste måned<br>
+	{% if customer.tickets %}
+	<img src="{{ STATIC_URL }}Icon_Warning.svg"> <a href="{% url 'ticket_list' %}?customer={{ customer.id }}">{{ customer.tickets }} åbne kuponer</a>
+	{% endif %}
+      </td>
       <td class="bools">
-	{{ customer.is_active }}<br>
+	<img src="{{ STATIC_URL }}Icon_{{ customer.is_active }}.svg"><br>
 	<a href="{% url 'customer_update' customer.pk %}">
-	  Rediger
+	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg">
 	</a>
       </td>
     </tr>
   </table>
   <hr>
   {% endfor %} 
-
-  <table border="1">
-    <tr>
-      <th>Kunde-ID</th>
-      <th>Navn</th>
-      <th>Aktiv</th>
-      <th>SMS'er afsendt</th>
-      <th>Kredit</th>
-      <th>Funktioner</th>
-    </tr>
-  {% for customer in object_list %}
-    <tr class="{% if customer.credit < 0 %}customer_in_minus{% endif %} {% if not customer.is_active %}customer_inactive{% endif %}">
-      <td>{{ customer.pk }}</td>
-      <td>
-	<a href="{% url 'customer_detail' customer.pk %}">
-	  {{ customer.name }}
-	</a>
-      </td>
-      <td>{{ customer.is_active }}</td>
-      <td>{{ customer.sms_sent }} stk.</td>
-      <td>{{ customer.credit }} kr.</td>
-      <td>
-	<a href="{% url 'customer_update' customer.pk %}">
-	  Rediger
-	</a>
-      </td>
-    </tr>
-  {% endfor %}
-  </table>
 {% endblock %}
