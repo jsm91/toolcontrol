@@ -5,7 +5,7 @@ from django.views.generic import UpdateView
 
 from customers.forms import CustomerForm, CreateCustomerForm, CreateTicketForm, TicketForm
 from customers.models import Customer
-from customers.views import CustomerDetail, TicketList
+from customers.views import CustomerDetail, TicketDetail, TicketList
 from tools.models import Ticket
 
 # Uncomment the next two lines to enable the admin:
@@ -29,13 +29,13 @@ urlpatterns = patterns('customers.views',
         name='customer_update'),
 
     url(r'log/$', 'log', name='log'),
+    url(r'action/$', 'action', name='action'),
 
     url(r'tickets/$', TicketList.as_view(), name='ticket_list'),
     url(r'tickets/create$', 
         CreateView.as_view(model=Ticket, form_class=CreateTicketForm, template_name='customers/ticket_form.html'), 
         name='ticket_create'),
-    url(r'tickets/(?P<pk>\d+)/$',
-        DetailView.as_view(model=Ticket, template_name='customers/ticket_detail.html'),
+    url(r'tickets/(?P<pk>\d+)/$', TicketDetail.as_view(), 
         name='ticket_detail'),
     url(r'tickets/(?P<pk>\d+)/update/$', 
         UpdateView.as_view(model=Ticket, form_class=TicketForm, template_name='customers/ticket_form.html'), 

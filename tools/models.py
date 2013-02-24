@@ -618,6 +618,12 @@ class Ticket(models.Model):
     def __unicode__(self):
         return self.name
 
+class TicketAnswer(models.Model):
+    ticket = models.ForeignKey(Ticket)
+    text = models.TextField()
+    created_by = models.ForeignKey(Employee)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
 class Reservation(models.Model):
     verbose_name = 'reservation'
     tool = models.ForeignKey(Tool, verbose_name='Værktøj')

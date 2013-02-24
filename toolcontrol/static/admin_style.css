@@ -163,3 +163,30 @@ div#content table.list td.bools {
 span.duplicate {
     color:#666666;
 }
+
+input.action_button {
+    background-color:#ffffff;
+    border-radius:5px 5px 5px 5px;
+    -moz-border-radius: 5px; /* Firefox */
+    -webkit-border-radius: 5px; /* Safari, Chrome */
+    padding:7px;
+    border:1px solid #CED3D9;
+}
+
+input.action_button:active {
+    background-color:#efefef;
+}
+
+h1 {
+    font-weight:normal;
+    color: #465263;
+}
+
+textarea {
+    width:100%;
+}
+
+span.ticketanswer-byline {
+    font-weight:bold;
+    color: #465263;    
+}

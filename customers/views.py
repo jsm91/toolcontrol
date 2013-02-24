@@ -3,9 +3,12 @@ from __future__ import unicode_literals
 
 import codecs
 
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, FormView, ListView
 
+from customers.forms import TicketAnswerForm
 from customers.models import Customer
 from tools.models import Ticket, Tool, ToolModel
 
@@ -36,8 +39,42 @@ class TicketList(ListView):
         else:
             return Ticket.objects.all()
 
+def action(request):
+    if 'close_ticket' in request.POST:
+        ticket_id = request.POST.get('close_ticket')
+        ticket = get_object_or_404(Ticket, id = ticket_id)
+        ticket.is_open = False
+        ticket.save()
+        return HttpResponseRedirect(reverse('ticket_detail', 
+                                            args=[ticket_id]))
+    elif 'reopen_ticket' in request.POST:
+        ticket_id = request.POST.get('reopen_ticket')
+        ticket = get_object_or_404(Ticket, id = ticket_id)
+        ticket.is_open = True
+        ticket.save()
+        return HttpResponseRedirect(reverse('ticket_detail', 
+                                            args=[ticket_id]))
 
+class TicketDetail(FormView):
+    form_class = TicketAnswerForm
+    template_name='customers/ticket_detail.html'
 
+    def form_valid(self, form):
+        ticket_answer = form.save(commit=False)
+        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
+        ticket_answer.ticket = ticket
+        ticket_answer.created_by = self.request.user
+        ticket_answer.save()
+        return super(TicketDetail, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(TicketDetail, self).get_context_data(**kwargs)
+        context['ticket'] = get_object_or_404(Ticket, id = self.kwargs['pk'])
+
+        return context
+
+    def get_success_url(self):
+        return reverse('ticket_detail', args=[self.kwargs['pk']])
 
 def log(request):
     log = ''

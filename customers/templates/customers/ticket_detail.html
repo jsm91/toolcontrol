@@ -2,6 +2,102 @@
 
 {% block tickets_active %}-active{% endblock %}
 
+{% block sub_top_bar %}
+<a href="{% url 'ticket_list' %}">
+  <span>Liste</span>
+</a>
+<a href="{% url 'ticket_create' %}">
+  <span>Ny kupon</span>
+</a>
+{% endblock %}
+
 {% block content %}
-{{ ticket.name }}
+  <table class="list {% if not ticket.is_open %}closed-ticket{% endif %}">
+    <tr>
+      <td class="credit">
+	{% if ticket.ticket_set.count == 0 %}
+	  <div class="positive">
+	    {{ ticket.ticket_set.count }}
+	  </div>
+	{% else %}
+	  {% if ticket.ticket_set.count < 5 %}
+            <div class="neutral">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% else %}
+	    <div class="negative">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% endif %}
+	{% endif %}
+      </td>
+      <td class="info">
+	#{{ ticket.pk }}
+	<a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.name }}</a>
+	{% if ticket.duplicate %}
+	<span class="duplicate">
+	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.duplicate.pk %}">{{ ticket.duplicate.name }}</a>)
+	</span>
+	{% endif %}<br>
+	{% if ticket.reported_by %}
+	Rapporteret af <a href="{% url 'customer_detail' ticket.reported_by.id %}">{{ ticket.reported_by }}</a><br>
+	{% endif %}
+	{% if ticket.assigned_to %}
+	Tildelt til {{ ticket.assigned_to }}
+	{% else %}
+	Ikke tildelt til nogen
+	{% endif %}
+      </td>
+      <td class="activity">
+	<form method="POST" action="{% url 'action' %}">
+	  {% csrf_token %}
+	  {% if ticket.is_open %}
+	  <input type="hidden" name="close_ticket" value="{{ ticket.id }}">
+	  <input type="submit" value="Luk kupon" class="action_button">
+	  {% else %}
+	  <input type="hidden" name="reopen_ticket" value="{{ ticket.id }}">
+	  <input type="submit" value="Genåben kupon" class="action_button">
+	  {% endif %}
+	</form>
+      </td>
+      <td class="bools">
+	<img src="{{ STATIC_URL }}Icon_{{ ticket.is_open }}.svg" 
+	     alt="Åben/lukket kupon"><br>
+	<a href="{% url 'ticket_update' ticket.pk %}">
+	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
+	       alt="Rediger">
+	</a>
+      </td>
+    </tr>
+  </table>
+  <hr>
+  <h1>Beskrivelse</h1>
+  {{ ticket.description }}
+  <h1>Svar</h1>
+  {% for ticketanswer in ticket.ticketanswer_set.all %}
+  <span class="ticketanswer-byline">{{ ticketanswer.created_by }}&nbsp;&#183;&nbsp;{{ ticketanswer.timestamp }}</span><br>
+  {{ ticketanswer.text }}<br><br>
+  {% empty %}
+  Der er ingen svar på denne kupon.
+  {% endfor %}
+
+  <form method="POST">
+    {% csrf_token %}
+    {% for field in form %}{{ field }}{% endfor %}<br>
+    <input type="submit" value="Opret svar" class="action_button">
+  </form>
+  {% if ticket.ticket_set.all %}
+  <h1>Dubletter</h1>
+  <ul>
+  {% for duplicate in ticket.ticket_set.all %}
+  <li>
+    <a href="{% url 'ticket_detail' duplicate.id %}">{{ duplicate.name }}</a>
+    <span class="duplicate">
+      (rapporteret af <a href="{% url 'ticket_detail' duplicate.pk %}">{{ duplicate.reported_by }}</a>)
+    </span>
+
+  </li>
+  {% endfor %}
+  </ul>
+  {% endif %}
 {% endblock %}

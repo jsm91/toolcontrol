@@ -37,7 +37,7 @@
 	<a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.name }}</a>
 	{% if ticket.duplicate %}
 	<span class="duplicate">
-	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.duplicate.name }}</a>)
+	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.duplicate.pk %}">{{ ticket.duplicate.name }}</a>)
 	</span>
 	{% endif %}<br>
 	{% if ticket.reported_by %}

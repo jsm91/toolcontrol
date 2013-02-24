@@ -5,7 +5,7 @@ from django import forms
 from django.db.models import Q
 
 from customers.models import Customer
-from tools.models import Employee, Ticket
+from tools.models import Employee, Ticket, TicketAnswer
 
 class CustomerForm(forms.ModelForm):
     class Meta:
@@ -34,6 +34,11 @@ class TicketForm(forms.ModelForm):
             duplicate.save()
 
         return ticket
+
+class TicketAnswerForm(forms.ModelForm):
+    class Meta:
+        model = TicketAnswer
+        fields = ['text',]
 
 class CreateTicketForm(forms.ModelForm):
     class Meta:
