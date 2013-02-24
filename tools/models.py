@@ -606,11 +606,11 @@ class Ticket(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     created_by = models.ForeignKey(Employee, related_name='tickets_created')
-    reported_by = models.ForeignKey(Customer)
-    duplicate = models.ForeignKey('self', null=True, blank=True)
+    reported_by = models.ForeignKey(Customer, null=True, blank=True, default=None)
+    duplicate = models.ForeignKey('self', null=True, blank=True, default=None)
     is_open = models.BooleanField(default=True)
     level = models.CharField(choices=LEVEL_CHOICES, max_length=200)
-    assigned_to = models.ForeignKey(Employee, related_name='tickets_assigned_to')
+    assigned_to = models.ForeignKey(Employee, related_name='tickets_assigned_to', null=True, blank=True, default=None)
 
     def get_absolute_url(self):
         return reverse('ticket_detail', args=[self.pk])

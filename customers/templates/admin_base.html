@@ -3,31 +3,25 @@
 <html>
   <head>
     <title>ToolControl - admin interface</title>
-  </head>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}admin_script.js"></script>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin_style.css">
+  </head>
   <body>
     <div id="top-bar">
-      <a href="{% url 'admin_index' %}">
-	<div id="logo">
-	  ToolControl
-	</div>
+      <a href="{% url 'admin_index' %}" class="logo">
+	ToolControl
       </a>
-      <a href="{% url 'customer_list' %}">
-	<div id="menu-link{% block customers_active %}{% endblock %}">
-	  Kunder
-	</div>
+      <a href="{% url 'customer_list' %}"
+	 class="menu-link{% block customers_active %}{% endblock %}">
+	Kunder
       </a>
-      <a href="{% url 'ticket_list' %}">
-	<div id="menu-link{% block tickets_active %}{% endblock %}">
-	  Kuponer
-	</div>
+      <a href="{% url 'ticket_list' %}"
+	 class="menu-link{% block tickets_active %}{% endblock %}">
+	Kuponer
       </a>
-      <a href="{% url 'logout' %}">
-	<div id="menu-link">
-	  Log ud
-	</div>
+      <a href="{% url 'logout' %}" class="menu-link">
+	Log ud
       </a>
     </div>
     <div id="sub-top-bar">

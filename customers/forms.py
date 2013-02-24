@@ -29,6 +29,10 @@ class TicketForm(forms.ModelForm):
                 duplicate.duplicate = ticket.duplicate
                 duplicate.save()
 
+        for duplicate in ticket.ticket_set.all():
+            duplicate.is_open = ticket.is_open
+            duplicate.save()
+
         return ticket
 
 class CreateTicketForm(forms.ModelForm):

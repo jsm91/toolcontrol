@@ -13,7 +13,7 @@
 
 {% block content %}
   {% for ticket in object_list %}
-  <table class="list">
+  <table class="list {% if not ticket.is_open %}closed-ticket{% endif %}">
     <tr>
       <td class="credit">
 	{% if ticket.ticket_set.count == 0 %}
@@ -40,13 +40,21 @@
 	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.duplicate.name }}</a>)
 	</span>
 	{% endif %}<br>
-	Rapporteret af {{ ticket.reported_by }}<br>
+	{% if ticket.reported_by %}
+	Rapporteret af <a href="{% url 'customer_detail' ticket.reported_by.id %}">{{ ticket.reported_by }}</a><br>
+	{% endif %}
+	{% if ticket.assigned_to %}
 	Tildelt til {{ ticket.assigned_to }}
+	{% else %}
+	Ikke tildelt til nogen
+	{% endif %}
       </td>
       <td class="bools">
-	<img src="{{ STATIC_URL }}Icon_{{ ticket.is_open }}.svg"><br>
+	<img src="{{ STATIC_URL }}Icon_{{ ticket.is_open }}.svg" 
+	     alt="Åben/lukket kupon"><br>
 	<a href="{% url 'ticket_update' ticket.pk %}">
-	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg">
+	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
+	       alt="Rediger">
 	</a>
       </td>
     </tr>
