@@ -45,6 +45,10 @@ class CreateTicketForm(forms.ModelForm):
         model = Ticket
         exclude = ('duplicate', 'is_open', 'created_by',)
 
+    def __init__(self, *args, **kwargs):
+        super(CreateTicketForm, self).__init__(*args, **kwargs)
+        self.fields['assigned_to'].queryset = Employee.objects.filter(customer__isnull=True)
+
 class CreateCustomerForm(forms.ModelForm):
     administrator = forms.CharField()
     email = forms.EmailField()
