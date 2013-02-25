@@ -72,7 +72,7 @@
   </table>
   <hr>
   <h1>Beskrivelse</h1>
-  {{ ticket.description }}
+  {{ ticket.description|linebreaksbr }}
   <h1>Svar</h1>
   {% for ticketanswer in ticket.ticketanswer_set.all %}
   <span class="ticketanswer-byline">{{ ticketanswer.created_by }}&nbsp;&#183;&nbsp;{{ ticketanswer.timestamp }}</span><br>

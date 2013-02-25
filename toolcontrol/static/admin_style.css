@@ -91,6 +91,11 @@ div#sub-top-bar span {
     border:1px solid #CED3D9;
 }
 
+div#sub-top-bar span:active {
+    background-color:#efefef;
+}
+
+
 div#content {
     padding:5px 20px 0px 20px;
 }
