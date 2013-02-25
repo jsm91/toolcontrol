@@ -171,6 +171,8 @@ input.action_button {
     -webkit-border-radius: 5px; /* Safari, Chrome */
     padding:7px;
     border:1px solid #CED3D9;
+    color: #666666;
+    font-weight:bold;
 }
 
 input.action_button:active {
