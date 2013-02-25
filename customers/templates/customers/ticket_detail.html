@@ -32,8 +32,7 @@
 	{% endif %}
       </td>
       <td class="info">
-	#{{ ticket.pk }}
-	<a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.name }}</a>
+	#{{ ticket.pk }} {{ ticket.name }}
 	{% if ticket.duplicate %}
 	<span class="duplicate">
 	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.duplicate.pk %}">{{ ticket.duplicate.name }}</a>)
@@ -60,8 +59,9 @@
 	  {% endif %}
 	</form>
       </td>
+      <td class="activity">&nbsp;</td>
       <td class="bools">
-	<img src="{{ STATIC_URL }}Icon_{{ ticket.is_open }}.svg" 
+	<img src="{{ STATIC_URL }}Icon_{{ ticket.is_closed }}.svg" 
 	     alt="Åben/lukket kupon"><br>
 	<a href="{% url 'ticket_update' ticket.pk %}">
 	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
@@ -78,23 +78,28 @@
   <span class="ticketanswer-byline">{{ ticketanswer.created_by }}&nbsp;&#183;&nbsp;{{ ticketanswer.timestamp }}</span><br>
   {{ ticketanswer.text }}<br><br>
   {% empty %}
-  Der er ingen svar på denne kupon.
+  Der er ingen svar på denne kupon.<br><br>
   {% endfor %}
 
-  <form method="POST">
-    {% csrf_token %}
-    {% for field in form %}{{ field }}{% endfor %}<br>
-    <input type="submit" value="Opret svar" class="action_button">
-  </form>
+  <div class="form-container">
+    <h2>Tilføj svar</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {% for field in form %}{{ field }}{% endfor %}<br>
+      <input type="submit" value="Opret svar" class="action_button">
+    </form>
+  </div>
   {% if ticket.ticket_set.all %}
   <h1>Dubletter</h1>
   <ul>
   {% for duplicate in ticket.ticket_set.all %}
   <li>
     <a href="{% url 'ticket_detail' duplicate.id %}">{{ duplicate.name }}</a>
+    {% if duplicate.reported_by %}
     <span class="duplicate">
       (rapporteret af <a href="{% url 'ticket_detail' duplicate.pk %}">{{ duplicate.reported_by }}</a>)
     </span>
+    {% endif %}
 
   </li>
   {% endfor %}

@@ -19,8 +19,13 @@ tr.history, tr.history div {
     display:none;
     background-color:#EEE;
 }
-img {
+
+td.activity img {
     height:12pt;
+}
+
+td.bools img {
+    height:20pt;
 }
 
 div#top-bar {
@@ -116,18 +121,18 @@ div#content table.closed-ticket {
 
 
 div#content table.list td.credit {
-    width:75px;
+    width:15%;
     text-align:center;
 }
 
 div#content table.list td.info {
-    width:400px;
+    width:35%;
 }
 
 div#content table.list td.activity {
     color:#666666;
+    width: 35%;
 }
-
 div#content table.list td.activity img{
     vertical-align:middle;
 }
@@ -156,7 +161,7 @@ div#content table.list td.credit div.positive {
 }
 
 div#content table.list td.bools {
-    width: 75px;
+    width: 15%;
     text-align: right;
 }
 
@@ -179,16 +184,32 @@ input.action_button:active {
     background-color:#efefef;
 }
 
-h1 {
+h1, h2 {
     font-weight:normal;
     color: #465263;
 }
 
+h2 {
+    margin:0px 0px 5px 0px;
+}
+
 textarea {
-    width:100%;
 }
 
 span.ticketanswer-byline {
     font-weight:bold;
     color: #465263;    
+}
+
+div.form-container {
+    border: 1px dotted #465263;
+    padding:10px;
+}
+
+table.database_list {
+    width:100%;
+}
+
+input.submit-image {
+    height:20pt;
 }

@@ -18,8 +18,8 @@ class TicketForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(TicketForm, self).__init__(*args, **kwargs)
-        print self.initial
         self.fields['duplicate'].queryset = Ticket.objects.filter(~Q(id=self.initial['id']), duplicate__isnull=True)
+        self.fields['assigned_to'].queryset = Employee.objects.filter(customer__isnull=True)
 
     def save(self, commit=True):
         ticket = super(TicketForm,self).save(commit=commit)
@@ -43,7 +43,7 @@ class TicketAnswerForm(forms.ModelForm):
 class CreateTicketForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        exclude = ('duplicate', 'is_open',)
+        exclude = ('duplicate', 'is_open', 'created_by',)
 
 class CreateCustomerForm(forms.ModelForm):
     administrator = forms.CharField()

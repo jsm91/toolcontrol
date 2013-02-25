@@ -6,9 +6,9 @@ import codecs
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.views.generic import DetailView, FormView, ListView
+from django.views.generic import CreateView, DetailView, FormView, ListView
 
-from customers.forms import TicketAnswerForm
+from customers.forms import CreateTicketForm, TicketAnswerForm
 from customers.models import Customer
 from tools.models import Ticket, Tool, ToolModel
 
@@ -35,9 +35,9 @@ class TicketList(ListView):
 
         if customer_id:
             customer = get_object_or_404(Customer, id=customer_id)
-            return Ticket.objects.filter(reported_by=customer)
+            return Ticket.objects.filter(reported_by=customer).order_by('-is_open', '-pk')
         else:
-            return Ticket.objects.all()
+            return Ticket.objects.all().order_by('-is_open', '-pk')
 
 def action(request):
     if 'close_ticket' in request.POST:
@@ -54,6 +54,11 @@ def action(request):
         ticket.save()
         return HttpResponseRedirect(reverse('ticket_detail', 
                                             args=[ticket_id]))
+    elif 'delete_ticket' in request.POST:
+        ticket_id = request.POST.get('delete_ticket')
+        ticket = get_object_or_404(Ticket, id = ticket_id)
+        ticket.delete()
+        return HttpResponseRedirect(reverse('ticket_list'))
 
 class TicketDetail(FormView):
     form_class = TicketAnswerForm
@@ -75,6 +80,19 @@ class TicketDetail(FormView):
 
     def get_success_url(self):
         return reverse('ticket_detail', args=[self.kwargs['pk']])
+
+class CreateTicket(CreateView):
+    form_class = CreateTicketForm
+    template_name='customers/ticket_form.html'
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.created_by = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('ticket_detail', args=[self.object.pk])
 
 def log(request):
     log = ''

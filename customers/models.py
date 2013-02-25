@@ -4,8 +4,12 @@ from django.core.urlresolvers import reverse
 from django.db import models
 
 class Customer(models.Model):
+    # Info
     name = models.CharField('Navn', max_length=200)
     is_active = models.BooleanField('Aktiv', default=True)
+    address = models.CharField('Adresse', max_length=200)
+    zip_code = models.IntegerField('Postnummer')
+    town = models.CharField('By', max_length=200)
     
     # Stats
     sms_sent = models.IntegerField('SMS\'er afsendt', default=0)

@@ -13,7 +13,7 @@
 
 {% block content %}
   {% for customer in object_list %}
-  <table class="list">
+  <table class="list  {% if not customer.is_active %}closed-ticket{% endif %}">
     <tr>
       <td class="credit">
 	{% if customer.credit < 0 %}
@@ -37,7 +37,7 @@
 	  {{ customer.name }}
 	</a><br>
 	KundeID #{{ customer.id }}<br>
-	Kærvej 1&nbsp;&#183;&nbsp;2610 Rødovre
+	{{ customer.address }}&nbsp;&#183;&nbsp;{{ customer.zip_code }} {{ customer.town }}
       </td>
       <td class="activity">
 	<img src="{{ STATIC_URL }}Icon_Login.svg"

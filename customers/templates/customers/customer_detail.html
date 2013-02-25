@@ -14,13 +14,58 @@
 
 {% block content %}
 <div class="admin_pane" id="initial">
-  {{ object.name }}<br>
-  {{ object.credit }} kr.<br>
+  <table class="list  {% if not customer.is_active %}closed-ticket{% endif %}">
+    <tr>
+      <td class="credit">
+	{% if customer.credit < 0 %}
+	  <div class="negative">
+	    {{ customer.credit }}
+	  </div>
+	{% else %}
+	  {% if customer.credit < 1000 %}
+            <div class="neutral">
+	      {{ customer.credit }}
+	    </div>
+	  {% else %}
+	    <div class="positive">
+	      {{ customer.credit }}
+	    </div>
+	  {% endif %}
+	{% endif %}
+      </td>
+      <td class="info">
+	<a href="{% url 'customer_detail' customer.pk %}">
+	  {{ customer.name }}
+	</a><br>
+	KundeID #{{ customer.id }}<br>
+	{{ customer.address }}&nbsp;&#183;&nbsp;{{ customer.zip_code }} {{ customer.town }}
+      </td>
+      <td class="activity">
+	<img src="{{ STATIC_URL }}Icon_Login.svg"
+	     alt="Login seneste måned"> {{ customer.logins }} logins seneste måned<br>
+	<img src="{{ STATIC_URL }}Icon_Tools.svg"
+	     alt="Begivenheder seneste måned"> {{ customer.events }} begivenheder seneste måned<br>
+	{% if customer.tickets %}
+	<img src="{{ STATIC_URL }}Icon_Warning.svg"
+	     alt="Åbne kuponer"> <a href="{% url 'ticket_list' %}?customer={{ customer.id }}">{{ customer.tickets }} åbne kuponer</a>
+	{% endif %}
+      </td>
+      <td class="bools">
+	<img src="{{ STATIC_URL }}Icon_{{ customer.is_active }}.svg"
+	     alt="Kundeaktivitet"><br>
+	<a href="{% url 'customer_update' customer.pk %}">
+	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
+	       alt="Rediger kunde">
+	</a>
+      </td>
+    </tr>
+  </table>
+  <hr>
 </div>
 
 <div class="admin_pane" id="tools">
   <h1>Værktøj</h1>
-  <table>
+  <table class="database_list">
     <tr>
       <th>Navn</th>
       <th>Model</th>
@@ -50,7 +95,7 @@
 
 <div class="admin_pane" id="models">
   <h1>Modeller</h1>
-  <table>
+  <table class="database_list">
     <tr>
       <th>Navn</th>
       <th>Kategori</th>
@@ -74,7 +119,7 @@
   
 <div class="admin_pane" id="categories">
   <h1>Kategorier</h1>
-  <table>
+  <table class="database_list">
     <tr>
       <th>Navn</th>
       <th>Antal modeller</th>
@@ -94,7 +139,7 @@
 
 <div class="admin_pane" id="employees">
   <h1>Medarbejdere</h1>
-  <table>
+  <table class="database_list">
     <tr>
       <th>Navn</th>
       <th>Email</th>
@@ -118,7 +163,7 @@
 
 <div class="admin_pane" id="construction_sites">
   <h1>Byggepladser</h1>
-  <table>
+  <table class="database_list">
     <tr>
       <th>Navn</th>
       <th>Aktiv</th>
@@ -134,7 +179,7 @@
 
 <div class="admin_pane" id="containers">
   <h1>Containere</h1>
-  <table>
+  <table class="database_list">
     <tr>
       <th>Navn</th>
       <th>Placering</th>
