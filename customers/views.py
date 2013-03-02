@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import codecs
 
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -39,6 +40,7 @@ class TicketList(ListView):
         else:
             return Ticket.objects.all().order_by('-is_open', '-pk')
 
+@login_required
 def action(request):
     if 'close_ticket' in request.POST:
         ticket_id = request.POST.get('close_ticket')
@@ -93,22 +95,3 @@ class CreateTicket(CreateView):
 
     def get_success_url(self):
         return reverse('ticket_detail', args=[self.object.pk])
-
-def log(request):
-    log = ''
-    search = request.POST.get('search')
-
-    f = codecs.open('log.log', encoding='utf-8')
-    line = f.readline()
-
-    while line:
-        if search:
-            if search.lower() in line.lower():
-                log += "%s<br>" % line
-        else:
-            log += "%s<br>" % line
-            
-        line = f.readline()
-
-    return render(request, 'customers/log.html', {'log': log, 
-                                                  'search': search})

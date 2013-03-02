@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, include, url
+from django.contrib.auth.decorators import login_required
 
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic import UpdateView
@@ -15,31 +16,34 @@ from tools.models import Ticket
 
 urlpatterns = patterns('customers.views',
     url(r'^$', 
-        TemplateView.as_view(template_name='customers/admin_index.html'),
+        login_required(TemplateView.as_view(template_name = 
+                                            'customers/admin_index.html')),
         name='admin_index'),
-    url(r'customers/$', ListView.as_view(model=Customer), 
+    url(r'customers/$', login_required(ListView.as_view(model=Customer)), 
         name='customer_list'),
     url(r'customers/create$', 
-        CreateView.as_view(model=Customer, form_class=CreateCustomerForm), 
+        login_required(CreateView.as_view(model=Customer, 
+                                          form_class=CreateCustomerForm)), 
         name='customer_create'),
     url(r'customers/(?P<pk>\d+)/$', 
-        CustomerDetail.as_view(),
+        login_required(CustomerDetail.as_view()),
         name='customer_detail'),
     url(r'customers/(?P<pk>\d+)/update/$', 
-        UpdateView.as_view(model=Customer, form_class=CustomerForm), 
+        login_required(UpdateView.as_view(model=Customer, 
+                                          form_class=CustomerForm)), 
         name='customer_update'),
 
-    url(r'log/$', 'log', name='log'),
-    url(r'action/$', 'action', name='action'),
-
-    url(r'tickets/$', TicketList.as_view(), name='ticket_list'),
-    url(r'tickets/create$', CreateTicket.as_view(), name='ticket_create'),
-    url(r'tickets/(?P<pk>\d+)/$', TicketDetail.as_view(), 
+    url(r'tickets/$', login_required(TicketList.as_view()), 
+        name='ticket_list'),
+    url(r'tickets/create$', login_required(CreateTicket.as_view()), 
+        name='ticket_create'),
+    url(r'tickets/(?P<pk>\d+)/$', login_required(TicketDetail.as_view()), 
         name='ticket_detail'),
     url(r'tickets/(?P<pk>\d+)/update/$', 
-        UpdateView.as_view(model=Ticket, form_class=TicketForm, template_name='customers/ticket_form.html'), 
+        login_required(UpdateView.as_view(model=Ticket, form_class=TicketForm, template_name='customers/ticket_form.html')), 
         name='ticket_update'),
-                    
+
+    url(r'action/$', 'action', name='action'),
    
     # Examples:
     # url(r'^$', 'sidste.views.home', name='home'),
