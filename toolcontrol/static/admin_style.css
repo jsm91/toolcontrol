@@ -219,6 +219,10 @@ table.database_list th {
     text-align:left;
 }
 
+table.database_list img {
+    height:12pt;
+}
+
 input.submit-image {
     height:20pt;
 }
