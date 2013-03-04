@@ -25,7 +25,7 @@ from tools.forms import ToolForm, ToolCategoryForm, ToolModelForm
 
 from tools.models import ConstructionSite, Container, Event, Employee, Tool
 from tools.models import ForgotPasswordToken, Reservation, ToolCategory
-from tools.models import ToolModel
+from tools.models import Login, ToolModel
 
 from toolcontrol.enums import verbose_action, MESSAGES
 from toolcontrol.utils import handle_loan_messages, make_message
@@ -39,6 +39,9 @@ def login_view(request):
             user = authentication_form.get_user()
             login(request, user)
             logger.info('Login successful')
+
+            l = Login(employee = user)
+            l.save()
 
             if user.customer == None:
                 return HttpResponseRedirect(reverse('admin_index'))

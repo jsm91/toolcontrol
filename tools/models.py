@@ -633,6 +633,7 @@ class TicketAnswer(models.Model):
     text = models.TextField()
     created_by = models.ForeignKey(Employee)
     timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
     
 class Reservation(models.Model):
     verbose_name = 'reservation'

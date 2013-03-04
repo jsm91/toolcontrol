@@ -14,7 +14,7 @@ from customers.views import UpdateViewWithRedirection
 
 
 from customers.views import CreateTicket, CustomerDetail, TicketDetail
-from customers.views import TicketList
+from customers.views import IndexTemplate, TicketList
 from tools.models import Ticket
 
 # Uncomment the next two lines to enable the admin:
@@ -22,9 +22,7 @@ from tools.models import Ticket
 # admin.autodiscover()
 
 urlpatterns = patterns('customers.views',
-    url(r'^$', 
-        login_required(TemplateViewWithRedirection.as_view(template_name = 'customers/admin_index.html')),
-        name='admin_index'),
+    url(r'^$', login_required(IndexTemplate.as_view()), name = 'admin_index'),
     url(r'customers/$', login_required(ListViewWithRedirection.as_view(model=Customer)), 
         name='customer_list'),
     url(r'customers/create$', 

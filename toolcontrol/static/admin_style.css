@@ -20,7 +20,7 @@ tr.history, tr.history div {
     background-color:#EEE;
 }
 
-td.activity img {
+td.activity img, td.info img {
     height:12pt;
 }
 
@@ -138,7 +138,7 @@ div#content table.list td.activity {
     color:#666666;
     width: 35%;
 }
-div#content table.list td.activity img{
+div#content table.list td.activity img, div#content table.list td.info img{
     vertical-align:middle;
 }
 
@@ -225,4 +225,23 @@ table.database_list img {
 
 input.submit-image {
     height:20pt;
+}
+
+div#front_left {
+    width:45%;
+    float:left;
+}
+
+div#front_right {
+    width:45%;
+    float:right;
+}
+
+div#front_top p {
+    font-size:12pt;
+}
+
+div#front_top img {
+    vertical-align:middle;
+    margin-right:10px;
 }

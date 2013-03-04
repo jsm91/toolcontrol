@@ -1,4 +1,83 @@
 {% extends "admin_base.html" %}
 {% block content %}
-  Hejsa
+<div id="front_top">
+  <h1>Databasen det seneste døgn</h1>
+  <p>
+    <img src="{{ STATIC_URL }}Icon_Login.svg"
+	 alt="Logins seneste døgn">{{ logins }} logins<br>
+    <img src="{{ STATIC_URL }}Icon_Tools.svg"
+	 alt="Nye begivenheder seneste døgn">{{ events }} nye begivenheder<br>
+  </p>
+</div>
+
+  <div id="front_left">
+    <h1>Ulæste svar</h1>
+  {% for answer in answers %}
+  <table class="list">
+    <tr>
+      <td class="info">
+	#{{ answer.ticket.pk }}
+	<a href="{% url 'ticket_detail' answer.ticket.pk %}">{{ answer.ticket.name }}</a>
+	{% if answer.ticket.duplicate %}
+	<span class="duplicate">
+	(dublet af #{{ answer.ticket.duplicate.pk }} <a href="{% url 'ticket_detail' answer.ticket.duplicate.pk %}">{{ answer.ticket.duplicate.name }}</a>)
+	</span>
+	{% endif %}<br>
+	<img src="{{ STATIC_URL }}Icon_Chat.svg"
+	     alt="Svar fra"> Svar fra {{ answer.created_by }}<br>
+	<img src="{{ STATIC_URL }}Icon_Watch.svg"
+	     alt="Indsendt">Indsendt {{ answer.timestamp }}
+      </td>
+    </tr>
+  </table>
+  <hr>
+  {% empty %}
+  Du har ingen ulæste svar.
+  {% endfor %} 
+  </div>
+
+  <div id="front_right">
+    <h1>Dine kuponer</h1>
+  {% for ticket in tickets %}
+  <table class="list">
+    <tr>
+      <td class="credit">
+	{% if ticket.ticket_set.count == 0 %}
+	  <div class="positive">
+	    {{ ticket.ticket_set.count }}
+	  </div>
+	{% else %}
+	  {% if ticket.ticket_set.count < 5 %}
+            <div class="neutral">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% else %}
+	    <div class="negative">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% endif %}
+	{% endif %}
+      </td>
+      <td class="info">
+	#{{ ticket.pk }}
+	<a href="{% url 'ticket_detail' ticket.pk %}">{{ ticket.name }}</a>
+	{% if ticket.duplicate %}
+	<span class="duplicate">
+	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.duplicate.pk %}">{{ ticket.duplicate.name }}</a>)
+	</span>
+	{% endif %}<br>
+	<img src="{{ STATIC_URL }}Icon_Chat.svg"
+	     alt="Antal svar"> {{ ticket.ticketanswer_set.all.count }} svar
+	{% if ticket.reported_by %}
+	Rapporteret af <a href="{% url 'customer_detail' ticket.reported_by.id %}">{{ ticket.reported_by }}</a><br>
+	{% endif %}
+      </td>
+    </tr>
+  </table>
+  <hr>
+  {% empty %}
+  Du har ingen kuponer.
+  {% endfor %} 
+  </div>
+
 {% endblock %}

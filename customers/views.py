@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-import codecs
+import codecs, datetime
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -12,7 +12,7 @@ from django.views.generic import TemplateView, UpdateView
 
 from customers.forms import CreateTicketForm, TicketAnswerForm
 from customers.models import Customer
-from tools.models import Ticket, Tool, ToolModel
+from tools.models import Event, Login, Ticket, TicketAnswer, Tool, ToolModel
 
 class CreateViewWithRedirection(CreateView):
     def get(self, request, *args, **kwargs):
@@ -61,6 +61,19 @@ class UpdateViewWithRedirection(UpdateView):
         else:
             return super(UpdateViewWithRedirection, 
                          self).get(request, *args, **kwargs)
+
+class IndexTemplate(TemplateViewWithRedirection):
+    template_name = 'customers/admin_index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(IndexTemplate, self).get_context_data(**kwargs)
+
+        context['logins'] = Login.objects.filter(timestamp__gte=datetime.datetime.now() - datetime.timedelta(days = 1)).count()
+        context['events'] = Event.objects.filter(start_date__gte=datetime.datetime.now() - datetime.timedelta(days = 1)).count()
+        context['tickets'] = Ticket.objects.filter(is_open=True, assigned_to=self.request.user)
+        context['answers'] = TicketAnswer.objects.filter(is_read=False, ticket__assigned_to=self.request.user)
+
+        return context
 
 class CustomerDetail(DetailViewWithRedirection):
     model = Customer
@@ -125,6 +138,16 @@ class TicketDetail(FormViewWithRedirection):
         ticket_answer.created_by = self.request.user
         ticket_answer.save()
         return super(TicketDetail, self).form_valid(form)
+
+    def get(self, request, *args, **kwargs):
+        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
+
+        if self.request.user == ticket.assigned_to:
+            for answer in ticket.ticketanswer_set.all():
+                answer.is_read = True
+                answer.save()
+
+        return super(TicketDetail, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(TicketDetail, self).get_context_data(**kwargs)
