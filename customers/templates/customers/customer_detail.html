@@ -108,10 +108,10 @@
     <tr>
       <td>{{ model }}</td>
       <td>{{ model.category }}</td>
-      <td>{{ model.service_interval }}</td>
-      <td>{{ model.price }}</td>
-      <td>{{ model.total_price }}</td>
-      <td>{{ model.number_of_tools }}</td>
+      <td>{{ model.service_interval }} mdr.</td>
+      <td>{{ model.price }} kr.</td>
+      <td>{{ model.total_price }} kr.</td>
+      <td>{{ model.number_of_tools }} stk.</td>
     </tr>
     {% endfor %}
   </table>
@@ -129,9 +129,9 @@
     {% for category in categories %}
     <tr>
       <td>{{ category }}</td>
-      <td>{{ category.number_of_models }}</td>
-      <td>{{ category.number_of_tools }}</td>
-      <td>{{ category.total_price }}</td>
+      <td>{{ category.number_of_models }} stk.</td>
+      <td>{{ category.number_of_tools }} stk.</td>
+      <td>{{ category.total_price }} kr.</td>
     </tr>
     {% endfor %}
   </table>
@@ -153,9 +153,21 @@
       <td>{{ employee }}</td>
       <td>{{ employee.email }}</td>
       <td>{{ employee.phone_number }}</td>
-      <td>{{ employee.is_active }}</td>
-      <td>{{ employee.is_admin }}</td>
-      <td>{{ employee.is_loan_flagged }}</td>
+      <td>
+	{% if employee.is_active %}
+	<img src="{{ STATIC_URL }}Icon_True.svg">
+	{% endif %}
+      </td>
+      <td>
+	{% if employee.is_admin %}
+	<img src="{{ STATIC_URL }}Icon_Users.svg">
+	{% endif %}
+      </td>
+      <td>
+	{% if employee.is_loan_flagged %}
+	<img src="{{ STATIC_URL }}Icon_Warning.svg">
+	{% endif %}
+      </td>
     </tr>
     {% endfor %}
   </table>
@@ -171,7 +183,11 @@
     {% for construction_site in construction_sites %}
     <tr>
       <td>{{ construction_site.name }}</td>
-      <td>{{ construction_site.is_active }}</td>
+      <td>
+	{% if construction_site.is_active %}
+	<img src="{{ STATIC_URL }}Icon_True.svg">
+	{% endif %}
+      </td>
     </tr>
     {% endfor %}
   </table>
@@ -189,7 +205,11 @@
     <tr>
       <td>{{ container }}</td>
       <td>{{ container.location }}</td>
-      <td>{{ container.is_active }}</td>
+      <td>
+	{% if container_site.is_active %}
+	<img src="{{ STATIC_URL }}Icon_True.svg">
+	{% endif %}
+      </td>
     </tr>
     {% endfor %}
   </table>
