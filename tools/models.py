@@ -606,7 +606,8 @@ class Ticket(models.Model):
     name = models.CharField('Overskrift', max_length=200)
     description = models.TextField('Beskrivelse')
     created_by = models.ForeignKey(Employee, related_name='tickets_created',
-                                   verbose_name='Oprettet af')
+                                   verbose_name='Oprettet af',
+                                   null=True, blank=True)
     reported_by = models.ForeignKey(Customer, null=True, blank=True, 
                                     default=None, 
                                     verbose_name='Rapporteret af')

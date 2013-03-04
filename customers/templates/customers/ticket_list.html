@@ -53,7 +53,7 @@
 	<img src="{{ STATIC_URL }}Icon_Settings.svg"
 	     alt="Kupontype"> {{ ticket.level }}<br>
 	<img src="{{ STATIC_URL }}Icon_Users.svg"
-	     alt="Oprettet af"> Oprettet af {{ ticket.created_by }}<br>
+	     alt="Oprettet af"> Oprettet af {{ ticket.created_by|default_if_none:"systemet" }}<br>
 	<img src="{{ STATIC_URL }}Icon_Chat.svg"
 	     alt="Antal svar"> {{ ticket.ticketanswer_set.all.count }} svar
       </td>

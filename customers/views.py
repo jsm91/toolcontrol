@@ -98,9 +98,9 @@ class TicketList(ListViewWithRedirection):
 
         if customer_id:
             customer = get_object_or_404(Customer, id=customer_id)
-            return Ticket.objects.filter(reported_by=customer).order_by('-is_open', '-pk')
+            return Ticket.objects.filter(reported_by=customer).order_by('-is_open', 'duplicate', '-pk')
         else:
-            return Ticket.objects.all().order_by('-is_open', '-pk')
+            return Ticket.objects.all().order_by('-is_open', 'duplicate', '-pk')
 
 @login_required
 def action(request):
@@ -112,6 +112,11 @@ def action(request):
         ticket = get_object_or_404(Ticket, id = ticket_id)
         ticket.is_open = False
         ticket.save()
+
+        for duplicate in ticket.ticket_set.all():
+            duplicate.is_open = False
+            duplicate.save()
+
         return HttpResponseRedirect(reverse('ticket_detail', 
                                             args=[ticket_id]))
     elif 'reopen_ticket' in request.POST:
@@ -119,6 +124,11 @@ def action(request):
         ticket = get_object_or_404(Ticket, id = ticket_id)
         ticket.is_open = True
         ticket.save()
+
+        for duplicate in ticket.ticket_set.all():
+            duplicate.is_open = True
+            duplicate.save()
+
         return HttpResponseRedirect(reverse('ticket_detail', 
                                             args=[ticket_id]))
     elif 'delete_ticket' in request.POST:
