@@ -59,6 +59,9 @@ def logout_view(request):
 
 @login_required
 def settings(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     password_change_form = PasswordChangeForm(request.user)
     settings_form = SettingsForm(instance=request.user)
 
@@ -93,6 +96,9 @@ def settings(request):
 
 @login_required
 def stats(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     lost_tool_count = Tool.objects.filter(location='Bortkommet',
                                           model__category__customer=request.user.customer).count()
     scrapped_tool_count = Tool.objects.filter(location='Kasseret',
@@ -156,11 +162,25 @@ class IndexView(FormView):
         logger.info('Many tools not created (%s)', form.errors)
         return super(IndexView, self).form_invalid(form)
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(IndexView, 
+                         self).get(request, *args, **kwargs)
+
     def get_form(self, form_class):
         return form_class(customer=self.request.user.customer,**self.get_form_kwargs())
 
 class ContainerListView(ListView):
     template_name = 'container_list.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -178,6 +198,13 @@ class ContainerListView(ListView):
 
 class ToolListView(ListView):
     template_name = 'tool_list.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -202,6 +229,13 @@ class ToolListView(ListView):
 class ModelListView(ListView):
     template_name = 'model_list.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
+
     def get_queryset(self):
         search = self.request.GET.get('search', '')
         ordering = self.request.GET.get('ordering', 'name')
@@ -219,6 +253,13 @@ class ModelListView(ListView):
 class CategoryListView(ListView):
     template_name = 'category_list.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
+
     def get_queryset(self):
         search = self.request.GET.get('search', '')
         ordering = self.request.GET.get('ordering', 'name')
@@ -234,6 +275,13 @@ class CategoryListView(ListView):
 
 class EmployeeListView(ListView):
     template_name = 'employee_list.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -260,6 +308,13 @@ class EmployeeListView(ListView):
 class ConstructionSiteListView(ListView):
     template_name = 'building_site_list.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
+
     def get_queryset(self):
         search = self.request.GET.get('search', '')
         ordering = self.request.GET.get('ordering', 'name')
@@ -283,6 +338,13 @@ class ConstructionSiteListView(ListView):
 class EventListView(ListView):
     template_name = 'event_list.html'
     
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
+
     def get_queryset(self):
         tool_id = self.request.GET.get('tool_id')
         tool = get_object_or_404(Tool, id = tool_id)
@@ -302,6 +364,13 @@ class EventListView(ListView):
 class LoanListView(ListView):
     template_name = 'loan_list.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
+
     def get_queryset(self):
         loaner_id = self.request.GET.get('loaner_id')
         object_type = self.request.GET.get('object_type')
@@ -315,6 +384,13 @@ class LoanListView(ListView):
 
 class SimpleToolListView(ListView):
     template_name = 'simple_tool_list.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.customer:
+            return HttpResponseRedirect(reverse('admin_index'))
+        else:
+            return super(ListView, 
+                         self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         show_model = self.request.GET.get('show_model')
@@ -347,16 +423,25 @@ class SimpleToolListView(ListView):
 
 @login_required
 def container_banner(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     context = {}
     return render(request, 'container_banner.html', context)
 
 @login_required
 def tool_banner(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     context = {}
     return render(request, 'tool_banner.html', context)
 
 @login_required
 def model_banner(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
@@ -365,6 +450,9 @@ def model_banner(request):
 
 @login_required
 def category_banner(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
@@ -373,6 +461,9 @@ def category_banner(request):
 
 @login_required
 def employee_banner(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
@@ -381,6 +472,9 @@ def employee_banner(request):
 
 @login_required
 def building_site_banner(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if not request.user.is_admin:
         return HttpResponse('Du kan ikke se denne side')
 
@@ -389,6 +483,9 @@ def building_site_banner(request):
 
 @login_required
 def form(request, class_name, form_name):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if request.POST:
         obj_id = request.POST.get('id')
 
@@ -456,6 +553,9 @@ def form(request, class_name, form_name):
 
 @login_required
 def action_form(request, form_name, object_type):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if request.POST:
         form = form_name(data=request.POST,
                          customer=request.user.customer)
@@ -479,6 +579,9 @@ def action_form(request, form_name, object_type):
 
 @login_required
 def action(request, class_name):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     action = request.POST.get('action')
     object_ids = request.POST.get('object_ids')
 
@@ -528,6 +631,9 @@ def action(request, class_name):
 
 @login_required
 def delete(request, class_to_delete):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     object_id = request.POST.get('id')
     logger.warning('%s is trying to delete %s with id %s' % (request.user,
                                                              class_to_delete.__name__,
@@ -552,6 +658,9 @@ def delete(request, class_to_delete):
                         mimetype="application/json")
 @login_required
 def event_delete(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     event_id = request.GET.get('id')
     logger.warning('%s is trying to delete event with id %s' % (request.user,
                                                                 event_id))
@@ -591,6 +700,9 @@ def event_delete(request):
 
 @login_required
 def reservation_delete(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     reservation_id = request.GET.get('id')
     logger.warning('%s is trying to delete reservation with id %s' % (request.user, reservation_id))
 
@@ -615,6 +727,9 @@ def reservation_delete(request):
                         mimetype="application/json")
 
 def forgot_password(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if request.POST:
         form = ForgotPasswordForm(data=request.POST)
 
@@ -630,6 +745,9 @@ def forgot_password(request):
     return render(request, 'forgot_password.html', context)
 
 def reset_password(request, token):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     forgot_password_token = get_object_or_404(ForgotPasswordToken, token=token)
     user = forgot_password_token.user
 
@@ -654,6 +772,9 @@ def reset_password(request, token):
 
 @login_required
 def model_object(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     model_id = request.GET.get('id')
     model = get_object_or_404(ToolModel, id=model_id)
 
@@ -665,18 +786,27 @@ def model_object(request):
                         mimetype='application/json')
 
 def qr_code(request, pk):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     img = qrcode.make('http://skou.toolcontrol.dk/tools/%s/qr_action' % pk)
     response = HttpResponse(mimetype='image/png')
     img.save(response, 'PNG')
     return response
 
 def qr_text(request, pk):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     tool = get_object_or_404(Tool, id=pk)
     context = {'tool': tool}
     return render(request, 'qr/qr.html', context)
 
 @login_required
 def qr_action(request, pk):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if request.user.is_authenticated():
         if request.user.is_admin:
             tool = get_object_or_404(Tool, id=pk)
@@ -745,6 +875,9 @@ def qr_action(request, pk):
 
 @login_required
 def inline_form(request, form_name, object_type):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if request.POST:
         form = form_name(data=request.POST, customer=request.user.customer)
         if form.is_valid():
@@ -769,6 +902,9 @@ def inline_form(request, form_name, object_type):
 
 @login_required
 def create_many_tools_form(request):
+    if not request.user.customer:
+        return HttpResponseRedirect(reverse('admin_index'))
+
     if request.POST:
         form = CreateManyToolsForm(data=request.POST, 
                                    customer=request.user.customer)

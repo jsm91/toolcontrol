@@ -6,6 +6,13 @@ from django.views.generic import UpdateView
 
 from customers.forms import CustomerForm, CreateCustomerForm, CreateTicketForm, TicketForm
 from customers.models import Customer
+
+from customers.views import CreateViewWithRedirection
+from customers.views import DetailViewWithRedirection, ListViewWithRedirection
+from customers.views import TemplateViewWithRedirection
+from customers.views import UpdateViewWithRedirection
+
+
 from customers.views import CreateTicket, CustomerDetail, TicketDetail
 from customers.views import TicketList
 from tools.models import Ticket
@@ -16,21 +23,18 @@ from tools.models import Ticket
 
 urlpatterns = patterns('customers.views',
     url(r'^$', 
-        login_required(TemplateView.as_view(template_name = 
-                                            'customers/admin_index.html')),
+        login_required(TemplateViewWithRedirection.as_view(template_name = 'customers/admin_index.html')),
         name='admin_index'),
-    url(r'customers/$', login_required(ListView.as_view(model=Customer)), 
+    url(r'customers/$', login_required(ListViewWithRedirection.as_view(model=Customer)), 
         name='customer_list'),
     url(r'customers/create$', 
-        login_required(CreateView.as_view(model=Customer, 
-                                          form_class=CreateCustomerForm)), 
+        login_required(CreateViewWithRedirection.as_view(model=Customer, form_class=CreateCustomerForm)), 
         name='customer_create'),
     url(r'customers/(?P<pk>\d+)/$', 
         login_required(CustomerDetail.as_view()),
         name='customer_detail'),
     url(r'customers/(?P<pk>\d+)/update/$', 
-        login_required(UpdateView.as_view(model=Customer, 
-                                          form_class=CustomerForm)), 
+        login_required(UpdateViewWithRedirection.as_view(model=Customer, form_class=CustomerForm)), 
         name='customer_update'),
 
     url(r'tickets/$', login_required(TicketList.as_view()), 
@@ -40,7 +44,7 @@ urlpatterns = patterns('customers.views',
     url(r'tickets/(?P<pk>\d+)/$', login_required(TicketDetail.as_view()), 
         name='ticket_detail'),
     url(r'tickets/(?P<pk>\d+)/update/$', 
-        login_required(UpdateView.as_view(model=Ticket, form_class=TicketForm, template_name='customers/ticket_form.html')), 
+        login_required(UpdateViewWithRedirection.as_view(model=Ticket, form_class=TicketForm, template_name='customers/ticket_form.html')), 
         name='ticket_update'),
 
     url(r'action/$', 'action', name='action'),
