@@ -73,6 +73,7 @@ class IndexTemplate(TemplateViewWithRedirection):
         context['events'] = Event.objects.filter(start_date__gte=datetime.datetime.now() - datetime.timedelta(days = 1)).count()
         context['tickets'] = Ticket.objects.filter(is_open=True, assigned_to=self.request.user)
         context['answers'] = TicketAnswer.objects.filter(is_read=False, ticket__assigned_to=self.request.user)
+        context['transactions'] = Transaction.objects.filter(is_confirmed=False)
 
         return context
 
@@ -137,6 +138,13 @@ def action(request):
         ticket = get_object_or_404(Ticket, id = ticket_id)
         ticket.delete()
         return HttpResponseRedirect(reverse('ticket_list'))
+
+    elif 'confirm_transaction' in request.POST:
+        transaction_id = request.POST.get('confirm_transaction')
+        transaction = get_object_or_404(Transaction, id = transaction_id)
+        transaction.is_confirmed = True
+        transaction.save()
+        return HttpResponseRedirect(reverse('admin_index'))
 
 class TicketDetail(FormViewWithRedirection):
     form_class = TicketAnswerForm

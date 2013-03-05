@@ -246,3 +246,8 @@ div#front_top img, div#front_left img, div#front_right img {
     vertical-align:middle;
     margin:10px;
 }
+
+div#front_top table.list img,div#front_left table.list img,div#front_right table.list img {
+    height:12pt;
+    margin:0px;
+}

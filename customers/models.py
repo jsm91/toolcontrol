@@ -41,6 +41,9 @@ class Customer(models.Model):
         from tools.models import Ticket
         return Ticket.objects.filter(reported_by=self).count()
 
+    def transactions(self):
+        return Transaction.objects.filter(customer=self).order_by('-timestamp')
+
 class Transaction(models.Model):
     customer = models.ForeignKey(Customer)
     credit = models.FloatField('Beløb')
@@ -53,5 +56,8 @@ def confirm_transaction(sender, **kwargs):
     transaction = Transaction.objects.get(id=transaction_id)
     transaction.is_confirmed = True
     transaction.save()
+
+    transaction.customer.credit += transaction.credit
+    transaction.customer.save()
 
 payment_was_successful.connect(confirm_transaction)
