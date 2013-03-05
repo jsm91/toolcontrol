@@ -111,6 +111,13 @@
 	  <input type="image" src="{{ STATIC_URL }}Icon_True.svg"
 		 class="submit-image">
 	</form>
+	<form method="POST" action="{% url 'action' %}">
+	  {% csrf_token %}
+	  <input type="hidden" name="delete_transaction" 
+		 value="{{ transaction.pk }}">
+	  <input type="image" src="{{ STATIC_URL }}Icon_False.svg"
+		 class="submit-image">
+	</form>
       </td>
     </tr>
   </table>

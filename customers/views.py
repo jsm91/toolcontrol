@@ -151,6 +151,13 @@ def action(request):
 
         return HttpResponseRedirect(reverse('admin_index'))
 
+    elif 'delete_transaction' in request.POST:
+        transaction_id = request.POST.get('delete_transaction')
+        transaction = get_object_or_404(Transaction, id = transaction_id)
+        transaction.delete()
+
+        return HttpResponseRedirect(reverse('admin_index'))
+
 class TicketDetail(FormViewWithRedirection):
     form_class = TicketAnswerForm
     template_name='customers/ticket_detail.html'
