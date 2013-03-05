@@ -1,7 +1,9 @@
+# -*- coding:utf-8 -*-
 import datetime
 
 from django.core.urlresolvers import reverse
 from django.db import models
+from paypal.standard.ipn.signals import payment_was_successful
 
 class Customer(models.Model):
     # Info
@@ -38,3 +40,18 @@ class Customer(models.Model):
     def tickets(self):
         from tools.models import Ticket
         return Ticket.objects.filter(reported_by=self).count()
+
+class Transaction(models.Model):
+    customer = models.ForeignKey(Customer)
+    credit = models.FloatField('Beløb')
+    description = models.TextField()
+    is_confirmed = models.BooleanField(default=False)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+def confirm_transaction(sender, **kwargs):
+    transaction_id = int(sender.incoice)
+    transaction = Transaction.objects.get(id=transaction_id)
+    transaction.is_confirmed = True
+    transaction.save()
+
+payment_was_successful.connect(confirm_transaction)

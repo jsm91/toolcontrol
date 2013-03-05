@@ -1,0 +1,35 @@
+{% extends "account_base.html" %}
+
+{% block payment_active %}-active{% endblock %}
+
+{% block content %}
+<p>Vi har registreret din anmodning om indbetaling. Du kan se detaljerne for transaktionen nedenfor. Betalingen gennemføres ved at trykke på knappen til højre - bemærk at der ikke hæves nogen penge på din konto før betalingen er gennemført hos PayPal.</p>
+<hr>
+  <table class="list {% if not object.confirmed %}closed-ticket{% endif %}">
+    <tr>
+      <td class="credit">
+	{% if object.credit < 0 %}
+	  <div class="negative">
+	    {{ object.credit }}
+	  </div>
+	{% else %}
+	  <div class="positive">
+	    {{ object.credit }}
+	  </div>
+	{% endif %}
+      </td>
+      <td class="info">
+	TransaktionsID #{{ object.id }}<br>
+	{{ object.description }}<br>
+	Registreret {{ object.timestamp }}<br>
+      </td>
+      <td class="activity"></td>
+      <td class="bools">
+	{% if not object.is_confirmed %}
+	{{ form.sandbox }}
+	{% endif %}
+      </td>
+    </tr>
+  </table>
+  <hr>
+{% endblock %}

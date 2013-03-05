@@ -1,0 +1,54 @@
+{% extends "account_base.html" %}
+
+{% block content %}
+  <h1>Din firmakonto</h1>
+  <div id="front_left">
+    <p>
+      <img src="{{ STATIC_URL }}Icon_Login.svg"
+	   alt="Logins seneste døgn">{{ logins }} logins seneste døgn<br>
+      <img src="{{ STATIC_URL }}Icon_Tools.svg"
+	   alt="Begivenheder seneste døgn">{{ events }} nye begivenheder seneste døgn
+    </p>
+  </div>
+  <div id="front_right">
+    <p> 
+      <img src="{{ STATIC_URL }}Icon_Calculator.svg"
+	   alt="Penge på konto">{{ object.credit }} kr. på din konto<br>
+      <img src="{{ STATIC_URL }}Icon_SMS.svg"
+	   alt="SMS'er afsendt">{{ object.sms_sent }} SMS'er afsendt i alt
+    </p>
+  </div>
+  <hr style="clear:both;">
+  <h1>Dine transaktioner</h1>
+  
+  {% for transaction in object.transaction_set.all %}
+  <table class="list {% if not transaction.confirmed %}closed-ticket{% endif %}">
+    <tr>
+      <td class="credit">
+	{% if transaction.credit < 0 %}
+          <div class="negative">
+	    {{ transaction.credit }}
+	  </div>
+	{% else %}
+	  <div class="positive">
+	    {{ transaction.credit }}
+	  </div>
+	{% endif %}
+      </td>
+      <td class="info">
+	TransaktionsID #{{ transaction.id }}<br>
+	{{ transaction.description }}<br>
+	Registreret {{ transaction.timestamp }}<br>
+      </td>
+      <td class="activity">
+	{% if not transaction.is_confirmed %}
+	<img src="{{ STATIC_URL }}Icon_Warning.svg"
+	     alt="Antal svar"> Transaktionen er ikke bekræftet
+	{% endif %}
+      </td>
+      <td class="bools"></td>
+    </tr>
+  </table>
+  <hr>
+  {% endfor %} 
+{% endblock %}

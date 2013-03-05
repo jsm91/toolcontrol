@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>ToolControl - admin interface</title>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}admin_script.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}admin_style.css">
+  </head>
+  <body>
+    <div id="top-bar">
+      <a href="{% url 'account' %}" class="logo">
+	ToolControl
+      </a>
+      <a href="{% url 'payment' %}"
+	 class="menu-link{% block payment_active %}{% endblock %}">
+	Betaling
+      </a>
+      <a href="{% url 'account_ticket_list' %}"
+	 class="menu-link{% block account_tickets_active %}{% endblock %}">
+	Kuponer
+      </a>
+      <a href="{% url 'index' %}" class="menu-link">
+	Til systemet
+      </a>
+      <a href="{% url 'logout' %}" class="menu-link">
+	Log ud
+      </a>
+    </div>
+    <div id="sub-top-bar">
+      {% block sub_top_bar %}{% endblock %}
+    </div>
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+  </body>
+</html>

@@ -10,8 +10,9 @@ from django.shortcuts import get_object_or_404, render
 from django.views.generic import CreateView, DetailView, FormView, ListView
 from django.views.generic import TemplateView, UpdateView
 
-from customers.forms import CreateTicketForm, TicketAnswerForm
-from customers.models import Customer
+from customers.forms import CreateTicketForm, TicketAnswerForm, TransactionForm
+from customers.models import Customer, Transaction
+from paypal.standard.forms import PayPalPaymentsForm
 from tools.models import Event, Login, Ticket, TicketAnswer, Tool, ToolModel
 
 class CreateViewWithRedirection(CreateView):
@@ -180,3 +181,58 @@ class CreateTicket(CreateViewWithRedirection):
 
     def get_success_url(self):
         return reverse('ticket_detail', args=[self.object.pk])
+
+class AccountDetail(DetailView):
+    template_name='customers/account.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AccountDetail, self).get_context_data(**kwargs)
+
+        context['logins'] = Login.objects.filter(employee__customer=self.object, timestamp__gte=datetime.datetime.now() - datetime.timedelta(days = 1)).count()
+        context['events'] = Event.objects.filter(tool__model__category__customer=self.object, start_date__gte=datetime.datetime.now() - datetime.timedelta(days = 1)).count()
+
+        return context
+
+    def get_object(self, queryset=None):
+        return self.request.user.customer
+
+def account_ticket_list(request):
+    return None
+
+def payment(request):
+    return None
+
+class CreateTransaction(CreateView):
+    model = Transaction
+    form_class = TransactionForm
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.customer = self.request.user.customer
+        self.object.description = 'Indbetaling via PayPal'
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('paypal', args=[self.object.pk])
+
+class TransactionDetail(DetailView):
+    model = Transaction
+
+    def get_context_data(self, **kwargs):
+        context = super(TransactionDetail, self).get_context_data(**kwargs)
+
+        paypal_dict = {
+            'business': 'kontor@rmbsupport.dk',
+            'amount': self.object.credit,
+            'item_name': 'Indbetaling til ToolControl',
+            'invoice': self.object.pk,
+            'notify_url': 'http://www.skou.toolcontrol.dk/admin/payment/notify',
+            'return_url': 'http://www.skou.toolcontrol.dk/admin/account',
+            'cancel_return': 'http://www.skou.toolcontrol.dk/admin/payment/cancel',
+            }
+
+        form = PayPalPaymentsForm(initial=paypal_dict)
+        context['form'] = form
+
+        return context

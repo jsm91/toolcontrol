@@ -238,10 +238,11 @@ div#front_right {
 }
 
 div#front_top p {
-    font-size:12pt;
+    font-size:11pt;
 }
 
-div#front_top img {
+div#front_top img, div#front_left img, div#front_right img {
+    height:28pt;
     vertical-align:middle;
-    margin-right:10px;
+    margin:10px;
 }

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django import forms
 from django.db.models import Q
 
-from customers.models import Customer
+from customers.models import Customer, Transaction
 from tools.models import Employee, Ticket, TicketAnswer
 
 class CustomerForm(forms.ModelForm):
@@ -84,3 +84,7 @@ class CreateCustomerForm(forms.ModelForm):
 
         return customer
         
+class TransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields=['credit',]
