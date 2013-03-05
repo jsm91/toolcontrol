@@ -1,0 +1,26 @@
+{% extends "account_base.html" %}
+
+{% block account_tickets_active %}-active{% endblock %}
+
+{% block sub_top_bar %}
+<a href="{% url 'account_ticket_list' %}">
+  <span>Liste</span>
+</a>
+<a href="{% url 'account_ticket_create' %}">
+  <span>Ny kupon</span>
+</a>
+{% endblock %}
+
+{% block content %}
+<form method="POST">
+  {% csrf_token %}
+  <table>
+    {{ form.as_table }}
+    <tr>
+      <td colspan="2">
+	<input type="submit" value="Gem">
+      </td>
+    </tr>
+  </table>
+</form>
+{% endblock content %}

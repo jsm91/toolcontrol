@@ -14,6 +14,8 @@ from customers.views import UpdateViewWithRedirection, CreateTransaction
 
 from customers.views import CreateTicket, CustomerDetail, TicketDetail
 from customers.views import IndexTemplate, TicketList, TransactionDetail
+from customers.views import AccountTicketList, AccountCreateTicket
+from customers.views import AccountTicketDetail
 from tools.models import Ticket
 
 # Uncomment the next two lines to enable the admin:
@@ -22,39 +24,43 @@ from tools.models import Ticket
 
 urlpatterns = patterns('customers.views',
     url(r'^$', login_required(IndexTemplate.as_view()), name = 'admin_index'),
-    url(r'customers/$', login_required(ListViewWithRedirection.as_view(model=Customer)), 
+    url(r'^customers/$', login_required(ListViewWithRedirection.as_view(model=Customer)), 
         name='customer_list'),
-    url(r'customers/create$', 
+    url(r'^customers/create$', 
         login_required(CreateViewWithRedirection.as_view(model=Customer, form_class=CreateCustomerForm)), 
         name='customer_create'),
-    url(r'customers/(?P<pk>\d+)/$',
+    url(r'^customers/(?P<pk>\d+)/$',
         login_required(CustomerDetail.as_view()),
         name='customer_detail'),
-    url(r'customers/(?P<pk>\d+)/update/$', 
+    url(r'^customers/(?P<pk>\d+)/update/$', 
         login_required(UpdateViewWithRedirection.as_view(model=Customer, form_class=CustomerForm)), 
         name='customer_update'),
 
-    url(r'tickets/$', login_required(TicketList.as_view()), 
+    url(r'^tickets/$', login_required(TicketList.as_view()), 
         name='ticket_list'),
-    url(r'tickets/create$', login_required(CreateTicket.as_view()), 
+    url(r'^tickets/create$', login_required(CreateTicket.as_view()), 
         name='ticket_create'),
-    url(r'tickets/(?P<pk>\d+)/$', login_required(TicketDetail.as_view()), 
+    url(r'^tickets/(?P<pk>\d+)/$', login_required(TicketDetail.as_view()), 
         name='ticket_detail'),
-    url(r'tickets/(?P<pk>\d+)/update/$', 
+    url(r'^tickets/(?P<pk>\d+)/update/$', 
         login_required(UpdateViewWithRedirection.as_view(model=Ticket, form_class=TicketForm, template_name='customers/ticket_form.html')), 
         name='ticket_update'),
 
-    url(r'account/$', login_required(AccountDetail.as_view()), 
+    url(r'^account/$', login_required(AccountDetail.as_view()), 
         name='account'),
-    url(r'payment/$', login_required(CreateTransaction.as_view()), 
+    url(r'^payment/$', login_required(CreateTransaction.as_view()), 
         name='payment'),
-    url(r'payment/(?P<pk>\d+)/$', login_required(TransactionDetail.as_view()), 
+    url(r'^payment/(?P<pk>\d+)/$', login_required(TransactionDetail.as_view()), 
         name='paypal'),
-
     (r'^payment/notify/', include('paypal.standard.ipn.urls')),
 
-    url(r'account/tickets/$', 'account_ticket_list', 
+    url(r'account/tickets/$', AccountTicketList.as_view(), 
         name='account_ticket_list'),
+    url(r'account/tickets/create$', AccountCreateTicket.as_view(), 
+        name='account_ticket_create'),
+    url(r'^account/tickets/(?P<pk>\d+)/$', 
+        login_required(AccountTicketDetail.as_view()), 
+        name='account_ticket_detail'),
 
     url(r'action/$', 'action', name='action'),
    

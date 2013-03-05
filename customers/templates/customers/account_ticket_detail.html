@@ -1,0 +1,75 @@
+{% extends "account_base.html" %}
+
+{% block account_tickets_active %}-active{% endblock %}
+
+{% block sub_top_bar %}
+<a href="{% url 'account_ticket_list' %}">
+  <span>Liste</span>
+</a>
+<a href="{% url 'account_ticket_create' %}">
+  <span>Ny kupon</span>
+</a>
+{% endblock %}
+
+{% block content %}
+  <table class="list {% if not ticket.is_open %}closed-ticket{% endif %}">
+    <tr>
+      <td class="credit">
+	{% if ticket.ticket_set.count == 0 %}
+	  <div class="positive">
+	    {{ ticket.ticket_set.count }}
+	  </div>
+	{% else %}
+	  {% if ticket.ticket_set.count < 5 %}
+            <div class="neutral">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% else %}
+	    <div class="negative">
+	      {{ ticket.ticket_set.count }}
+	    </div>
+	  {% endif %}
+	{% endif %}
+      </td>
+      <td class="info">
+	#{{ ticket.pk }} {{ ticket.name }}
+	{% if ticket.duplicate %}
+	<span class="duplicate">
+	(dublet af #{{ ticket.duplicate.pk }} <a href="{% url 'ticket_detail' ticket.duplicate.pk %}">{{ ticket.duplicate.name }}</a>)
+	</span>
+	{% endif %}<br>
+	{% if ticket.reported_by %}
+	Rapporteret af <a href="{% url 'customer_detail' ticket.reported_by.id %}">{{ ticket.reported_by }}</a><br>
+	{% endif %}
+	{% if ticket.assigned_to %}
+	Tildelt til {{ ticket.assigned_to }}
+	{% else %}
+	Ikke tildelt til nogen
+	{% endif %}
+      </td>
+      <td class="activity">
+      </td>
+      <td class="bools">
+      </td>
+    </tr>
+  </table>
+  <hr>
+  <h1>Beskrivelse</h1>
+  {{ ticket.description|linebreaksbr }}
+  <h1>Svar</h1>
+  {% for ticketanswer in ticket.ticketanswer_set.all %}
+  <span class="ticketanswer-byline">{{ ticketanswer.created_by }}&nbsp;&#183;&nbsp;{{ ticketanswer.timestamp }}</span><br>
+  {{ ticketanswer.text }}<br><br>
+  {% empty %}
+  Der er ingen svar på denne kupon.<br><br>
+  {% endfor %}
+
+  <div class="form-container">
+    <h2>Tilføj svar</h2>
+    <form method="POST">
+      {% csrf_token %}
+      {% for field in form %}{{ field }}{% endfor %}<br>
+      <input type="submit" value="Opret svar" class="action_button">
+    </form>
+  </div>
+{% endblock %}

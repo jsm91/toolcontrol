@@ -11,6 +11,7 @@ from django.views.generic import CreateView, DetailView, FormView, ListView
 from django.views.generic import TemplateView, UpdateView
 
 from customers.forms import CreateTicketForm, TicketAnswerForm, TransactionForm
+from customers.forms import AccountCreateTicketForm
 from customers.models import Customer, Transaction
 from paypal.standard.forms import PayPalPaymentsForm
 from tools.models import Event, Login, Ticket, TicketAnswer, Tool, ToolModel
@@ -166,6 +167,10 @@ class TicketDetail(FormViewWithRedirection):
                 answer.is_read = True
                 answer.save()
 
+        if (request.user.customer and 
+            request.user.customer != ticket.reported_by):
+            return HttpResponseRedirect(reverse('index'))
+
         return super(TicketDetail, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -244,3 +249,55 @@ class TransactionDetail(DetailView):
         context['form'] = form
 
         return context
+
+class AccountTicketList(ListView):
+    template_name = 'customers/account_ticket_list.html'
+
+    def get_queryset(self):
+        customer = self.request.user.customer
+
+        return Ticket.objects.filter(reported_by=customer).order_by('-is_open', 'duplicate', '-pk')
+
+class AccountCreateTicket(CreateView):
+    form_class = AccountCreateTicketForm
+    template_name='customers/account_ticket_form.html'
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.created_by = self.request.user
+        self.object.reported_by = self.request.user.customer
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('ticket_detail', args=[self.object.pk])
+
+class AccountTicketDetail(FormView):
+    form_class = TicketAnswerForm
+    template_name='customers/account_ticket_detail.html'
+
+    def form_valid(self, form):
+        ticket_answer = form.save(commit=False)
+        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
+        ticket_answer.ticket = ticket
+        ticket_answer.created_by = self.request.user
+        ticket_answer.save()
+        return super(AccountTicketDetail, self).form_valid(form)
+
+    def get(self, request, *args, **kwargs):
+        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
+
+        if (request.user.customer and 
+            request.user.customer != ticket.reported_by):
+            return HttpResponseRedirect(reverse('index'))
+
+        return super(AccountTicketDetail, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(AccountTicketDetail, self).get_context_data(**kwargs)
+        context['ticket'] = get_object_or_404(Ticket, id = self.kwargs['pk'])
+
+        return context
+
+    def get_success_url(self):
+        return reverse('account_ticket_detail', args=[self.kwargs['pk']])
