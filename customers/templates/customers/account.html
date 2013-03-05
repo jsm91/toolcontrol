@@ -21,8 +21,8 @@
   <hr style="clear:both;">
   <h1>Dine transaktioner</h1>
   
-  {% for transaction in object.transaction_set.all %}
-  <table class="list {% if not transaction.confirmed %}closed-ticket{% endif %}">
+  {% for transaction in object.transactions %}
+  <table class="list">
     <tr>
       <td class="credit">
 	{% if transaction.credit < 0 %}

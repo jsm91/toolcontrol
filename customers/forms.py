@@ -88,3 +88,11 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields=['credit',]
+
+    def clean(self):
+        cleaned_data = super(TransactionForm, self).clean()
+
+        if cleaned_data['credit'] <= 0:
+        	raise forms.ValidationError('Beløbet skal være positivt')
+
+        return cleaned_data

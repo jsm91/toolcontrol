@@ -33,6 +33,7 @@
   <hr>
   {% empty %}
   Du har ingen ulæste svar.
+  <hr>
   {% endfor %} 
   </div>
 
@@ -76,7 +77,46 @@
   </table>
   <hr>
   {% empty %}
-  Du har ingen kuponer.
+  Du har ingen åbne kuponer.
+  <hr>
+  {% endfor %} 
+  </div>
+
+  <div id="front_left">
+    <h1>Ubekræftede transaktioner</h1>
+  {% for transaction in transactions %}
+  <table class="list">
+    <tr>
+      <td class="credit">
+	{% if transaction.credit < 0 %}
+          <div class="negative">
+	    {{ transaction.credit }}
+	  </div>
+	{% else %}
+	  <div class="positive">
+	    {{ transaction.credit }}
+	  </div>
+	{% endif %}
+      </td>
+      <td class="info">
+	TransaktionsID #{{ transaction.id }}<br>
+	{{ transaction.description }}<br>
+	Registreret {{ transaction.timestamp }}<br>
+      </td>
+      <td class="bools">
+	<form method="POST" action="{% url 'action' %}">
+	  {% csrf_token %}
+	  <input type="hidden" name="confirm_transaction" 
+		 value="{{ transaction.pk }}">
+	  <input type="image" src="{{ STATIC_URL }}Icon_True.svg"
+		 class="submit-image">
+	</form>
+      </td>
+    </tr>
+  </table>
+  <hr>
+  {% empty %}
+  Der er ingen ubekræftede transaktioner.
   {% endfor %} 
   </div>
 
