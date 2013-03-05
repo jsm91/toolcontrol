@@ -247,8 +247,9 @@ class TransactionDetail(DetailView):
         context = super(TransactionDetail, self).get_context_data(**kwargs)
 
         paypal_dict = {
+            'current_code': 'DKK',
             'business': 'kontakt@toolcontrol.dk',
-            'amount': self.object.credit,
+            'amount': round((self.object.credit + 2.6) / 0.996, 2),
             'item_name': 'Indbetaling til ToolControl',
             'invoice': self.object.pk,
             'notify_url': 'http://www.skou.toolcontrol.dk/admin/payment/notify',
