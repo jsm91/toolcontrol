@@ -49,7 +49,7 @@ class Transaction(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 def confirm_transaction(sender, **kwargs):
-    transaction_id = int(sender.incoice)
+    transaction_id = int(sender.invoice)
     transaction = Transaction.objects.get(id=transaction_id)
     transaction.is_confirmed = True
     transaction.save()

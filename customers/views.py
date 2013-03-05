@@ -223,7 +223,7 @@ class TransactionDetail(DetailView):
         context = super(TransactionDetail, self).get_context_data(**kwargs)
 
         paypal_dict = {
-            'business': 'kontor@rmbsupport.dk',
+            'business': 'kontor_1362492873_biz@rmbsupport.dk',
             'amount': self.object.credit,
             'item_name': 'Indbetaling til ToolControl',
             'invoice': self.object.pk,

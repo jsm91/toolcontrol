@@ -22,7 +22,7 @@
   <h1>Dine transaktioner</h1>
   
   {% for transaction in object.transaction_set.all %}
-  <table class="list {% if not transaction.confirmed %}closed-ticket{% endif %}">
+  <table class="list {% if not transaction.is_confirmed %}closed-ticket{% endif %}">
     <tr>
       <td class="credit">
 	{% if transaction.credit < 0 %}
