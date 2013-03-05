@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-import codecs, datetime
+import codecs, datetime, logging
+logger = logging.getLogger(__name__)
 
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -107,7 +108,10 @@ class TicketList(ListViewWithRedirection):
 
 @login_required
 def action(request):
+    logger.info('%s is initiating an action' % request.user)
+
     if request.user.customer:
+        logger.warning('Action aborted, user is not admin')
         return HttpResponseRedirect(reverse('index'))
 
     if 'close_ticket' in request.POST:
@@ -119,6 +123,8 @@ def action(request):
         for duplicate in ticket.ticket_set.all():
             duplicate.is_open = False
             duplicate.save()
+
+        logger.info('Ticket #%s has been closed' % ticket_id)
 
         return HttpResponseRedirect(reverse('ticket_detail', 
                                             args=[ticket_id]))
@@ -132,12 +138,17 @@ def action(request):
             duplicate.is_open = True
             duplicate.save()
 
+        logger.info('Ticket #%s has been reopened' % ticket_id)
+
         return HttpResponseRedirect(reverse('ticket_detail', 
                                             args=[ticket_id]))
     elif 'delete_ticket' in request.POST:
         ticket_id = request.POST.get('delete_ticket')
         ticket = get_object_or_404(Ticket, id = ticket_id)
         ticket.delete()
+
+        logger.info('Ticket #%s has been deleted' % ticket_id)
+
         return HttpResponseRedirect(reverse('ticket_list'))
 
     elif 'confirm_transaction' in request.POST:
@@ -149,12 +160,16 @@ def action(request):
         transaction.customer.credit += transaction.credit
         transaction.customer.save()
 
+        logger.info('Transaction #%s has been confirmed' % transaction_id)
+
         return HttpResponseRedirect(reverse('admin_index'))
 
     elif 'delete_transaction' in request.POST:
         transaction_id = request.POST.get('delete_transaction')
         transaction = get_object_or_404(Transaction, id = transaction_id)
         transaction.delete()
+
+        logger.info('Transaction #%s has been deleted' % transaction_id)
 
         return HttpResponseRedirect(reverse('admin_index'))
 

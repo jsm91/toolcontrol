@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-import datetime
+import datetime, logging
 
 from django.core.urlresolvers import reverse
 from django.db import models
@@ -59,5 +59,8 @@ def confirm_transaction(sender, **kwargs):
 
     transaction.customer.credit += transaction.credit
     transaction.customer.save()
+
+    logger = logging.getLogger(__name__)
+    logger.info('Transaction ID %s (%s kr. from %s) has been paid' % (transaction_id, transaction.credit, transaction.customer))
 
 payment_was_successful.connect(confirm_transaction)
