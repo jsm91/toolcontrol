@@ -145,6 +145,10 @@ def action(request):
         transaction = get_object_or_404(Transaction, id = transaction_id)
         transaction.is_confirmed = True
         transaction.save()
+
+        transaction.customer.credit += transaction.credit
+        transaction.customer.save()
+
         return HttpResponseRedirect(reverse('admin_index'))
 
 class TicketDetail(FormViewWithRedirection):
