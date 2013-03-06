@@ -183,13 +183,15 @@ class TicketDetail(FormViewWithRedirection):
         ticket_answer.ticket = ticket
         ticket_answer.created_by = self.request.user
         ticket_answer.save()
+        logger.info('Answer to ticket #%s created by %s' % (ticket.pk, self.request.user))
         return super(TicketDetail, self).form_valid(form)
 
     def get(self, request, *args, **kwargs):
         ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
 
         if self.request.user == ticket.assigned_to:
-            for answer in ticket.ticketanswer_set.all():
+            for answer in ticket.ticketanswer_set.filter(is_read=False):
+                logger.info('Answer #%s marked as read by %s' % (answer.pk, self.request.user))
                 answer.is_read = True
                 answer.save()
 
@@ -216,6 +218,7 @@ class CreateTicket(CreateViewWithRedirection):
         self.object = form.save(commit=False)
         self.object.created_by = self.request.user
         self.object.save()
+        logger.info('Ticket #%s created (%s) by %s' % (self.object.pk, self.object.name, self.request.user))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -244,6 +247,8 @@ class CreateTransaction(CreateView):
         self.object.customer = self.request.user.customer
         self.object.description = 'Indbetaling via PayPal'
         self.object.save()
+        logger.info('Transaction #%s (%s kr.) created by %s' % (self.object.pk, self.object.credit, self.request.user))
+
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -288,6 +293,7 @@ class AccountCreateTicket(CreateView):
         self.object.created_by = self.request.user
         self.object.reported_by = self.request.user.customer
         self.object.save()
+        logger.info('Ticket #%s created (%s) by %s' % (self.object.pk, self.object.name, self.request.user))
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
@@ -303,6 +309,7 @@ class AccountTicketDetail(FormView):
         ticket_answer.ticket = ticket
         ticket_answer.created_by = self.request.user
         ticket_answer.save()
+        logger.info('Answer to ticket #%s created by %s' % (ticket.pk, self.request.user))
         return super(AccountTicketDetail, self).form_valid(form)
 
     def get(self, request, *args, **kwargs):

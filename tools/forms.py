@@ -256,6 +256,7 @@ class EmployeeForm(NewModelForm):
 
     def save(self, commit=True):
         employee = super(EmployeeForm, self).save(commit=False)
+        employee.customer = self.customer
 
         if not employee.pk:
             password = Employee.objects.make_random_password()
@@ -272,8 +273,6 @@ class EmployeeForm(NewModelForm):
             employee.send_mail('Oprettet som bruger', message)
             employee.send_sms(message)
         
-        employee.customer = self.customer
-
         if commit:
             employee.save()
         return employee

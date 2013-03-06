@@ -169,8 +169,7 @@ class IndexView(FormView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(IndexView, 
-                         self).get(request, *args, **kwargs)
+            return super(IndexView, self).get(request, *args, **kwargs)
 
     def get_form(self, form_class):
         return form_class(customer=self.request.user.customer,**self.get_form_kwargs())
@@ -206,8 +205,7 @@ class ToolListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -236,8 +234,7 @@ class ModelListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -260,8 +257,7 @@ class CategoryListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -283,8 +279,7 @@ class EmployeeListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -315,8 +310,7 @@ class ConstructionSiteListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
@@ -345,8 +339,7 @@ class EventListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         tool_id = self.request.GET.get('tool_id')
@@ -371,8 +364,7 @@ class LoanListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         loaner_id = self.request.GET.get('loaner_id')
@@ -392,8 +384,7 @@ class SimpleToolListView(ListView):
         if not request.user.customer:
             return HttpResponseRedirect(reverse('admin_index'))
         else:
-            return super(ListView, 
-                         self).get(request, *args, **kwargs)
+            return super(ListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         show_model = self.request.GET.get('show_model')
@@ -560,14 +551,16 @@ def action_form(request, form_name, object_type):
         return HttpResponseRedirect(reverse('admin_index'))
 
     if request.POST:
+        logger.info('%s is using a form action (%s)' % (request.user, object_type))
         form = form_name(data=request.POST,
                          customer=request.user.customer)
         if form.is_valid():
             obj_dict = form.save()
             response = {'status': 'success',
                         'response': make_message(obj_dict)}
+            logger.info('Action resulted in %s' % response['response'])
         else:
-            print form.errors
+            logger.info('Action not succesful')
             context = {'form': form,
                        'object_type': object_type}
             response = {'status': 'failure',
@@ -587,6 +580,8 @@ def action(request, class_name):
 
     action = request.POST.get('action')
     object_ids = request.POST.get('object_ids')
+
+    logger.info('%s is attempting an action (%s on %s)' % (request.user, action, object_ids))
 
     if object_ids:
         object_ids = object_ids.split(',')
@@ -628,6 +623,8 @@ def action(request, class_name):
                 obj_dict[response] = [obj_name]
 
     response = {'response': make_message(obj_dict)}
+
+    logger.info('Action resulted in %s' % response['response'])
 
     return HttpResponse(simplejson.dumps(response), 
                         content_type="application/json")
@@ -815,10 +812,14 @@ def qr_action(request, pk):
             tool = get_object_or_404(Tool, id=pk)
             if tool.location == 'Lager':
                 if request.POST:
+                    logger.info('%s is attempting a QR action' % request.user)
                     form = QRLoanForm(tool=tool, data=request.POST)
                     if form.is_valid():
                         obj_dict = form.save()
+
                         context = {'message': make_message(obj_dict)}
+
+                        logger.info('Action resulted in %s' % context['message'])
 
                         if MESSAGES.TOOL_LOAN_SUCCESS in obj_dict:
                             context['status'] = 'success'
@@ -833,11 +834,13 @@ def qr_action(request, pk):
                 return render(request, 'qr/form.html', context)
 
             elif tool.location == 'Udlånt' or tool.location == 'Reparation':
+                logger.info('%s is returning %s via QR' % (request.user, tool.name))
                 tool.end_loan(request.user)
                 context = {'message': 'Værktøjet blev afleveret',
                            'status': 'success'}
                 return render(request, 'qr/success.html', context)
             else:
+                logger.info('%s is returning %s via QR, but the tool is scrapped or lost' % (request.user, tool.name))
                 context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet',
                            'status': 'failure'}
                 return render(request, 'qr/success.html', context)
@@ -846,19 +849,23 @@ def qr_action(request, pk):
             tool = get_object_or_404(Tool, id=pk)
             if tool.location == 'Lager':
                 tool.loan(request.user) 
+                logger.info('%s is loaning %s via QR' % (request.user, tool.name))
                 context = {'message': 'Værktøjet blev udlånt til %s' % request.user,
                            'status': 'success'}
                 return render(request, 'qr/success.html', context)
             elif tool.location == 'Udlånt' or tool.location == 'Reparation':
                 if tool.employee == request.user:
                     tool.end_loan(request.user)
+                    logger.info('%s is returning %s via QR' % (request.user, tool.name))
                     context = {'message': 'Værktøjet blev afleveret',
                                'status': 'success'}
                 else:
+                    logger.info('%s is returning %s via QR, but it fails as he can\' return tools for other employees' % (request.user, tool.name))
                     context = {'message': 'Du har ikke rettigheder til at aflevere værktøj udlånt til andre',
                                'status': 'failure'}
                 return render(request, 'qr/success.html', context)
             else:
+                logger.info('%s is loaning %s via QR, but it fails as it is lost or scrapped' % (request.user, tool.name))
                 context = {'message': 'Værktøjet kan ikke udlånes, da det er kasseret eller bortkommet',
                            'status': 'failure'}
                 return render(request, 'qr/success.html', context)
@@ -882,14 +889,19 @@ def inline_form(request, form_name, object_type):
         return HttpResponseRedirect(reverse('admin_index'))
 
     if request.POST:
+        logger.info('%s is creating a %s (%s)' % (request.user,
+                                                  object_type.__name__,
+                                                  request.POST.get('name')))
         form = form_name(data=request.POST, customer=request.user.customer)
         if form.is_valid():
+            logger.info('%s successfully created' % object_type.__name__)
             obj = form.save()
             response = {'status': 'success',
                         'response': 'Objekt oprettet',
                         'value': obj.id,
                         'name': obj.name}
         else:
+            logger.info('%s not created' % object_type.__name__)
             context = {'form': form,
                        'object_type': object_type}
             response = {'status': 'failure',
@@ -909,13 +921,16 @@ def create_many_tools_form(request):
         return HttpResponseRedirect(reverse('admin_index'))
 
     if request.POST:
+        logger.info('%s is creating many tools' % request.user)
         form = CreateManyToolsForm(data=request.POST, 
                                    customer=request.user.customer)
         if form.is_valid():
+            logger.info('Many tools created succesfully')
             form.save()
             response = {'status': 'success',
                         'response': 'Værktøj oprettet'}
         else:
+            logger.info('Many tools not created')
             context = {'form': form,
                        'object_type': 'add_many_tools'}
             response = {'status': 'failure',
