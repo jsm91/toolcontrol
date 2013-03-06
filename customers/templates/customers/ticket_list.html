@@ -59,8 +59,8 @@
       </td>
       <td class="bools">
 	<form method="POST" action="{% url 'action' %}">
-	  {% csrf_token %}
 	  <p class="no_margin">
+	    {% csrf_token %}
 	    <input type="hidden" name="delete_ticket" value="{{ ticket.pk }}">
 	    <input type="image" src="{{ STATIC_URL }}Icon_False.svg"
 		   class="submit-image">
