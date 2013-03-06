@@ -727,9 +727,6 @@ def reservation_delete(request):
                         mimetype="application/json")
 
 def forgot_password(request):
-    if not request.user.customer:
-        return HttpResponseRedirect(reverse('admin_index'))
-
     if request.POST:
         form = ForgotPasswordForm(data=request.POST)
 
@@ -745,9 +742,6 @@ def forgot_password(request):
     return render(request, 'forgot_password.html', context)
 
 def reset_password(request, token):
-    if not request.user.customer:
-        return HttpResponseRedirect(reverse('admin_index'))
-
     forgot_password_token = get_object_or_404(ForgotPasswordToken, token=token)
     user = forgot_password_token.user
 
