@@ -152,7 +152,7 @@ class ForgotPasswordForm(forms.Form):
                        'http://toolcontrol.dk/reset_password/' +token+
                        '. Hvis du ikke har bedt om at få nulstillet '+
                        'dit kodeord, kan du se bort fra denne mail\n\n'+
-                       'MVH\nToolControl for Skou Gruppen A/S')
+                       'MVH\nToolControl')
 
             user.send_message('Nulstilling af kodeord', message)
 
@@ -302,7 +302,7 @@ class EmployeeForm(NewModelForm):
             
             message = ('Hej ' + employee.name + '\n\n' + 
                        'Du er netop blevet oprettet i ToolControl-systemet ' +
-                       'hos Skou Gruppen A/S. Du kan logge ind med navnet ' +
+                       'hos ' + employee.customer + '. Du kan logge ind med navnet ' +
                        employee.name + ' samt kodeordet ' + password + '. ' +
                        'Kodeordet kan ændres når du er logget ind.\n\n' +
                        'MVH\n' +
