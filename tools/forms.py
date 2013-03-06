@@ -269,9 +269,6 @@ class EmployeeForm(NewModelForm):
         if not phone_number and not email:
             raise forms.ValidationError('Enten email eller telefonnummer er påkfrævet')
 
-        if not receive_sms and not receive_email:
-            raise forms.ValidationError('Der skal vælges mindst én måde at modtage beskeder fra systemet på')
-
         return cleaned_data
 
     def save(self, commit=True):
