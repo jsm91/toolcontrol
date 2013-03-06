@@ -23,19 +23,10 @@ def handle_loan_messages(tools, loaner):
         admins = Employee.objects.filter(Q(is_tool_admin=True)|
                                        Q(is_office_admin=True))
     else:
-        admins = Employee.objects.filter(sms_loan_threshold__lte=len(tools))
+        admins = Employee.objects.filter(loan_threshold__lte=len(tools))
 
     for admin in admins:
-        admin.send_sms(message)
-
-    if loaner.is_loan_flagged:
-        admins = Employee.objects.filter(Q(is_tool_admin=True)|
-                                       Q(is_office_admin=True))
-    else:
-        admins = Employee.objects.filter(email_loan_threshold__lte=len(tools))
-
-    for admin in admins:
-        admin.send_mail('Værktøj udlånt', message)
+        admin.send_message('Værktøj udlånt', message)
 
 def check_for_service(tool):
     if tool.service_interval == 0:

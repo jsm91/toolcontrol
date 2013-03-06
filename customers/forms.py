@@ -85,8 +85,7 @@ class CreateCustomerForm(forms.ModelForm):
                    'MVH\n' +
                    'ToolControl')
         
-        employee.send_mail('Oprettet som bruger', message)
-        employee.send_sms(message)
+        employee.send_message('Oprettet som bruger', message)
 
         return customer
         

@@ -21,5 +21,6 @@ class Command(BaseCommand):
             
             if customer.credit < 0:
                 for admin in customer.employee_set.filter(is_admin=True):
+                    subject = 'Din ToolControl-konto er i minus'
                     message = ('Hej %s\n\n Kontoen for %s på ToolControl er gået i minus (%s kr.). Systemet fungerer stadig, men vi beder dig om at bringe kontoen i plus inden for nærmeste fremtid.\n\n MVH\n ToolControl' % (admin.name, customer.name, customer.credit))
-                    admin.send_sms(message)
+                    admin.send_message(subject, message)

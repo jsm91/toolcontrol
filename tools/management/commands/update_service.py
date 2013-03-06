@@ -20,6 +20,7 @@ class Command(BaseCommand):
                 if check_for_service(tool):
                     tools_to_service.append(tool)
         
+            subject = 'Daglig serviceopdatering'
             message = 'Daglig serviceopdatering. Følgende værktøj mangler service:\n'
             
             if not tools_to_service:
@@ -30,7 +31,7 @@ class Command(BaseCommand):
 
             for admin in Employee.objects.filter(customer=customer, is_admin=True):
                 if admin.name != 'Henrik' and admin.name != 'Jacob Møller':
-                    admin.send_sms(message)
+                    admin.send_message(subject, message)
                 
         # Send SMS to all loaners who have tools that need service
         for employee in Employee.objects.all():
@@ -40,6 +41,7 @@ class Command(BaseCommand):
                 if check_for_service(tool):
                     tools_to_service.append(tool)
 
+            subject = 'Daglig serviceopdatering'
             message = 'Daglig serviceopdatering. Følgende værktøj i din besiddelse mangler service:\n'
 
             for tool in tools_to_service:
@@ -47,4 +49,7 @@ class Command(BaseCommand):
 
             if (tools_to_service and employee.name != 'Henrik' and 
                 employee.name != 'Jacob Møller'):
-                employee.send_sms(message)
+                employee.send_message(subject, message)
+
+
+

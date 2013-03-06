@@ -22,6 +22,7 @@ class Command(BaseCommand):
                 if tool.is_reserved(now,future):
                     tools_to_return.append(tool)
 
+            subject = 'Daglig reservationsopdatering'
             message = 'Daglig reservationsopdatering. Følgende værktøj i din besiddelse er reserveret inden for tre dage:\n'
 
             for tool in tools_to_return:
@@ -32,4 +33,4 @@ class Command(BaseCommand):
                     message += '%s (reserveret til %s fra %s)\n' % (tool.name, reservation.employee, reservation.start_date.isoformat())
 
             if tools_to_return:
-                employee.send_sms(message)
+                employee.send_message(subject, message)

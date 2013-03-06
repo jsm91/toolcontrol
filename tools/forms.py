@@ -6,6 +6,9 @@ import datetime
 from django import forms
 from django.shortcuts import get_object_or_404
 
+from toolcontrol.enums import MESSAGES
+from toolcontrol.utils import handle_loan_messages
+
 from tools.models import Container, ContainerLoan, ConstructionSite, Employee
 from tools.models import Event, ForgotPasswordToken, Reservation, Tool
 from tools.models import ToolCategory, ToolModel
@@ -73,6 +76,14 @@ class LoanForm(NewModelForm):
             except KeyError:
                 obj_dict[response] = [tool.name]
 
+        try:
+            if cd['employee']:
+                # Don't send any messages if we loan to a construction site
+                handle_loan_messages(obj_dict[MESSAGES.TOOL_LOAN_SUCCESS], 
+                                     cd['employee'])
+        except KeyError:
+            pass
+
         return obj_dict
 
 class QRLoanForm(forms.ModelForm):
@@ -107,6 +118,9 @@ class QRLoanForm(forms.ModelForm):
         response = self.tool.loan(cd['employee'], cd['construction_site'])
         obj_dict[response] = [self.tool.name]
 
+        handle_loan_messages(obj_dict[MESSAGES.TOOL_LOAN_SUCCESS], 
+                             cd['employee'])
+
         return obj_dict
 
 class ForgotPasswordForm(forms.Form):
@@ -129,7 +143,7 @@ class ForgotPasswordForm(forms.Form):
                        'dit kodeord, kan du se bort fra denne mail\n\n'+
                        'MVH\nToolControl for Skou Gruppen A/S')
 
-            user.send_mail('Nulstilling af kodeord', message)
+            user.send_message('Nulstilling af kodeord', message)
 
     def clean(self):
         cleaned_data = super(ForgotPasswordForm, self).clean()
@@ -238,7 +252,8 @@ class EmployeeForm(NewModelForm):
     class Meta:
         model = Employee
         exclude = ['password', 'last_login', 'is_loan_flagged', 'is_employee',
-                   'sms_loan_threshold', 'email_loan_threshold','customer']
+                   'loan_threshold', 'receive_sms', 'receive_mail', 
+                   'customer']
 
     def __init__(self, customer, *args, **kwargs):
         super(EmployeeForm, self).__init__(*args, **kwargs)
@@ -248,9 +263,14 @@ class EmployeeForm(NewModelForm):
         cleaned_data = super(EmployeeForm, self).clean()
         phone_number = cleaned_data.get('phone_number')
         email = cleaned_data.get('email')
+        receive_sms = cleaned_data.get('receive_sms')
+        receive_email = cleaned_data.get('receive_email')
 
         if not phone_number and not email:
             raise forms.ValidationError('Enten email eller telefonnummer er påkfrævet')
+
+        if not receive_sms and not receive_email:
+            raise forms.ValidationError('Der skal vælges mindst én måde at modtage beskeder fra systemet på')
 
         return cleaned_data
 
@@ -270,8 +290,7 @@ class EmployeeForm(NewModelForm):
                        'MVH\n' +
                        'ToolControl')
 
-            employee.send_mail('Oprettet som bruger', message)
-            employee.send_sms(message)
+            employee.send_message('Oprettet som bruger', message)
         
         if commit:
             employee.save()
@@ -295,17 +314,15 @@ class BuildingSiteForm(NewModelForm):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model = Employee
-        fields = ['sms_loan_threshold', 'email_loan_threshold',
+        fields = ['loan_threshold', 'receive_sms', 'receive_mail',
                   'email', 'phone_number',]
 
     def __init__(self, *args, **kwargs):
         super(SettingsForm, self).__init__(*args, **kwargs)
         if not kwargs['instance'].is_admin:
-            self.fields['sms_loan_threshold'].widget.attrs['disabled'] = 'disabled'
-            self.fields['email_loan_threshold'].widget.attrs['disabled'] = 'disabled'
+            self.fields['loan_threshold'].widget.attrs['disabled'] = 'disabled'
 
-        self.fields['sms_loan_threshold'].required = False
-        self.fields['email_loan_threshold'].required = False
+        self.fields['loan_threshold'].required = False
 
 class CreateManyToolsForm(NewForm):
     prefix = forms.CharField(label="Præfiks", 

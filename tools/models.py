@@ -158,14 +158,23 @@ class Employee(AbstractBaseUser):
     is_admin = models.BooleanField('Administrator', default=False)
     is_loan_flagged = models.BooleanField('Låneflag', default=False)
 
-    sms_loan_threshold = models.IntegerField('Min. udlån ved sms', 
-                                             null=True, default=None)
-    email_loan_threshold = models.IntegerField('Min. udlån ved email', 
-                                               null=True, default=None)
+    # Number of tools needed for sending SMS or email to admin
+    loan_threshold = models.IntegerField('Min. udlån ved besked', 
+                                         null=True, default=None)
+
+    # Method of communication
+    receive_sms = models.BooleanField(default=True)
+    receive_mail = models.BooleanField(default=True)
 
     objects = EmployeeManager()
     
     USERNAME_FIELD = 'name'
+
+    def send_message(self, subject, message):
+        if self.receive_sms:
+            self.send_sms(message)
+        if self.receive_mail:
+            self.send_mail(subject, message)
 
     def mark_login(self):
         login = Login(employee=self)

@@ -762,7 +762,7 @@ def reset_password(request, token):
                'MVH\n' +
                'ToolControl')
 
-    user.send_mail('Kodeord nulstillet', message)
+    user.send_message('Kodeord nulstillet', message)
 
     forgot_password_token.delete()
 
