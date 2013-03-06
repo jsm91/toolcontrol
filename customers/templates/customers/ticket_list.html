@@ -60,9 +60,11 @@
       <td class="bools">
 	<form method="POST" action="{% url 'action' %}">
 	  {% csrf_token %}
-	  <input type="hidden" name="delete_ticket" value="{{ ticket.pk }}">
-	  <input type="image" src="{{ STATIC_URL }}Icon_False.svg"
-		 class="submit-image">
+	  <p class="no_margin">
+	    <input type="hidden" name="delete_ticket" value="{{ ticket.pk }}">
+	    <input type="image" src="{{ STATIC_URL }}Icon_False.svg"
+		   class="submit-image">
+	  </p>
 	</form>
 	<a href="{% url 'ticket_update' ticket.pk %}">
 	  <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"

@@ -283,3 +283,7 @@ img.faqpost_edit {
 a.faqpost_edit {
     text-decoration:none;
 }
+
+p.no_margin {
+    margin:0px;
+}
