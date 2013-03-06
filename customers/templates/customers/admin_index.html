@@ -99,7 +99,7 @@
 	{% endif %}
       </td>
       <td class="info">
-	TransaktionsID #{{ transaction.id }}<br>
+	TransaktionsID #{{ transaction.id }} (<a href="{% url 'customer_detail' transaction.customer.pk %}">{{ transaction.customer }}</a>)<br>
 	{{ transaction.description }}<br>
 	Registreret {{ transaction.timestamp }}<br>
       </td>

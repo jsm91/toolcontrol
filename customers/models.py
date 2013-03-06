@@ -51,6 +51,9 @@ class Transaction(models.Model):
     is_confirmed = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    def credit_with_fee(self):
+        return round((self.credit + 2.6) / 0.966, 2)
+
 def confirm_transaction(sender, **kwargs):
     transaction_id = int(sender.invoice)
     transaction = Transaction.objects.get(id=transaction_id)

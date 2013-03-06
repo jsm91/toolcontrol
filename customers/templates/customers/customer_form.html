@@ -3,7 +3,7 @@
 {% block content %}
 <form method="POST">
   {% csrf_token %}
-  <table>
+  <table class="form">
     {{ form.as_table }}
     <tr>
       <td colspan="2">

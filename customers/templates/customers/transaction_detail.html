@@ -4,7 +4,7 @@
 
 {% block content %}
 <p>Vi har registreret din anmodning om indbetaling. Du kan se detaljerne for transaktionen nedenfor. Betalingen gennemføres ved at trykke på knappen til højre - bemærk at der ikke hæves nogen penge på din konto før betalingen er gennemført hos PayPal.</p>
-<p>Bemærk, at PayPal lægger et gebyr på 2,6 kr. + 3,4 % på overførslen</p>
+<p>Bemærk, at PayPal lægger et gebyr på 2,6 kr. + 3,4 % på overførslen. Total inklusiv gebyr for denne overførsel bliver {{ object.credit_with_fee }} kr.</p>
 <hr>
   <table class="list {% if not object.confirmed %}closed-ticket{% endif %}">
     <tr>

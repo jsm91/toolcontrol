@@ -235,12 +235,6 @@ class AccountDetail(DetailView):
     def get_object(self, queryset=None):
         return self.request.user.customer
 
-def account_ticket_list(request):
-    return None
-
-def payment(request):
-    return None
-
 class CreateTransaction(CreateView):
     model = Transaction
     form_class = TransactionForm
@@ -264,7 +258,7 @@ class TransactionDetail(DetailView):
         paypal_dict = {
             'currency_code': 'DKK',
             'business': 'kontakt@toolcontrol.dk',
-            'amount': round((self.object.credit + 2.6) / 0.966, 2),
+            'amount': self.object.credit_with_fee(),
             'item_name': 'Indbetaling til ToolControl',
             'invoice': self.object.pk,
             'notify_url': 'http://www.skou.toolcontrol.dk/admin/payment/notify',

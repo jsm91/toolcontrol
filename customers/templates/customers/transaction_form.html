@@ -4,6 +4,7 @@
 
 {% block content %}
 <p>På denne side kan du overføre penge til din ToolControl-konto. Det gør du ved at indtaste et beløb i feltet nedenfor og indsende formularen. Herefter oprettes transaktionen, som du gennemfører ved at følge linket til PayPal. Når betalingen er gennemført, og du har fulgt linket tilbage til siden, bliver betalingen godkendt, og beløbet indføres på din konto. Hvis beløbet ikke bliver tilføjet din konto, kan du rette henvendelse til os ved at oprette en kupon. Desuden gennemgår vi selv alle betalinger på PayPal dagligt.</p>
+<p>Bemærk, at PayPal lægger et gebyr på 2,6 kr. + 3,4 % på overførslen</p>
 <form method="POST">
   {% csrf_token %}
   <table>
