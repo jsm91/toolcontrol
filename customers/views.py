@@ -253,7 +253,7 @@ class CreateTransaction(CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('paypal', args=[self.object.pk])
+        return reverse('transaction_detail', args=[self.object.pk])
 
 class TransactionDetail(DetailView):
     model = Transaction

@@ -46,7 +46,13 @@
 	     alt="Antal svar"> Transaktionen er ikke bekræftet
 	{% endif %}
       </td>
-      <td class="bools"></td>
+      <td class="bools">
+	{% if not transaction.is_confirmed %}
+	<form method="GET" action="{% url 'transaction_detail' transaction.pk %}">
+	  <input type="submit" value="Foretag betaling" class="action_button">
+	</form>
+	{% endif %}
+      </td>
     </tr>
   </table>
   <hr>
