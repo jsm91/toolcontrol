@@ -56,9 +56,9 @@ class AccountCreateTicketForm(forms.ModelForm):
                    'assigned_to')
 
 class CreateCustomerForm(forms.ModelForm):
-    administrator = forms.CharField()
+    administrator = forms.CharField(label='Navn på administrator')
     email = forms.EmailField()
-    phone_number = forms.IntegerField()
+    phone_number = forms.IntegerField(label='Telefonnummer')
 
     class Meta:
         model = Customer

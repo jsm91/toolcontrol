@@ -3,9 +3,29 @@
 {% block account_faq_active %}-active{% endblock %}
 
 {% block content %}
-  {% for faqpost in object_list %}
-    <h1>{{ faqpost.question }}</h1>
-    {{ faqpost.answer }}
-    <hr>
+<h1>Ofte stillede spørgsmål</h1>
+
+  {% regroup object_list by category as category_list %}
+  {% for category in category_list %}
+    <h2>{{ category.grouper }}</h2>
+    <ol>
+      {% for faqpost in category.list %}
+      <li><a href="#{{ faqpost.pk }}">{{ faqpost.question }}</a></li>
+      {% endfor %}
+    </ol>
+  {% endfor %}
+
+  <hr>
+  {% for category in category_list %}
+  <h1>{{ category.grouper }}</h1>
+  <ol>
+    {% for faqpost in category.list %}
+    <li>
+      <a id="{{ faqpost.pk }}"></a>
+      <span class="headline">{{ faqpost.question }}</span>
+      <p>{{ faqpost.answer }}</p>
+    </li>
+    {% endfor %}
+  </ol>
   {% endfor %}
 {% endblock %}

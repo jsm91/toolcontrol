@@ -9,16 +9,43 @@
 <a href="{% url 'faqpost_create' %}">
   <span>Ny FAQ-post</span>
 </a>
+<a href="{% url 'faqcategory_create' %}">
+  <span>Ny FAQ-kategori</span>
+</a>
 {% endblock %}
 
 {% block content %}
-  {% for faqpost in object_list %}
-    <span class="headline">{{ faqpost.question }}</span>
-    <a href="{% url 'faqpost_update' faqpost.pk %}" class="faqpost_edit">
-      <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
-	   alt="Rediger" class="faqpost_edit">
-    </a><br>
-    <p>{{ faqpost.answer }}</p>
-    <hr>
+<h1>Ofte stillede spørgsmål</h1>
+
+  {% regroup object_list by category as category_list %}
+  {% for category in category_list %}
+      <span class="headline">{{ category.grouper }}</span>
+      <a href="{% url 'faqcategory_update' category.grouper.pk %}" class="faqpost_edit">
+	<img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
+	     alt="Rediger" class="faqpost_edit">
+      </a><br>
+  <ol>
+    {% for faqpost in category.list %}
+    <li><a href="#{{ faqpost.pk }}">{{ faqpost.question }}</a></li>
+    {% endfor %}
+  </ol>
+  {% endfor %}
+
+  <hr>
+  {% for category in category_list %}
+  <h1>{{ category.grouper }}</h1>
+  <ol>
+    {% for faqpost in category.list %}
+    <li>
+      <a id="{{ faqpost.pk }}"></a>
+      <span class="headline">{{ faqpost.question }}</span>
+      <a href="{% url 'faqpost_update' faqpost.pk %}" class="faqpost_edit">
+	<img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
+	     alt="Rediger" class="faqpost_edit">
+      </a><br>
+      <p>{{ faqpost.answer }}</p>
+    </li>
+    {% endfor %}
+  </ol>
   {% endfor %}
 {% endblock %}

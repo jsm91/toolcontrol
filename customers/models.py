@@ -54,7 +54,14 @@ class Transaction(models.Model):
     def credit_with_fee(self):
         return round((self.credit + 2.6) / 0.966, 2)
 
+class FAQCategory(models.Model):
+    name = models.CharField('Navn', max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
 class FAQPost(models.Model):
+    category = models.ForeignKey(FAQCategory, verbose_name = 'Kategori')
     question = models.TextField('Spørgsmål')
     answer = models.TextField('Svar')
 

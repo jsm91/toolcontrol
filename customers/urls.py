@@ -6,7 +6,7 @@ from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic import UpdateView
 
 from customers.forms import CustomerForm, CreateCustomerForm, CreateTicketForm, TicketForm, TransactionForm
-from customers.models import Customer, FAQPost, Transaction
+from customers.models import Customer, FAQCategory, FAQPost, Transaction
 
 from customers.views import AccountDetail, CreateViewWithRedirection
 from customers.views import DetailViewWithRedirection, ListViewWithRedirection
@@ -16,7 +16,7 @@ from customers.views import UpdateViewWithRedirection, CreateTransaction
 from customers.views import CreateTicket, CustomerDetail, TicketDetail
 from customers.views import IndexTemplate, TicketList, TransactionDetail
 from customers.views import AccountTicketList, AccountCreateTicket
-from customers.views import AccountTicketDetail, CreateFAQPost
+from customers.views import AccountTicketDetail
 from tools.models import Ticket
 
 # Uncomment the next two lines to enable the admin:
@@ -38,10 +38,14 @@ urlpatterns = patterns('customers.views',
         name='customer_update'),
 
     url(r'^faq/$', login_required(ListViewWithRedirection.as_view(model=FAQPost)), name='faqpost_list'),
-    url(r'^faq/create$', login_required(CreateFAQPost.as_view()), name='faqpost_create'),
+    url(r'^faq/create_category$', login_required(CreateViewWithRedirection.as_view(model=FAQCategory, success_url=reverse_lazy('faqpost_list'))), name='faqcategory_create'),
+    url(r'^faq/create$', login_required(CreateViewWithRedirection.as_view(model=FAQPost, success_url=reverse_lazy('faqpost_list'))), name='faqpost_create'),
     url(r'^faq/(?P<pk>\d+)/update/$', 
         login_required(UpdateViewWithRedirection.as_view(model=FAQPost, template_name='customers/faqpost_form.html', success_url = reverse_lazy('faqpost_list'))),
         name='faqpost_update'),
+    url(r'^faq/(?P<pk>\d+)/update_category/$', 
+        login_required(UpdateViewWithRedirection.as_view(model=FAQCategory, template_name='customers/faqcategory_form.html', success_url = reverse_lazy('faqpost_list'))),
+        name='faqcategory_update'),
 
     url(r'^tickets/$', login_required(TicketList.as_view()), 
         name='ticket_list'),

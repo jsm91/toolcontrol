@@ -329,9 +329,3 @@ class AccountTicketDetail(FormView):
 
     def get_success_url(self):
         return reverse('account_ticket_detail', args=[self.kwargs['pk']])
-
-class CreateFAQPost(CreateViewWithRedirection):
-    model = FAQPost
-
-    def get_success_url(self):
-        return reverse('faqpost_list')
