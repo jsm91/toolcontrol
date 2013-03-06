@@ -259,8 +259,21 @@ table.form {
     width:80%;
 }
 
-table.form input, table.form textarea {
+table.form input, table.form textarea, table.form select {
     width:100%;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color:#ffffff;
+    border-radius:5px 5px 5px 5px;
+    -moz-border-radius: 5px; /* Firefox */
+    -webkit-border-radius: 5px; /* Safari, Chrome */
+    border:1px solid #CED3D9;
+    color: #666666;
+    font-weight:bold;
+}
+
+table.form input:active {
+    background-color:#efefef;
 }
 
 table.form td, table.form th {
