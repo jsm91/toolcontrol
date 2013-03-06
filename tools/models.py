@@ -163,8 +163,10 @@ class Employee(AbstractBaseUser):
                                          null=True, default=None)
 
     # Method of communication
-    receive_sms = models.BooleanField(default=True)
-    receive_mail = models.BooleanField(default=True)
+    receive_sms = models.BooleanField('Modtag SMS fra systemet', 
+                                      default=True)
+    receive_mail = models.BooleanField('Modtag mail fra systemet', 
+                                       default=True)
 
     objects = EmployeeManager()
     

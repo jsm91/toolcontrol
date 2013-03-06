@@ -324,6 +324,21 @@ class SettingsForm(forms.ModelForm):
 
         self.fields['loan_threshold'].required = False
 
+    def clean(self):
+        cleaned_data = super(SettingsForm, self).clean()
+        phone_number = cleaned_data.get('phone_number')
+        email = cleaned_data.get('email')
+        receive_sms = cleaned_data.get('receive_sms')
+        receive_email = cleaned_data.get('receive_email')
+
+        if not phone_number and not email:
+            raise forms.ValidationError('Enten email eller telefonnummer er påkfrævet')
+
+        if not receive_sms and not receive_email:
+            raise forms.ValidationError('Der skal vælges mindst én måde at modtage beskeder fra systemet på')
+
+        return cleaned_data
+
 class CreateManyToolsForm(NewForm):
     prefix = forms.CharField(label="Præfiks", 
                              help_text="Præfiks der deles af alt værktøjet")
