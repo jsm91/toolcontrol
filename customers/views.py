@@ -12,60 +12,23 @@ from django.views.generic import CreateView, DetailView, FormView, ListView
 from django.views.generic import TemplateView, UpdateView
 
 from customers.forms import CreateTicketForm, TicketAnswerForm, TransactionForm
-from customers.forms import AccountCreateTicketForm
-from customers.models import Customer, FAQPost, Transaction
+from customers.forms import AccountCreateTicketForm, CreateCustomerForm
+from customers.forms import CustomerForm, TicketForm
+
+from customers.models import Customer, FAQCategory, FAQPost, Transaction
 from paypal.standard.forms import PayPalPaymentsForm
 from tools.models import Event, Login, Ticket, TicketAnswer, Tool, ToolModel
 
-class CreateViewWithRedirection(CreateView):
-    def get(self, request, *args, **kwargs):
+class HasCustomerRedirectMixin(object):
+    def dispatch(self, request, *args, **kwargs):
         if request.user.customer:
             return HttpResponseRedirect(reverse('index'))
         else:
-            return super(CreateViewWithRedirection, 
-                         self).get(request, *args, **kwargs)
+            return super(HasCustomerRedirectMixin, 
+                         self).dispatch(request, *args, **kwargs)
 
-class DetailViewWithRedirection(DetailView):
-    def get(self, request, *args, **kwargs):
-        if request.user.customer:
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            return super(DetailViewWithRedirection, 
-                         self).get(request, *args, **kwargs)
-
-class FormViewWithRedirection(FormView):
-    def get(self, request, *args, **kwargs):
-        if request.user.customer:
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            return super(FormViewWithRedirection, 
-                         self).get(request, *args, **kwargs)
-
-class ListViewWithRedirection(ListView):
-    def get(self, request, *args, **kwargs):
-        if request.user.customer:
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            return super(ListViewWithRedirection, 
-                         self).get(request, *args, **kwargs)
-
-class TemplateViewWithRedirection(TemplateView):
-    def get(self, request, *args, **kwargs):
-        if request.user.customer:
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            return super(TemplateViewWithRedirection, 
-                         self).get(request, *args, **kwargs)
-
-class UpdateViewWithRedirection(UpdateView):
-    def get(self, request, *args, **kwargs):
-        if request.user.customer:
-            return HttpResponseRedirect(reverse('index'))
-        else:
-            return super(UpdateViewWithRedirection, 
-                         self).get(request, *args, **kwargs)
-
-class IndexTemplate(TemplateViewWithRedirection):
+# Index view
+class IndexTemplate(HasCustomerRedirectMixin, TemplateView):
     template_name = 'customers/admin_index.html'
 
     def get_context_data(self, **kwargs):
@@ -79,7 +42,15 @@ class IndexTemplate(TemplateViewWithRedirection):
 
         return context
 
-class CustomerDetail(DetailViewWithRedirection):
+# Customer views
+class CustomerList(HasCustomerRedirectMixin, ListView):
+    model = Customer
+
+class CreateCustomer(HasCustomerRedirectMixin, CreateView):
+    model = Customer
+    form_class = CreateCustomerForm
+
+class CustomerDetail(HasCustomerRedirectMixin, DetailView):
     model = Customer
 
     def get_context_data(self, **kwargs):
@@ -94,7 +65,12 @@ class CustomerDetail(DetailViewWithRedirection):
 
         return context
 
-class TicketList(ListViewWithRedirection):
+class UpdateCustomer(HasCustomerRedirectMixin, UpdateView):
+    model = Customer
+    form_class = CustomerForm
+
+# Ticket views
+class TicketList(HasCustomerRedirectMixin, ListView):
     template_name = 'customers/ticket_list.html'
 
     def get_queryset(self):
@@ -105,6 +81,91 @@ class TicketList(ListViewWithRedirection):
             return Ticket.objects.filter(reported_by=customer).order_by('-is_open', 'duplicate', '-pk')
         else:
             return Ticket.objects.all().order_by('-is_open', 'duplicate', '-pk')
+
+class CreateTicket(HasCustomerRedirectMixin, CreateView):
+    form_class = CreateTicketForm
+    template_name='customers/ticket_form.html'
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.created_by = self.request.user
+        self.object.save()
+        logger.info('Ticket #%s created (%s) by %s' % (self.object.pk, self.object.name, self.request.user))
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('ticket_detail', args=[self.object.pk])
+
+class TicketDetail(HasCustomerRedirectMixin, FormView):
+    form_class = TicketAnswerForm
+    template_name='customers/ticket_detail.html'
+
+    def form_valid(self, form):
+        ticket_answer = form.save(commit=False)
+        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
+        ticket_answer.ticket = ticket
+        ticket_answer.created_by = self.request.user
+        ticket_answer.save()
+        logger.info('Answer to ticket #%s created by %s' % (ticket.pk, self.request.user))
+        return super(TicketDetail, self).form_valid(form)
+
+    def get(self, request, *args, **kwargs):
+        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
+
+        if self.request.user == ticket.assigned_to:
+            for answer in ticket.ticketanswer_set.filter(is_read=False):
+                logger.info('Answer #%s marked as read by %s' % (answer.pk, self.request.user))
+                answer.is_read = True
+                answer.save()
+
+        if (request.user.customer and 
+            request.user.customer != ticket.reported_by):
+            return HttpResponseRedirect(reverse('index'))
+
+        return super(TicketDetail, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(TicketDetail, self).get_context_data(**kwargs)
+        context['ticket'] = get_object_or_404(Ticket, id = self.kwargs['pk'])
+
+        return context
+
+    def get_success_url(self):
+        return reverse('ticket_detail', args=[self.kwargs['pk']])
+
+class UpdateTicket(HasCustomerRedirectMixin, UpdateView):
+    model = Ticket
+    form_class = TicketForm
+    template_name='customers/ticket_form.html'
+
+# FAQ views
+class FAQList(HasCustomerRedirectMixin, ListView):
+    model = FAQPost
+
+class CreateFAQ(HasCustomerRedirectMixin, CreateView):
+    model = FAQPost
+
+    def get_success_url(self):
+        return reverse('faqpost_list',)
+
+class UpdateFAQ(HasCustomerRedirectMixin, UpdateView):
+    model=FAQPost
+
+    def get_success_url(self):
+        return reverse('faqpost_list',)
+
+# FAQ category views
+class CreateFAQCategory(HasCustomerRedirectMixin, CreateView):
+    model = FAQCategory
+
+    def get_success_url(self):
+        return reverse('faqpost_list',)
+
+class UpdateFAQCategory(HasCustomerRedirectMixin, UpdateView):
+    model=FAQCategory
+
+    def get_success_url(self):
+        return reverse('faqpost_list',)
 
 @login_required
 def action(request):
@@ -172,57 +233,6 @@ def action(request):
         logger.info('Transaction #%s has been deleted' % transaction_id)
 
         return HttpResponseRedirect(reverse('admin_index'))
-
-class TicketDetail(FormViewWithRedirection):
-    form_class = TicketAnswerForm
-    template_name='customers/ticket_detail.html'
-
-    def form_valid(self, form):
-        ticket_answer = form.save(commit=False)
-        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
-        ticket_answer.ticket = ticket
-        ticket_answer.created_by = self.request.user
-        ticket_answer.save()
-        logger.info('Answer to ticket #%s created by %s' % (ticket.pk, self.request.user))
-        return super(TicketDetail, self).form_valid(form)
-
-    def get(self, request, *args, **kwargs):
-        ticket = get_object_or_404(Ticket, id = self.kwargs['pk'])
-
-        if self.request.user == ticket.assigned_to:
-            for answer in ticket.ticketanswer_set.filter(is_read=False):
-                logger.info('Answer #%s marked as read by %s' % (answer.pk, self.request.user))
-                answer.is_read = True
-                answer.save()
-
-        if (request.user.customer and 
-            request.user.customer != ticket.reported_by):
-            return HttpResponseRedirect(reverse('index'))
-
-        return super(TicketDetail, self).get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(TicketDetail, self).get_context_data(**kwargs)
-        context['ticket'] = get_object_or_404(Ticket, id = self.kwargs['pk'])
-
-        return context
-
-    def get_success_url(self):
-        return reverse('ticket_detail', args=[self.kwargs['pk']])
-
-class CreateTicket(CreateViewWithRedirection):
-    form_class = CreateTicketForm
-    template_name='customers/ticket_form.html'
-
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.created_by = self.request.user
-        self.object.save()
-        logger.info('Ticket #%s created (%s) by %s' % (self.object.pk, self.object.name, self.request.user))
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('ticket_detail', args=[self.object.pk])
 
 class AccountDetail(DetailView):
     template_name='customers/account.html'

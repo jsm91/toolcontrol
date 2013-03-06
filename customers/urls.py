@@ -8,15 +8,17 @@ from django.views.generic import UpdateView
 from customers.forms import CustomerForm, CreateCustomerForm, CreateTicketForm, TicketForm, TransactionForm
 from customers.models import Customer, FAQCategory, FAQPost, Transaction
 
-from customers.views import AccountDetail, CreateViewWithRedirection
-from customers.views import DetailViewWithRedirection, ListViewWithRedirection
-from customers.views import TemplateViewWithRedirection
-from customers.views import UpdateViewWithRedirection, CreateTransaction
+from customers.views import AccountDetail, CreateTransaction
 
 from customers.views import CreateTicket, CustomerDetail, TicketDetail
 from customers.views import IndexTemplate, TicketList, TransactionDetail
 from customers.views import AccountTicketList, AccountCreateTicket
-from customers.views import AccountTicketDetail
+from customers.views import AccountTicketDetail, CustomerList, CreateCustomer
+from customers.views import UpdateCustomer, UpdateTicket
+
+from customers.views import FAQList, CreateFAQ, UpdateFAQ
+from customers.views import CreateFAQCategory, UpdateFAQCategory
+
 from tools.models import Ticket
 
 # Uncomment the next two lines to enable the admin:
@@ -25,37 +27,41 @@ from tools.models import Ticket
 
 urlpatterns = patterns('customers.views',
     url(r'^$', login_required(IndexTemplate.as_view()), name = 'admin_index'),
-    url(r'^customers/$', login_required(ListViewWithRedirection.as_view(model=Customer)), 
+
+    # Customer URL's
+    url(r'^customers/$', login_required(CustomerList.as_view()), 
         name='customer_list'),
-    url(r'^customers/create$', 
-        login_required(CreateViewWithRedirection.as_view(model=Customer, form_class=CreateCustomerForm)), 
+    url(r'^customers/create$', login_required(CreateCustomer.as_view()), 
         name='customer_create'),
-    url(r'^customers/(?P<pk>\d+)/$',
-        login_required(CustomerDetail.as_view()),
+    url(r'^customers/(?P<pk>\d+)/$', login_required(CustomerDetail.as_view()),
         name='customer_detail'),
-    url(r'^customers/(?P<pk>\d+)/update/$', 
-        login_required(UpdateViewWithRedirection.as_view(model=Customer, form_class=CustomerForm)), 
+    url(r'^customers/(?P<pk>\d+)/update/$', login_required(UpdateCustomer.as_view()), 
         name='customer_update'),
 
-    url(r'^faq/$', login_required(ListViewWithRedirection.as_view(model=FAQPost)), name='faqpost_list'),
-    url(r'^faq/create_category$', login_required(CreateViewWithRedirection.as_view(model=FAQCategory, success_url=reverse_lazy('faqpost_list'))), name='faqcategory_create'),
-    url(r'^faq/create$', login_required(CreateViewWithRedirection.as_view(model=FAQPost, success_url=reverse_lazy('faqpost_list'))), name='faqpost_create'),
-    url(r'^faq/(?P<pk>\d+)/update/$', 
-        login_required(UpdateViewWithRedirection.as_view(model=FAQPost, template_name='customers/faqpost_form.html', success_url = reverse_lazy('faqpost_list'))),
-        name='faqpost_update'),
-    url(r'^faq/(?P<pk>\d+)/update_category/$', 
-        login_required(UpdateViewWithRedirection.as_view(model=FAQCategory, template_name='customers/faqcategory_form.html', success_url = reverse_lazy('faqpost_list'))),
-        name='faqcategory_update'),
-
+    # Ticket URL's
     url(r'^tickets/$', login_required(TicketList.as_view()), 
         name='ticket_list'),
     url(r'^tickets/create$', login_required(CreateTicket.as_view()), 
         name='ticket_create'),
     url(r'^tickets/(?P<pk>\d+)/$', login_required(TicketDetail.as_view()), 
         name='ticket_detail'),
-    url(r'^tickets/(?P<pk>\d+)/update/$', 
-        login_required(UpdateViewWithRedirection.as_view(model=Ticket, form_class=TicketForm, template_name='customers/ticket_form.html')), 
+    url(r'^tickets/(?P<pk>\d+)/update/$', login_required(UpdateTicket.as_view()), 
         name='ticket_update'),
+
+    # FAQ URL's
+    url(r'^faq/$', login_required(FAQList.as_view()), name='faqpost_list'),
+    url(r'^faq/create$', login_required(CreateFAQ.as_view()), name='faqpost_create'),
+    url(r'^faq/(?P<pk>\d+)/update/$', login_required(UpdateFAQ.as_view()),
+        name='faqpost_update'),
+
+    # FAQ category URL's
+    url(r'^faq-category/create/$', login_required(CreateFAQCategory.as_view()), 
+        name='faqcategory_create'),
+    url(r'^faq-category/(?P<pk>\d+)/update$', login_required(UpdateFAQCategory.as_view()),
+        name='faqcategory_update'),
+
+    # Action URL
+    url(r'action/$', 'action', name='action'),
 
     url(r'^account/$', login_required(AccountDetail.as_view()), 
         name='account'),
@@ -77,7 +83,6 @@ urlpatterns = patterns('customers.views',
     url(r'^account/faq/$', 
         login_required(ListView.as_view(model=FAQPost, template_name='customers/account_faqpost_list.html')), name='account_faqpost_list'),
 
-    url(r'action/$', 'action', name='action'),
    
     # Examples:
     # url(r'^$', 'sidste.views.home', name='home'),
