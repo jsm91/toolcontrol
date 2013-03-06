@@ -227,6 +227,12 @@ class CreateTicket(CreateViewWithRedirection):
 class AccountDetail(DetailView):
     template_name='customers/account.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_admin:
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return super(AccountDetail, self).get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super(AccountDetail, self).get_context_data(**kwargs)
 
@@ -251,11 +257,23 @@ class CreateTransaction(CreateView):
 
         return HttpResponseRedirect(self.get_success_url())
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_admin:
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return super(CreateTransaction, self).get(request, *args, **kwargs)
+
     def get_success_url(self):
         return reverse('transaction_detail', args=[self.object.pk])
 
 class TransactionDetail(DetailView):
     model = Transaction
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_admin:
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return super(TransactionDetail, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(TransactionDetail, self).get_context_data(**kwargs)
@@ -279,6 +297,12 @@ class TransactionDetail(DetailView):
 class AccountTicketList(ListView):
     template_name = 'customers/account_ticket_list.html'
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_admin:
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return super(AccountTicketList, self).get(request, *args, **kwargs)
+
     def get_queryset(self):
         customer = self.request.user.customer
 
@@ -287,6 +311,13 @@ class AccountTicketList(ListView):
 class AccountCreateTicket(CreateView):
     form_class = AccountCreateTicketForm
     template_name='customers/account_ticket_form.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_admin:
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return super(AccountCreateTicket, 
+                         self).get(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -317,6 +348,9 @@ class AccountTicketDetail(FormView):
 
         if (request.user.customer and 
             request.user.customer != ticket.reported_by):
+            return HttpResponseRedirect(reverse('index'))
+
+        if not request.user.is_admin:
             return HttpResponseRedirect(reverse('index'))
 
         return super(AccountTicketDetail, self).get(request, *args, **kwargs)

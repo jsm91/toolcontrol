@@ -452,12 +452,19 @@ class Tool(models.Model):
 
         reservations = self.is_reserved(datetime.datetime.now())
 
+        print reservations
+
         # Check for reservation
         if reservations:
             reservation = reservations[0]
-            if (employee != reservation.employee and
-                construction_site != reservation.construction_site):
-                return MESSAGES.TOOL_LOAN_RESERVED
+
+            if employee:
+                if employee != reservation.employee:
+                    return MESSAGES.TOOL_LOAN_RESERVED
+
+            if construction_site:
+                if construction_site != reservation.construction_site:
+                    return MESSAGES.TOOL_LOAN_RESERVED
 
         if self.location == 'Lager':
             event = Event(event_type='Udlån', tool=self,
