@@ -138,7 +138,7 @@ class ForgotPasswordForm(forms.Form):
                        'Vi har fået en anmodning om at nulstille dit kodeord.'+
                        'Hvis du ønsker at nulstille dit kodeord, bedes du '+
                        'tilgå denne URL: '+
-                       'http://skou.toolcontrol.dk/reset_password/' +token+
+                       'http://toolcontrol.dk/reset_password/' +token+
                        '. Hvis du ikke har bedt om at få nulstillet '+
                        'dit kodeord, kan du se bort fra denne mail\n\n'+
                        'MVH\nToolControl for Skou Gruppen A/S')

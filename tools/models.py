@@ -252,7 +252,7 @@ class Employee(AbstractBaseUser):
         logger.debug('Sending mail to %s with content %s' % (self.name, message))
         if self.email:
             try:
-                send_mail(subject, message, 'ToolControl <kontor@toolcontrol.dk>', 
+                send_mail(subject, message, 'ToolControl <kontakt@toolcontrol.dk>', 
                           [self.email])
                 logger.debug('Mail successfully sent')
             except Exception, e:

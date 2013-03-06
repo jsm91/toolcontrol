@@ -266,9 +266,9 @@ class TransactionDetail(DetailView):
             'amount': self.object.credit_with_fee(),
             'item_name': 'Indbetaling til ToolControl',
             'invoice': self.object.pk,
-            'notify_url': 'http://www.skou.toolcontrol.dk/admin/payment/notify',
-            'return_url': 'http://www.skou.toolcontrol.dk/admin/account',
-            'cancel_return': 'http://www.skou.toolcontrol.dk/admin/payment/cancel',
+            'notify_url': 'http://www.toolcontrol.dk/admin/payment/notify',
+            'return_url': 'http://www.toolcontrol.dk/admin/account',
+            'cancel_return': 'http://www.toolcontrol.dk/admin/payment/cancel',
             }
 
         form = PayPalPaymentsForm(initial=paypal_dict)

@@ -789,7 +789,7 @@ def qr_code(request, pk):
     if not request.user.customer:
         return HttpResponseRedirect(reverse('admin_index'))
 
-    img = qrcode.make('http://skou.toolcontrol.dk/tools/%s/qr_action' % pk)
+    img = qrcode.make('http://toolcontrol.dk/tools/%s/qr_action' % pk)
     response = HttpResponse(mimetype='image/png')
     img.save(response, 'PNG')
     return response
