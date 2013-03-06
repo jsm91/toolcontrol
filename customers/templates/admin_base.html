@@ -20,6 +20,10 @@
 	 class="menu-link{% block tickets_active %}{% endblock %}">
 	Kuponer
       </a>
+      <a href="{% url 'faqpost_list' %}"
+	 class="menu-link{% block faq_active %}{% endblock %}">
+	FAQ
+      </a>
       <a href="{% url 'logout' %}" class="menu-link">
 	Log ud
       </a>

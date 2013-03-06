@@ -13,7 +13,7 @@ from django.views.generic import TemplateView, UpdateView
 
 from customers.forms import CreateTicketForm, TicketAnswerForm, TransactionForm
 from customers.forms import AccountCreateTicketForm
-from customers.models import Customer, Transaction
+from customers.models import Customer, FAQPost, Transaction
 from paypal.standard.forms import PayPalPaymentsForm
 from tools.models import Event, Login, Ticket, TicketAnswer, Tool, ToolModel
 
@@ -329,3 +329,9 @@ class AccountTicketDetail(FormView):
 
     def get_success_url(self):
         return reverse('account_ticket_detail', args=[self.kwargs['pk']])
+
+class CreateFAQPost(CreateViewWithRedirection):
+    model = FAQPost
+
+    def get_success_url(self):
+        return reverse('faqpost_list')

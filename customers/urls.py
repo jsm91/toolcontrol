@@ -1,11 +1,12 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
 
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic import UpdateView
 
 from customers.forms import CustomerForm, CreateCustomerForm, CreateTicketForm, TicketForm, TransactionForm
-from customers.models import Customer, Transaction
+from customers.models import Customer, FAQPost, Transaction
 
 from customers.views import AccountDetail, CreateViewWithRedirection
 from customers.views import DetailViewWithRedirection, ListViewWithRedirection
@@ -15,7 +16,7 @@ from customers.views import UpdateViewWithRedirection, CreateTransaction
 from customers.views import CreateTicket, CustomerDetail, TicketDetail
 from customers.views import IndexTemplate, TicketList, TransactionDetail
 from customers.views import AccountTicketList, AccountCreateTicket
-from customers.views import AccountTicketDetail
+from customers.views import AccountTicketDetail, CreateFAQPost
 from tools.models import Ticket
 
 # Uncomment the next two lines to enable the admin:
@@ -36,6 +37,12 @@ urlpatterns = patterns('customers.views',
         login_required(UpdateViewWithRedirection.as_view(model=Customer, form_class=CustomerForm)), 
         name='customer_update'),
 
+    url(r'^faq/$', login_required(ListViewWithRedirection.as_view(model=FAQPost)), name='faqpost_list'),
+    url(r'^faq/create$', login_required(CreateFAQPost.as_view()), name='faqpost_create'),
+    url(r'^faq/(?P<pk>\d+)/update/$', 
+        login_required(UpdateViewWithRedirection.as_view(model=FAQPost, template_name='customers/faqpost_form.html', success_url = reverse_lazy('faqpost_list'))),
+        name='faqpost_update'),
+
     url(r'^tickets/$', login_required(TicketList.as_view()), 
         name='ticket_list'),
     url(r'^tickets/create$', login_required(CreateTicket.as_view()), 
@@ -54,13 +61,17 @@ urlpatterns = patterns('customers.views',
         name='transaction_detail'),
     (r'^payment/notify/', include('paypal.standard.ipn.urls')),
 
-    url(r'account/tickets/$', AccountTicketList.as_view(), 
+    url(r'account/tickets/$', login_required(AccountTicketList.as_view()), 
         name='account_ticket_list'),
-    url(r'account/tickets/create$', AccountCreateTicket.as_view(), 
+    url(r'account/tickets/create$', 
+        login_required(AccountCreateTicket.as_view()), 
         name='account_ticket_create'),
     url(r'^account/tickets/(?P<pk>\d+)/$', 
         login_required(AccountTicketDetail.as_view()), 
         name='account_ticket_detail'),
+
+    url(r'^account/faq/$', 
+        login_required(ListView.as_view(model=FAQPost, template_name='customers/account_faqpost_list.html')), name='account_faqpost_list'),
 
     url(r'action/$', 'action', name='action'),
    

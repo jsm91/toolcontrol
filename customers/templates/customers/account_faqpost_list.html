@@ -1,0 +1,11 @@
+{% extends "account_base.html" %}
+
+{% block account_faq_active %}-active{% endblock %}
+
+{% block content %}
+  {% for faqpost in object_list %}
+    <h1>{{ faqpost.question }}</h1>
+    {{ faqpost.answer }}
+    <hr>
+  {% endfor %}
+{% endblock %}

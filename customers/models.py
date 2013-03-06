@@ -54,6 +54,10 @@ class Transaction(models.Model):
     def credit_with_fee(self):
         return round((self.credit + 2.6) / 0.966, 2)
 
+class FAQPost(models.Model):
+    question = models.TextField()
+    answer = models.TextField()
+
 def confirm_transaction(sender, **kwargs):
     transaction_id = int(sender.invoice)
     transaction = Transaction.objects.get(id=transaction_id)

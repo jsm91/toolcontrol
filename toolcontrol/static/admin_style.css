@@ -268,3 +268,18 @@ table.form td, table.form th {
     padding-top:5px;
     padding-bottom:5px;
 }
+
+span.headline {
+    color: #465263;
+    font-size:18pt;
+    vertical-align:middle;
+}
+
+img.faqpost_edit {
+    height:18pt;
+    vertical-align:middle;
+}
+
+a.faqpost_edit {
+    text-decoration:none;
+}

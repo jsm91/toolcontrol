@@ -1,0 +1,24 @@
+{% extends "admin_base.html" %}
+
+{% block faq_active %}-active{% endblock %}
+
+{% block sub_top_bar %}
+<a href="{% url 'faqpost_list' %}">
+  <span>Liste</span>
+</a>
+<a href="{% url 'faqpost_create' %}">
+  <span>Ny FAQ-post</span>
+</a>
+{% endblock %}
+
+{% block content %}
+  {% for faqpost in object_list %}
+    <span class="headline">{{ faqpost.question }}</span>
+    <a href="{% url 'faqpost_update' faqpost.pk %}" class="faqpost_edit">
+      <img src="{{ STATIC_URL }}Icon_Admin_Edit.svg"
+	   alt="Rediger" class="faqpost_edit">
+    </a><br>
+    <p>{{ faqpost.answer }}</p>
+    <hr>
+  {% endfor %}
+{% endblock %}
