@@ -124,11 +124,22 @@ class QRLoanForm(forms.ModelForm):
         return obj_dict
 
 class ForgotPasswordForm(forms.Form):
-    email = forms.EmailField()
+    email = forms.EmailField(required=False)
+    phone_number = forms.IntegerField(required=False, label="Telefonnummer")
 
     def save(self, commit=True):
         email = self.cleaned_data.get('email')
-        for user in Employee.objects.filter(email=email):
+        phone_number = self.cleaned_data.get('phone_number')
+
+        if email and phone_number:
+            users = Employee.objects.filter(email=email, 
+                                            phone_number=phone_number)
+        elif phone_number:
+            users = Employee.objects.filter(phone_number=phone_number)
+        elif email:
+            users = Employee.objects.filter(email=email)
+
+        for user in users:
             token = Employee.objects.make_random_password()
 
             forgot_password_token = ForgotPasswordToken(token=token, user=user)
@@ -148,11 +159,21 @@ class ForgotPasswordForm(forms.Form):
     def clean(self):
         cleaned_data = super(ForgotPasswordForm, self).clean()
         email = cleaned_data.get('email')
+        phone_number = cleaned_data.get('phone_number')
 
-        user = Employee.objects.filter(email=email)[0]
+        if not email and not phone_number:
+            raise forms.ValidationError('Enten email eller telefonnummer er påkrævet')
 
-        if user is None:
-            raise forms.ValidationError('Ingen bruger med den angivne email')
+        if email and phone_number:
+            users = Employee.objects.filter(email=email, 
+                                            phone_number=phone_number)
+        elif phone_number:
+            users = Employee.objects.filter(phone_number=phone_number)
+        elif email:
+            users = Employee.objects.filter(email=email)
+
+        if not users.exists():
+            raise forms.ValidationError('Ingen bruger med den angivne email/telefonnummer')
 
         return cleaned_data
         

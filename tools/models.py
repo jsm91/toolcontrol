@@ -278,9 +278,9 @@ class Employee(AbstractBaseUser):
             if match.group('status') == 'succes':
                 logger.debug('SMS gateway returned "%s: %s"' % (match.group('status'),
                                                                 match.group('message')))
-                self.customer.sms_sent += 1
-                self.customer.credit -= self.customer.sms_price
-                self.customer.save()
+                if self.customer:
+                    self.customer.sms_sent += 1
+                    self.customer.save()
             else:
                 logger.error('SMS gateway returned "%s: %s"' % (match.group('status'),
                                                                 match.group('message')))
