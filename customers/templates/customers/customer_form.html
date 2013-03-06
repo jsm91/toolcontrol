@@ -1,5 +1,16 @@
 {% extends "admin_base.html" %}
 
+{% block customers_active %}-active{% endblock %}
+
+{% block sub_top_bar %}
+<a href="{% url 'customer_list' %}">
+  <span>Liste</span>
+</a>
+<a href="{% url 'customer_create' %}">
+  <span>Ny kunde</span>
+</a>
+{% endblock %}
+
 {% block content %}
 <form method="POST">
   {% csrf_token %}
