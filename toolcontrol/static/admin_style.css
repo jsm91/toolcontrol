@@ -261,19 +261,8 @@ table.form {
 
 table.form input, table.form textarea, table.form select {
     width:100%;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    background-color:#ffffff;
-    border-radius:5px 5px 5px 5px;
-    -moz-border-radius: 5px; /* Firefox */
-    -webkit-border-radius: 5px; /* Safari, Chrome */
-    border:1px solid #CED3D9;
-    color: #666666;
-    font-weight:bold;
-}
-
-table.form input:active {
-    background-color:#efefef;
+    padding-top:7px;
+    padding-bottom:7px;
 }
 
 table.form td, table.form th {
@@ -299,4 +288,18 @@ a.faqpost_edit {
 
 p.no_margin {
     margin:0px;
+}
+
+input.submit_button {
+    background-color:#ffffff;
+    border-radius:5px 5px 5px 5px;
+    -moz-border-radius: 5px; /* Firefox */
+    -webkit-border-radius: 5px; /* Safari, Chrome */
+    border:1px solid #CED3D9;
+    color: #666666;
+    font-weight:bold;
+}
+
+input.submit_button:active {
+    background-color:#efefef;
 }
