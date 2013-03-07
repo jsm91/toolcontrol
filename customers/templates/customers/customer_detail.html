@@ -94,6 +94,19 @@
   </table>
   <hr>
   {% endfor %}
+  <div class="form-container">
+    <h2>Tilføj transaktion</h2>
+    <table>
+      <form method="POST">
+	{% csrf_token %}
+	{{ form.as_table }}
+	<tr><td colspan="2">
+	    <input type="submit" value="Opret transaktion" 
+		   class="action_button">
+	</td></tr>
+      </form>
+    </table>
+  </div>
 </div>
 
 <div class="admin_pane" id="tools">

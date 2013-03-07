@@ -102,3 +102,18 @@ class TransactionForm(forms.ModelForm):
                 raise forms.ValidationError('Beløbet skal være positivt')
 
         return cleaned_data
+
+class AdminTransactionForm(forms.ModelForm):
+    class Meta:
+        model = Transaction
+        fields=['credit', 'description', 'is_confirmed']
+
+    def clean(self):
+        cleaned_data = super(AdminTransactionForm, self).clean()
+
+        if cleaned_data.get('credit'):
+            if cleaned_data['credit'] <= 0:
+                raise forms.ValidationError('Beløbet skal være positivt')
+
+        return cleaned_data
+

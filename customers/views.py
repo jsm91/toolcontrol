@@ -13,6 +13,7 @@ from django.views.generic import TemplateView, UpdateView
 
 from customers.forms import CreateTicketForm, TicketAnswerForm
 from customers.forms import CreateCustomerForm, CustomerForm, TicketForm
+from customers.forms import AdminTransactionForm
 from customers.models import Customer, FAQCategory, FAQPost, Transaction
 from tools.models import Event, Login, Ticket, TicketAnswer, Tool, ToolModel
 
@@ -47,20 +48,40 @@ class CreateCustomer(HasCustomerRedirectMixin, CreateView):
     model = Customer
     form_class = CreateCustomerForm
 
-class CustomerDetail(HasCustomerRedirectMixin, DetailView):
-    model = Customer
+class CustomerDetail(HasCustomerRedirectMixin, FormView):
+    form_class = AdminTransactionForm
+    template_name='customers/customer_detail.html'
+
+    def form_valid(self, form):
+        transaction = form.save(commit=False)
+        customer = get_object_or_404(Customer, id = self.kwargs['pk'])
+
+        transaction.customer = customer
+        transaction.save()
+
+        if transaction.is_confirmed:
+            customer.credit += transaction.credit
+            customer.save()
+
+        logger.info('Transaction (%s kr for %s) created by %s' % (transaction.credit, customer, self.request.user))
+        return super(CustomerDetail, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super(CustomerDetail, self).get_context_data(**kwargs)
+        customer = get_object_or_404(Customer, id = self.kwargs['pk'])
 
-        context['tools'] = Tool.objects.filter(model__category__customer=self.object)
-        context['models'] = ToolModel.objects.filter(category__customer=self.object)
-        context['categories'] = self.object.toolcategory_set.all()
-        context['employees'] = self.object.employee_set.all()
-        context['construction_sites'] = self.object.constructionsite_set.all()
-        context['containers'] = self.object.container_set.all()
+        context['customer'] = customer
+        context['tools'] = Tool.objects.filter(model__category__customer=customer)
+        context['models'] = ToolModel.objects.filter(category__customer=customer)
+        context['categories'] = customer.toolcategory_set.all()
+        context['employees'] = customer.employee_set.all()
+        context['construction_sites'] = customer.constructionsite_set.all()
+        context['containers'] = customer.container_set.all()
 
         return context
+
+    def get_success_url(self):
+        return reverse('customer_detail', args=[self.kwargs['pk']])
 
 class UpdateCustomer(HasCustomerRedirectMixin, UpdateView):
     model = Customer

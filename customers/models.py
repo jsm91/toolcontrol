@@ -47,8 +47,8 @@ class Customer(models.Model):
 class Transaction(models.Model):
     customer = models.ForeignKey(Customer)
     credit = models.FloatField('Beløb')
-    description = models.TextField()
-    is_confirmed = models.BooleanField(default=False)
+    description = models.TextField('Beskrivelse')
+    is_confirmed = models.BooleanField('Bekræftet', default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def credit_with_fee(self):
