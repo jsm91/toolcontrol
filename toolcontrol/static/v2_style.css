@@ -1,0 +1,230 @@
+body {
+    margin: 0px;
+    font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+}
+
+div#top {
+    background-color: #465263;
+    height: 75px;
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    z-index: 2;
+}
+
+div#sub-top {
+    background-color: #DEE3E9;
+    height: 50px;
+    z-index: 2;
+    position: fixed;
+    top: 75px;
+    width: 100%;
+}
+
+div#main-container {
+    float: left;
+    width: 78%;
+    position: absolute;
+    top: 125px;
+    z-index: 1;
+}
+
+div#sidebar-container {
+    width: 22%;
+    position: fixed;
+    top: 125px;
+    right: 0px;
+    z-index: 0;
+}
+
+div#main {
+    margin:10px 5px 10px 10px;
+}
+
+div#sidebar {
+    margin: 10px 10px 10px 5px;
+    background-color: #EEF3F9;
+}
+
+/* TOP SPECIFIC */
+div#top a {
+    display:inline-block;
+    height: 100%;
+    text-align: center;
+    width: 150px;
+    text-decoration: none;
+    line-height: 75px;
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+div#top a#logo {
+    color: #EEF5FC;
+}
+
+div#top a.menu, div#top a.menu-right {
+    color: #8E96A3;
+}
+
+div#top a.menu-right {
+    float: right;
+    font-size:10pt;
+    width:300px;
+}
+
+/* SUB-TOP SPECIFIC */
+div#sub-top div.right-spacer {
+    width:22%;
+    float:right;
+}
+
+div#sub-top div.right {
+    float:right;
+}
+
+div#sub-top div.right input {
+    margin:13px 13px 0px 0px;
+}
+
+div#sub-top div.left select {
+    margin:13px 0px 0px 13px;
+}
+
+/* SIDEBAR SPECIFIC */
+div.sidebar-menu-active {
+    width: 100%;
+    background-color: #0088CC;
+    padding:5px 0px 5px 0px;
+}
+
+div.sidebar-menu-active a {
+    color: #FFFFFF;
+    text-decoration: none;
+    margin-left: 5px;
+}
+
+div.sidebar-menu {
+    width: 100%;
+    padding: 5px 0px 5px 0px;
+}
+
+div.sidebar-menu a {
+    color: #000000;
+    text-decoration: none;
+    margin-left: 5px;
+}
+
+div.sidebar-menu-block {
+    width: 100%;
+    padding: 5px 0px 5px 0px;
+}
+
+div.sidebar-menu-block span {
+    color: #777777;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-left: 5px;
+    font-size: 8pt;
+}
+
+/* MAIN SPECIFIC */
+div#main div.message-info {
+    padding: 13px 0px 13px 0px;
+    width: 100%;
+    text-align: center;
+    background-color: #DEE3E9;
+    margin-bottom: 10px;
+    border: 1px solid #BEC9C9;
+}
+
+div#main div.message-error {
+    padding: 13px 0px 13px 0px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+    background-color: #FAE5E5;
+    color: #9E6060;    
+    border: 1px solid #9E6060;
+}
+
+div#main div.message-success {
+    padding: 13px 0px 13px 0px;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+    background-color: #E5FAE5;
+    color: #609E60;
+    border: 1px solid #609E60;
+}
+
+div#main table.list {
+    width: 100%;
+    border-spacing: 0px;
+    background-color: #FFFFFF;
+    font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+}
+
+div#main table.list th {
+    text-align: left;
+}
+
+div#main table.list tr.cycle1, div#main table.form tr.cycle1 {
+    background-color: #F9F9FC;
+}
+
+div#main table.form {
+    width:75%;
+    margin-left: auto;
+    margin-right: auto;
+    border-spacing: 0px;
+    background-color: #FFFFFF;
+    font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+}
+
+div#main table.form th {
+    width: 25%;
+    text-align: right;
+    padding:13px;
+}
+
+div#main table.form input, div#main table.form select {
+    width: 50%;
+    margin:5px;
+    padding:5px;
+}
+
+div#main table.form td.bottom input {
+    padding: 9px;
+    border:1px solid #444444;
+    border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px; /* Firefox */
+    -webkit-border-radius: 5px; /* Safari, Chrome */    
+    color: #FFFFFF;
+    margin:5px 0px 5px 0px;
+    width: 50%;
+    background-color: #0088CC;
+}
+
+div#main table.form td.bottom input:active {
+    background-color:#0077BB;
+}
+
+div#main table.form td.bottom {
+    background-color: #E5E5E5;
+    text-align:center;
+}
+
+div#main table.form tr.field-error {
+    background-color: #FAE5E5;
+    color: #9E6060;
+}
+
+div#main table.form tr.non-field-error {
+    background-color: #FAE5E5;
+    color: #9E6060;
+}
+
+div#main table.form tr.non-field-error td {
+    padding: 13px;
+    text-align: center;
+}

@@ -1,0 +1,79 @@
+{% extends "version2/base.html" %}
+
+{% block top %}
+<a href="{% url 'tool_list_v2' %}" id="logo">ToolControl</a>
+<a href="{% url 'tool_list_v2' %}" class="menu">Database</a>
+<a href="#" class="menu">Statistik</a>
+<a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-menu-block">
+  <span>Indhold</span>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_list_v2' %}">Værktøj</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_model_list_v2' %}">Modeller</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_category_list_v2' %}">Kategorier</a>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'employee_list_v2' %}">Medarbejdere</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'building_site_list_v2' %}">Byggepladser</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'container_list_v2' %}">Containere</a>
+</div>
+<div class="sidebar-menu-block">
+  <span>&nbsp;</span>
+</div>
+<div class="sidebar-menu-block">
+  <span>Side</span>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'employee_list_v2' %}">Liste</a>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'create_employee_v2' %}">Opret ny medarbejder</a>
+</div>
+{% endblock %}
+
+{% block main %}
+<form method="POST">
+  {% csrf_token %}
+  <table class="form">
+    {% if form.non_field_errors %}
+    <tr class="non-field-error">
+      <td colspan="2">
+	{% for error in form.non_field_errors %}
+	  {{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% endif %}
+    {% for field in form %}
+    <tr class="{% if field.errors %}field-error{% endif %} {% cycle 'cycle1' 'cycle2' %}">
+      <th>
+	{{ field.label }}
+      </th>
+      <td>
+	{{ field }}
+	{% for error in field.errors %}
+	{{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <td colspan="2" class="bottom">
+	<input type="submit" value="Gem">
+      </td>
+    </tr>
+  </table>
+</form>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% if messages %}
+  {% for message in messages %}
+    <div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+<table class="list">
+  <tr class="cycle1">
+    <th>Adresse</th>
+    <th>Aktiv</th>
+    <th>Funktioner</th>
+  </tr>
+  {% for buildingsite in constructionsite_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>{{ buildingsite }}</td>
+    <td>{{ buildingsite.is_active }}</td>
+    <td>
+      <a href="{% url 'update_building_site_v2' buildingsite.pk %}">Rediger</a>
+      <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">Slet</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

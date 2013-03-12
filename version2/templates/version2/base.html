@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>ToolControl</title>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}v2_style.css">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}v2_script.js"></script>
+  </head>
+  <body>
+    <div id="top">
+      {% block top %}
+      Top
+      {% endblock %}
+    </div>
+    <div id="sub-top">
+      {% block sub-top %}
+      Sub-top
+      {% endblock %}
+    </div>
+    <div id="main-container">
+      <div id="main">
+	{% if messages %}
+  	  {% for message in messages %}
+	    <div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
+	      {{ message }}
+	    </div>
+	  {% endfor %}
+	{% endif %}
+	{% block main %}
+	Main
+	{% endblock %}
+      </div>
+    </div>
+    <div id="sidebar-container">
+      <div id="sidebar">
+	{% block sidebar %}
+	Sidebar
+	{% endblock %}
+      </div>
+    </div>
+  </body>
+</html>

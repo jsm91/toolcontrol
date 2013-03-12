@@ -1,0 +1,28 @@
+{% if messages %}
+  {% for message in messages %}
+    <div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+<table class="list">
+  <tr class="cycle1">
+    <th>Navn</th>
+    <th>Antal modeller</th>
+    <th>Antal værktøj</th>
+    <th>Samlet pris</th>
+    <th>Funktioner</th>
+  </tr>
+  {% for toolcategory in toolcategory_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>{{ toolcategory }}</td>
+    <td>{{ toolcategory.number_of_models }}</td>
+    <td>{{ toolcategory.number_of_tools }}</td>
+    <td>{{ toolcategory.total_price }}</td>
+    <td>
+      <a href="{% url 'update_tool_category_v2' toolcategory.pk %}">Rediger</a>
+      <a href="{% url 'delete_tool_category_v2' toolcategory.pk %}">Slet</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

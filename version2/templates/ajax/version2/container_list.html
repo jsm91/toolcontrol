@@ -1,0 +1,26 @@
+{% if messages %}
+  {% for message in messages %}
+    <div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+<table class="list">
+  <tr class="cycle1">
+    <th>Navn</th>
+    <th>Placering</th>
+    <th>Aktiv</th>
+    <th>Funktioner</th>
+  </tr>
+  {% for container in container_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>{{ container }}</td>
+    <td>{{ container.location }}</td>
+    <td>{{ container.is_active }}</td>
+    <td>
+      <a href="{% url 'update_container_v2' container.pk %}">Rediger</a>
+      <a href="{% url 'delete_container_v2' container.pk %}">Slet</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

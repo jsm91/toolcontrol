@@ -1,0 +1,36 @@
+{% if messages %}
+  {% for message in messages %}
+    <div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+<table class="list">
+  <tr class="cycle1">
+    <th><input type="checkbox" class="mark_all"></th>
+    <th>Navn</th>
+    <th>Kategori</th>
+    <th>Serviceinterval</th>
+    <th>Pris</th>
+    <th>Samlet pris</th>
+    <th>Antal værktøj</th>
+    <th>Funktioner</th>
+  </tr>
+  {% for toolmodel in toolmodel_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>
+      <input type="checkbox" class="object_checkbox" name="{{ toolmodel.pk }}">
+    </td>
+    <td>{{ toolmodel }}</td>
+    <td>{{ toolmodel.category }}</td>
+    <td>{{ toolmodel.service_interval }}</td>
+    <td>{{ toolmodel.price }}</td>
+    <td>{{ toolmodel.total_price }}</td>
+    <td>{{ toolmodel.number_of_tools }}</td>
+    <td>
+      <a href="{% url 'update_tool_model_v2' toolmodel.pk %}">Rediger</a>
+      <a href="{% url 'delete_tool_model_v2' toolmodel.pk %}">Slet</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

@@ -452,8 +452,6 @@ class Tool(models.Model):
 
         reservations = self.is_reserved(datetime.datetime.now())
 
-        print reservations
-
         # Check for reservation
         if reservations:
             reservation = reservations[0]

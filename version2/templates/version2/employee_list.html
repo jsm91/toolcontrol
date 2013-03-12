@@ -1,0 +1,78 @@
+{% extends "version2/base.html" %}
+
+{% block top %}
+<a href="{% url 'tool_list_v2' %}" id="logo">ToolControl</a>
+<a href="{% url 'tool_list_v2' %}" class="menu">Database</a>
+<a href="#" class="menu">Statistik</a>
+<a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
+{% endblock %}
+
+{% block sub-top %}
+<form method="POST">
+  <input type="text" class="search" name="search" placeholder="Søg...">
+</form>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-menu-block">
+  <span>Indhold</span>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_list_v2' %}">Værktøj</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_model_list_v2' %}">Modeller</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_category_list_v2' %}">Kategorier</a>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'employee_list_v2' %}">Medarbejdere</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'building_site_list_v2' %}">Byggepladser</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'container_list_v2' %}">Containere</a>
+</div>
+<div class="sidebar-menu-block">
+  <span>&nbsp;</span>
+</div>
+<div class="sidebar-menu-block">
+  <span>Side</span>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'employee_list_v2' %}">Liste</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'create_employee_v2' %}">Opret ny medarbejder</a>
+</div>
+{% endblock %}
+
+{% block main %}
+<table class="list">
+  <tr class="cycle1">
+    <th>Navn</th>
+    <th>Email</th>
+    <th>Telefonnummer</th>
+    <th>Aktiv</th>
+    <th>Admin</th>
+    <th>Låneflag</th>
+    <th>Funktioner</th>
+  </tr>
+  {% for employee in employee_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>{{ employee }}</td>
+    <td>{{ employee.email }}</td>
+    <td>{{ employee.phone_number }}</td>
+    <td>{{ employee.is_active }}</td>
+    <td>{{ employee.is_admin }}</td>
+    <td>{{ employee.is_loan_flagged }}</td>
+    <td>
+      <a href="{% url 'update_employee_v2' employee.pk %}">Rediger</a>
+      <a href="{% url 'delete_employee_v2' employee.pk %}">Slet</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

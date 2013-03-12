@@ -1,0 +1,32 @@
+{% if messages %}
+  {% for message in messages %}
+    <div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+<table class="list">
+  <tr class="cycle1">
+    <th>Navn</th>
+    <th>Email</th>
+    <th>Telefonnummer</th>
+    <th>Aktiv</th>
+    <th>Admin</th>
+    <th>Låneflag</th>
+    <th>Funktioner</th>
+  </tr>
+  {% for employee in employee_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>{{ employee }}</td>
+    <td>{{ employee.email }}</td>
+    <td>{{ employee.phone_number }}</td>
+    <td>{{ employee.is_active }}</td>
+    <td>{{ employee.is_admin }}</td>
+    <td>{{ employee.is_loan_flagged }}</td>
+    <td>
+      <a href="{% url 'update_employee_v2' employee.pk %}">Rediger</a>
+      <a href="{% url 'delete_employee_v2' employee.pk %}">Slet</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>

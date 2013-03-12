@@ -1,0 +1,106 @@
+{% extends "version2/base.html" %}
+
+{% block top %}
+<a href="{% url 'tool_list_v2' %}" id="logo">ToolControl</a>
+<a href="{% url 'tool_list_v2' %}" class="menu">Database</a>
+<a href="#" class="menu">Statistik</a>
+<a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
+{% endblock %}
+
+{% block sub-top %}
+<div class="right-spacer">&nbsp;</div>
+<div class="right">
+  <form method="POST">
+    <input type="text" class="search" name="search" placeholder="Søg...">
+  </form>
+</div>
+<div class="left">
+  <form method="POST">
+    <select class="action" name="action_type">
+      <option value="none">Med det markerede...</option>
+      <option value="service">Marker som serviceret</option>
+      <option value="udlaan">Marker som udlånt</option>
+      <option value="reparation">Marker som til reparation</option>
+      <option value="returnering">Marker som afleveret</option>
+      <option value="reservation">Marker som reserveret</option>
+      <option value="kasseret">Marker som kasseret</option>
+      <option value="bortkommet">Marker som bortkommet</option>
+      <option value="slet">Slet</option>
+    </select>
+  </form>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-menu-block">
+  <span>Indhold</span>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'tool_list_v2' %}">Værktøj</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_model_list_v2' %}">Modeller</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'tool_category_list_v2' %}">Kategorier</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'employee_list_v2' %}">Medarbejdere</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'building_site_list_v2' %}">Byggepladser</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'container_list_v2' %}">Containere</a>
+</div>
+<div class="sidebar-menu-block">
+  <span>&nbsp;</span>
+</div>
+<div class="sidebar-menu-block">
+  <span>Side</span>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'tool_list_v2' %}">Liste</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'create_tool_v2' %}">Opret nyt værktøj</a>
+</div>
+{% endblock %}
+
+{% block main %}
+<table class="list">
+  <tr class="cycle1">
+    <th><input type="checkbox" class="mark_all"></th>
+    <th>Navn</th>
+    <th>Model</th>
+    <th>Kategori</th>
+    <th>Container</th>
+    <th>Seneste service</th>
+    <th>Indkøbsdato</th>
+    <th>Ophørsdato</th>
+    <th>Placering</th>
+    <th>Pris</th>
+    <th>Funktioner</th>
+  </tr>
+  {% for tool in tool_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>
+      <input type="checkbox" class="object_checkbox" name="{{ tool.pk }}">
+    </td>
+    <td>{{ tool }}</td>
+    <td>{{ tool.model }}</td>
+    <td>{{ tool.model.category }}</td>
+    <td>{{ tool.container }}</td>
+    <td>{{ tool.last_service }}</td>
+    <td>{{ tool.buy_date }}</td>
+    <td>{{ tool.end_date }}</td>
+    <td>{{ tool.get_location }}</td>
+    <td>{{ tool.price }}</td>
+    <td>
+      <a href="{% url 'update_tool_v2' tool.pk %}">Rediger</a>
+      <a href="{% url 'delete_tool_v2' tool.pk %}">Slet</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
