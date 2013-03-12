@@ -54,11 +54,11 @@
   <table>
     <tr>
       <th>Samlet pris på værktøj</th>
-      <td>{{ sum_price_tools.price__sum }} kr.</td>
+      <td>{{ sum_price_tools.price__sum|default_if_none:0 }} kr.</td>
     </tr>
     <tr>
       <th>Gennemsnitlig pris på værktøj</th>
-      <td>{{ avg_price_tools.price__avg }} kr./stk.</td>
+      <td>{{ avg_price_tools.price__avg|default_if_none:0 }} kr./stk.</td>
     </tr>
     <tr>
       <th>Gennemsnitlig pris på modeller</th>

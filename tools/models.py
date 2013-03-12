@@ -322,7 +322,7 @@ class ToolModel(models.Model):
     verbose_name = 'model'
 
     name = models.CharField('Navn', max_length=200)
-    category = models.ForeignKey(ToolCategory)
+    category = models.ForeignKey(ToolCategory, verbose_name = 'Kategori')
     service_interval = models.IntegerField('Serviceinterval', default=6)
     price = models.IntegerField('Pris', default=0)
 

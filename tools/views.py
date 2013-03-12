@@ -884,18 +884,18 @@ def inline_form(request, form_name, object_type):
 
     if request.POST:
         logger.info('%s is creating a %s (%s)' % (request.user,
-                                                  object_type.__name__,
+                                                  object_type,
                                                   request.POST.get('name')))
         form = form_name(data=request.POST, customer=request.user.customer)
         if form.is_valid():
-            logger.info('%s successfully created' % object_type.__name__)
+            logger.info('%s successfully created' % object_type)
             obj = form.save()
             response = {'status': 'success',
                         'response': 'Objekt oprettet',
                         'value': obj.id,
                         'name': obj.name}
         else:
-            logger.info('%s not created' % object_type.__name__)
+            logger.info('%s not created' % object_type)
             context = {'form': form,
                        'object_type': object_type}
             response = {'status': 'failure',
