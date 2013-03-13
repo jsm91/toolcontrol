@@ -1,0 +1,45 @@
+<span class="details">Modeller</span>
+<hr class="details">
+<table class="details">
+  <tr>
+    <th>Navn</th>
+    <th>Serviceinterval</th>
+    <th>Pris</th>
+    <th>Samlet pris</th>
+    <th>Antal værktøj</th>
+  </tr>
+  {% for toolmodel in toolcategory.toolmodel_set.all %}
+    <tr>
+      <td>{{ toolmodel }}</td>
+      <td>{{ toolmodel.service_interval }} måneder</td>
+      <td>{{ toolmodel.price }} kr.</td>
+      <td>{{ toolmodel.total_price }} kr.</td>
+      <td>{{ toolmodel.number_of_tools }} stk.</td>
+    </tr>
+  {% endfor %}
+</table>
+
+<span class="details">Værktøj</span>
+<hr class="details">
+<table class="details">
+  <tr>
+    <th>Navn</th>
+    <th>Container</th>
+    <th>Seneste service</th>
+    <th>Indkøbsdato</th>
+    <th>Ophørsdato</th>
+    <th>Placering</th>
+    <th>Pris</th>
+  </tr>
+  {% for tool in toolcategory.tool_set %}
+    <tr>
+      <td>{{ tool }}</td>
+      <td>{{ tool.container|default:"" }}</td>
+      <td>{{ tool.last_service }}</td>
+      <td>{{ tool.buy_date }}</td>
+      <td>{{ tool.end_date|default:"" }}</td>
+      <td>{{ tool.get_location }}</td>
+      <td>{{ tool.price }} kr.</td>
+    </tr>
+  {% endfor %}
+</table>

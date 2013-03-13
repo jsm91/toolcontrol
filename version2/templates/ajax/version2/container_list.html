@@ -22,12 +22,22 @@
     <td>{{ container.location|default_if_none:"Ikke i brug" }}</td>
     <td><img src="{{ STATIC_URL }}Icon_{{ container.is_active }}.svg"></td>
     <td>
+      <a href="#{{ container.pk }}" class="show_details">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
       <a href="{% url 'update_container_v2' container.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
       <a href="{% url 'delete_container_v2' container.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
+    </td>
+  </tr>
+  <tr id="details-{{ container.pk }}" class="details">
+    <td colspan="11">
+      <div>
+	Detaljer
+      </div>
     </td>
   </tr>
   {% endfor %}

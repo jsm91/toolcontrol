@@ -5,11 +5,17 @@
   <tr>
     <th>Dato</th>
     <th>Reserveret af</th>
+    <th>&nbsp;</th>
   </tr>
   {% for reservation in tool.reservation_set.all %}
     <tr>
       <td>{{ reservation.start_date }} - {{ reservation.end_date }}</td>
       <td>{{ reservation.employee }}</td>
+      <td>
+	<a href="{% url 'delete_reservation_v2' reservation.id %}">
+	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
+	</a>
+      </td>
     </tr>
   {% endfor %}
 </table>
@@ -20,11 +26,25 @@
   <tr>
     <th>Begivenhed</th>
     <th>Dato</th>
+    <th>&nbsp;</th>
   </tr>
   {% for event in tool.event_set.all %}
     <tr>
-      <td>{{ event.event_type }}</td>
+      <td>
+	{% if event.event_type == "Udlån" %}
+	Udlånt til {{ event.get_loan_location }}
+	{% else %}
+	{{ event.event_type }}
+	{% endif %}
+      </td>
       <td>{{ event.start_date }}{% if event.end_date %} - {{ event.end_date }}{% endif %}</td>
+      <td>
+	{% if event.event_type != "Oprettelse" %}
+	<a href="{% url 'delete_event_v2' event.id %}">
+	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
+	</a>
+	{% endif %}
+      </td>
     </tr>
   {% endfor %}
 </table>

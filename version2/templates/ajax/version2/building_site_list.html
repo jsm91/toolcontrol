@@ -20,12 +20,22 @@
     <td>{{ buildingsite }}</td>
     <td><img src="{{ STATIC_URL}}Icon_{{ buildingsite.is_active }}.svg"></td>
     <td>
+      <a href="#{{ buildingsite.pk }}" class="show_details">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
       <a href="{% url 'update_building_site_v2' buildingsite.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
       <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
+    </td>
+  </tr>
+  <tr id="details-{{ buildingsite.pk }}" class="details">
+    <td colspan="11">
+      <div>
+	Detaljer
+      </div>
     </td>
   </tr>
   {% endfor %}

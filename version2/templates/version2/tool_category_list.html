@@ -80,12 +80,22 @@
     <td>{{ toolcategory.number_of_tools }} stk.</td>
     <td>{{ toolcategory.total_price }} kr.</td>
     <td>
+      <a href="#{{ toolcategory.pk }}" class="show_details">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
       <a href="{% url 'update_tool_category_v2' toolcategory.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
       <a href="{% url 'delete_tool_category_v2' toolcategory.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
+    </td>
+  </tr>
+  <tr id="details-{{ toolcategory.pk }}" class="details">
+    <td colspan="11">
+      <div>
+	Detaljer
+      </div>
     </td>
   </tr>
   {% endfor %}

@@ -1,0 +1,37 @@
+<span class="details">Værktøj i medarbejderens besiddelse</span>
+<hr class="details">
+<table class="details">
+  <tr>
+    <th>Navn</th>
+    <th>Container</th>
+    <th>Seneste service</th>
+    <th>Indkøbsdato</th>
+    <th>Ophørsdato</th>
+    <th>Pris</th>
+  </tr>
+  {% for tool in employee.tool_set.all %}
+    <tr>
+      <td>{{ tool }}</td>
+      <td>{{ tool.container|default:"" }}</td>
+      <td>{{ tool.last_service }}</td>
+      <td>{{ tool.buy_date }}</td>
+      <td>{{ tool.end_date|default:"" }}</td>
+      <td>{{ tool.price }} kr.</td>
+    </tr>
+  {% endfor %}
+</table>
+
+<span class="details">Udlån</span>
+<hr class="details">
+<table class="details">
+  <tr>
+    <th>Værktøj</th>
+    <th>Dato</th>
+  </tr>
+  {% for event in employee.event_set.all %}
+    <tr>
+      <td>{{ event.tool }}</td>
+      <td>{{ event.start_date }}{% if event.end_date %} - {{ event.end_date }}{% endif %}</td>
+    </tr>
+  {% endfor %}
+</table>

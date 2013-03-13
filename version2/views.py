@@ -1,19 +1,20 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
-import datetime
+import datetime, json
 
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core import serializers
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q, Sum, Avg
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, DeleteView, DetailView, FormView
 from django.views.generic import ListView, TemplateView, UpdateView
 
 from tools.models import ConstructionSite, Container, Employee, Event
-from tools.models import Tool, ToolCategory, ToolModel
+from tools.models import Reservation, Tool, ToolCategory, ToolModel
 
 from version2.forms import BuildingSiteForm, ContainerForm, EmployeeForm
 from version2.forms import ToolForm, ToolCategoryForm, ToolModelForm
@@ -66,6 +67,21 @@ class ActionView(FormView):
     def form_valid(self, form):
         form.save(self.request.user)
         return super(ActionView, self).form_valid(form)
+
+class ActionFilterCustomerView(ActionView):
+    def get_form_kwargs(self):
+        kwargs = super(ActionView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+class JSONResponseMixin(object):
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get('response'):
+            response = {'object': serializers.serialize('json', 
+                                                        [self.object,])}
+            return HttpResponse(json.dumps(response), 
+                                content_type='application/json')
+        return super(JSONResponseMixin, self).render_to_response(context, **response_kwargs) 
 
 class ToolList(AjaxResponseMixin, ListView):
     model = Tool
@@ -352,13 +368,36 @@ class DeleteContainer(DeleteView):
     template_name = 'version2/container_confirm_delete.html'
     success_url = reverse_lazy('container_list_v2')
 
+class DeleteEvent(DeleteView):
+    model = Event
+    template_name = 'version2/event_confirm_delete.html'
+    success_url = reverse_lazy('tool_list_v2')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.event_type != 'Oprettelse':
+            print self.object.event_type
+            if (self.object.event_type == 'Kasseret' or
+                self.object.event_type == 'Bortkommet'):
+                self.object.tool.end_date = None
+                self.object.tool.save()
+
+            self.object.delete()
+                
+        return HttpResponseRedirect(self.get_success_url())
+
+class DeleteReservation(DeleteView):
+    model = Reservation
+    template_name = 'version2/reservation_confirm_delete.html'
+    success_url = reverse_lazy('tool_list_v2')
+
 class ServiceTools(ActionView):
     form_class = ServiceForm
     template_name = 'version2/service.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
-class LoanTools(ActionView):
+class LoanTools(ActionFilterCustomerView):
     form_class = LoanToolsForm
     template_name = 'version2/loan.html'
     success_url = reverse_lazy('tool_list_v2')
@@ -376,7 +415,7 @@ class ReturnTools(ActionView):
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
-class ReserveTools(ActionView):
+class ReserveTools(ActionFilterCustomerView):
     form_class = ReserveForm
     template_name = 'version2/reserve.html'
     success_url = reverse_lazy('tool_list_v2')
@@ -490,7 +529,7 @@ class DeleteContainers(ActionView):
     success_url = reverse_lazy('container_list_v2')
     model = Container
 
-class LoanContainers(ActionView):
+class LoanContainers(ActionFilterCustomerView):
     form_class = LoanContainersForm
     template_name = 'version2/loan_containers.html'
     success_url = reverse_lazy('container_list_v2')
@@ -505,6 +544,26 @@ class ReturnContainers(ActionView):
 class ToolDetails(DetailView):
     model = Tool
     template_name = 'version2/tool_details.html'
+
+class ToolModelDetails(JSONResponseMixin, DetailView):
+    model = ToolModel
+    template_name = 'version2/tool_model_details.html'
+
+class ToolCategoryDetails(DetailView):
+    model = ToolCategory
+    template_name = 'version2/tool_category_details.html'
+
+class EmployeeDetails(DetailView):
+    model = Employee
+    template_name = 'version2/employee_details.html'
+
+class BuildingSiteDetails(DetailView):
+    model = ConstructionSite
+    template_name = 'version2/building_site_details.html'
+
+class ContainerDetails(DetailView):
+    model = Container
+    template_name = 'version2/container_details.html'
 
 class Settings(UpdateView):
     form_class = SettingsForm

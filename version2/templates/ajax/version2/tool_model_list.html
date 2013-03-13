@@ -28,12 +28,22 @@
     <td>{{ toolmodel.total_price }} kr.</td>
     <td>{{ toolmodel.number_of_tools }} stk.</td>
     <td>
+      <a href="#{{ toolmodel.pk }}" class="show_details">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
       <a href="{% url 'update_tool_model_v2' toolmodel.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Edit.svg">
       </a>
       <a href="{% url 'delete_tool_model_v2' toolmodel.pk %}">
 	<img src="{{ STATIC_URL }}Icon_Delete.svg">
       </a>
+    </td>
+  </tr>
+  <tr id="details-{{ toolmodel.pk }}" class="details">
+    <td colspan="11">
+      <div>
+	Detaljer
+      </div>
     </td>
   </tr>
   {% endfor %}

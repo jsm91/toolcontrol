@@ -94,15 +94,15 @@ $(document).ready(function() {
 
     /* SHOW DETAILS */
     $(document).on("click", "a.show_details", function() {
-	var tool_id = $(this).attr("href").replace("#","");
-	var tr_id = "details-" + tool_id;
+	var object_id = $(this).attr("href").replace("#","");
+	var tr_id = "details-" + object_id;
 	if($("tr#" + tr_id).is(":visible")) {
 	    $("tr#" + tr_id + " div").slideUp(function() {
 		$("tr#" + tr_id).hide();
 	    });
 	}
 	else {
-	    $("tr#" + tr_id + " div").load("/version2/vaerktoej/"+tool_id+"/", function() {
+	    $("tr#" + tr_id + " div").load(object_id + "/", function() {
 		$("tr#" + tr_id).show();
 		$("tr#" + tr_id + " div").slideDown();
 	    });
@@ -131,5 +131,15 @@ $(document).ready(function() {
 	    });
 	}
 	return false;
+    });
+
+    /* WHEN CHANGING MODEL, CHANGE PARAMETERS */
+    $("select#id_model").change(function() {
+	var id = $(this).val();
+	$.getJSON("/version2/modeller/" + id + "/", "response=JSON", function(data) {
+	    var model = $.parseJSON(data.object)[0];
+	    $("input#id_service_interval").val(model.fields.service_interval);
+	    $("input#id_price").val(model.fields.price);
+	});
     });
 });

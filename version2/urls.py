@@ -24,7 +24,10 @@ from version2.views import MakeBuildingSitesActive, MakeBuildingSitesInactive
 from version2.views import DeleteBuildingSites, MakeContainersActive
 from version2.views import DeleteContainers, MakeContainersInactive
 from version2.views import LoanContainers, ReturnContainers, Settings
-from version2.views import ChangePassword, Stats, EmployeeStats
+from version2.views import ChangePassword, Stats, EmployeeStats, DeleteEvent
+from version2.views import DeleteReservation, ToolModelDetails
+from version2.views import ToolCategoryDetails, EmployeeDetails
+from version2.views import BuildingSiteDetails, ContainerDetails
 
 urlpatterns = patterns(
     '',
@@ -87,6 +90,10 @@ urlpatterns = patterns(
         name='delete_building_site_v2'),
     url(r'^containere/(?P<pk>\d+)/slet/$', DeleteContainer.as_view(), 
         name='delete_container_v2'),
+    url(r'^begivenheder/(?P<pk>\d+)/slet/$', DeleteEvent.as_view(), 
+        name='delete_event_v2'),
+    url(r'^reservation/(?P<pk>\d+)/slet/$', DeleteReservation.as_view(), 
+        name='delete_reservation_v2'),
 
     # Action views
     url(r'^vaerktoej/service/$', ServiceTools.as_view(), 
@@ -145,4 +152,14 @@ urlpatterns = patterns(
     # Detail views
     url(r'^vaerktoej/(?P<pk>\d+)/$', ToolDetails.as_view(), 
         name='tool_details_v2'),    
+    url(r'^modeller/(?P<pk>\d+)/$', ToolModelDetails.as_view(), 
+        name='tool_model_details_v2'),    
+    url(r'^kategorier/(?P<pk>\d+)/$', ToolCategoryDetails.as_view(), 
+        name='tool_category_details_v2'),    
+    url(r'^medarbejdere/(?P<pk>\d+)/$', EmployeeDetails.as_view(), 
+        name='employee_details_v2'),    
+    url(r'^byggepladser/(?P<pk>\d+)/$', BuildingSiteDetails.as_view(), 
+        name='building_site_details_v2'),    
+    url(r'^containere/(?P<pk>\d+)/$', ContainerDetails.as_view(), 
+        name='container_details_v2'),    
 )

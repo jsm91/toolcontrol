@@ -78,6 +78,11 @@ class LoanToolsForm(forms.Form):
                                            ConstructionSite.objects.all(),
                                            required=False, label="Byggeplads")
 
+    def __init__(self, user, *args, **kwargs):
+        super(LoanToolsForm, self).__init__(*args, **kwargs)
+        self.fields['employee'].queryset = Employee.objects.filter(customer=user.customer)
+        self.fields['building_site'].queryset = ConstructionSite.objects.filter(customer=user.customer)
+
     def clean(self):
         cleaned_data = super(LoanToolsForm, self).clean()
         employee = cleaned_data.get('employee')
@@ -122,6 +127,11 @@ class ReserveForm(forms.Form):
                                            required=False, label="Byggeplads")
     start_date = forms.DateField(label="Startdato")
     end_date = forms.DateField(label="Slutdato")
+
+    def __init__(self, user, *args, **kwargs):
+        super(ReserveForm, self).__init__(*args, **kwargs)
+        self.fields['employee'].queryset = Employee.objects.filter(customer=user.customer)
+        self.fields['building_site'].queryset = ConstructionSite.objects.filter(customer=user.customer)
 
     def clean(self):
         cleaned_data = super(ReserveForm, self).clean()
@@ -191,6 +201,15 @@ class DeleteToolCategoriesForm(forms.Form):
             for tool_category_id in self.cleaned_data.get('objects').split(','):
                 tool_category = get_object_or_404(ToolCategory, pk=tool_category_id)
                 tool_category.delete()
+
+class DeleteToolsForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for tool_id in self.cleaned_data.get('objects').split(','):
+                tool = get_object_or_404(Tool, pk=tool_id)
+                tool.delete()
 
 class MakeEmployeesActiveForm(forms.Form):
     objects = forms.CharField(widget=forms.HiddenInput, required=False)
@@ -318,6 +337,10 @@ class LoanContainersForm(forms.Form):
     building_site = forms.ModelChoiceField(queryset=
                                            ConstructionSite.objects.all(),
                                            label="Byggeplads")
+
+    def __init__(self, user, *args, **kwargs):
+        super(LoanContainersForm, self).__init__(*args, **kwargs)
+        self.fields['building_site'].queryset = ConstructionSite.objects.filter(customer=user.customer)
 
     def save(self, user):
         if self.cleaned_data.get('objects'):

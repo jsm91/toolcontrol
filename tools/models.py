@@ -329,6 +329,9 @@ class ToolCategory(models.Model):
     name = models.CharField('Navn', max_length=200)
     customer = models.ForeignKey(Customer, verbose_name='Kunde')
 
+    def tool_set(self):
+        return Tool.objects.filter(model__category=self)
+
     def total_price(self):
         price = Tool.objects.filter(model__category=self).aggregate(Sum('price'))
         if price['price__sum'] is None:
@@ -696,6 +699,14 @@ class Reservation(models.Model):
         elif self.employee:
             return self.employee
         elif self.construction_site:
+            return self.construction_site
+
+    def get_reservation_location(self):
+        if self.employee and self.construction_site:
+            return "%s/%s" % (self.employee, self.construction_site)
+        elif self.employee:
+            return self.employee
+        else:
             return self.construction_site
 
 @receiver(pre_delete, sender=Event)
