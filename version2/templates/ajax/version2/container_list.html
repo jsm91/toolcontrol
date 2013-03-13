@@ -8,9 +8,9 @@
 <table class="list">
   <tr class="cycle1">
     <th><input type="checkbox" class="mark_all"></th>
-    <th>Navn</th>
-    <th>Placering</th>
-    <th>Aktiv</th>
+    <th><a href="#name" class="order_by" id="order_by-name">Adresse</a></th>
+    <th><a href="#location" class="order_by" id="order_by-location">Placering</a></th>
+    <th><a href="#is_active" class="order_by" id="order_by-is_active">Aktiv</a></th>
     <th>Funktioner</th>
   </tr>
   {% for container in container_list %}
@@ -19,11 +19,15 @@
       <input type="checkbox" class="object_checkbox" name="{{ container.pk }}">
     </td>
     <td>{{ container }}</td>
-    <td>{{ container.location }}</td>
-    <td>{{ container.is_active }}</td>
+    <td>{{ container.location|default_if_none:"Ikke i brug" }}</td>
+    <td><img src="{{ STATIC_URL }}Icon_{{ container.is_active }}.svg"></td>
     <td>
-      <a href="{% url 'update_container_v2' container.pk %}">Rediger</a>
-      <a href="{% url 'delete_container_v2' container.pk %}">Slet</a>
+      <a href="{% url 'update_container_v2' container.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="{% url 'delete_container_v2' container.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
     </td>
   </tr>
   {% endfor %}

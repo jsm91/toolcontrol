@@ -227,6 +227,15 @@ div#main table.list tr.details, div#main table.list tr.details div {
     padding:5px;
 }
 
+div#main table.list th a {
+    color: black;
+    text-decoration: underline;
+}
+
+div#main table.list th a:hover {
+    text-decoration: none;
+}
+
 div#main table.list a {
     text-decoration: none;
 }

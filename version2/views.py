@@ -7,11 +7,12 @@ from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q, Sum, Avg
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, DeleteView, DetailView, FormView
 from django.views.generic import ListView, TemplateView, UpdateView
 
-from tools.models import ConstructionSite, Container, Employee
+from tools.models import ConstructionSite, Container, Employee, Event
 from tools.models import Tool, ToolCategory, ToolModel
 
 from version2.forms import BuildingSiteForm, ContainerForm, EmployeeForm
@@ -72,6 +73,7 @@ class ToolList(AjaxResponseMixin, ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('search')
+        order_by = self.request.GET.get('order_by', 'name')
 
         if search:
             messages.info(self.request, 'Viser søgeresultater for %s' % search)
@@ -83,9 +85,9 @@ class ToolList(AjaxResponseMixin, ListView):
                                        Q(location__iexact=search) |
                                        Q(secondary_name__icontains=search) |
                                        Q(invoice_number__icontains=search),
-                                       model__category__customer=self.request.user.customer).select_related('loaned_to')
+                                       model__category__customer=self.request.user.customer).select_related('loaned_to').order_by(order_by)
         else:
-            return Tool.objects.all()
+            return Tool.objects.all().order_by(order_by)
 
 class ToolModelList(AjaxResponseMixin, ListView):
     model = ToolModel
@@ -93,14 +95,15 @@ class ToolModelList(AjaxResponseMixin, ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('search')
+        order_by = self.request.GET.get('order_by', 'name')
 
         if search:
             messages.info(self.request, 'Viser søgeresultater for %s' % search)
             return ToolModel.objects.filter(Q(name__icontains=search) |
                                             Q(category__name__icontains=search),
-                                            category__customer=self.request.user.customer)
+                                            category__customer=self.request.user.customer).order_by(order_by)
         else:
-            return ToolModel.objects.all()
+            return ToolModel.objects.all().order_by(order_by)
 
 class ToolCategoryList(AjaxResponseMixin, ListView):
     model = ToolCategory
@@ -108,13 +111,14 @@ class ToolCategoryList(AjaxResponseMixin, ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('search', '')
+        order_by = self.request.GET.get('order_by', 'name')
 
         if search:
             messages.info(self.request, 'Viser søgeresultater for %s' % search)
             return ToolCategory.objects.filter(customer=self.request.user.customer,
-                                           name__icontains=search)
+                                           name__icontains=search).order_by(order_by)
         else:
-            return ToolCategory.objects.all()
+            return ToolCategory.objects.all().order_by(order_by)
 
 class EmployeeList(AjaxResponseMixin, ListView):
     model = Employee
@@ -122,22 +126,23 @@ class EmployeeList(AjaxResponseMixin, ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('search')
+        order_by = self.request.GET.get('order_by', 'name')
 
         if search:
             messages.info(self.request, 'Viser søgeresultater for %s' % search)
             if search == 'aktiv' or search == 'inaktive':
                 return Employee.objects.filter(customer=self.request.user.customer,
-                                               is_active=True)
+                                               is_active=True).order_by(order_by)
             elif search == 'inaktiv' or search == 'inaktive':
                 return Employee.objects.filter(customer=self.request.user.customer,
-                                               is_active=False)
+                                               is_active=False).order_by(order_by)
             else:
                 return Employee.objects.filter(Q(name__icontains=search) |
                                                Q(phone_number__icontains=search) |
                                                Q(email__icontains=search),
-                                               customer=self.request.user.customer)
+                                               customer=self.request.user.customer).order_by(order_by)
         else:
-            return Employee.objects.all()
+            return Employee.objects.all().order_by(order_by)
 
 class BuildingSiteList(AjaxResponseMixin, ListView):
     model = ConstructionSite
@@ -145,19 +150,20 @@ class BuildingSiteList(AjaxResponseMixin, ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('search')
+        order_by = self.request.GET.get('order_by', 'name')
 
         if search:
             if search == 'aktiv' or search == 'aktive':
                 return ConstructionSite.objects.filter(customer=self.request.user.customer,
-                                                       is_active=True)
+                                                       is_active=True).order_by(order_by)
             elif search == 'inaktiv' or search == 'inaktive':
                 return ConstructionSite.objects.filter(customer=self.request.user.customer,
-                                                       is_active=False)
+                                                       is_active=False).order_by(order_by)
             else:
                 return ConstructionSite.objects.filter(customer=self.request.user.customer,
-                                                       name__icontains=search)
+                                                       name__icontains=search).order_by(order_by)
         else:
-            return ConstructionSite.objects.all()
+            return ConstructionSite.objects.all().order_by(order_by)
 
 class ContainerList(AjaxResponseMixin, ListView):
     model = Container
@@ -165,14 +171,15 @@ class ContainerList(AjaxResponseMixin, ListView):
 
     def get_queryset(self):
         search = self.request.GET.get('search')
+        order_by = self.request.GET.get('order_by', 'name')
 
         if search:
             messages.info(self.request, 'Viser søgeresultater for %s' % search)
             return Container.objects.filter(Q(name__icontains=search) |
                                             Q(location__name__icontains=search),
-                                            customer=self.request.user.customer).select_related('location')
+                                            customer=self.request.user.customer).select_related('location').order_by(order_by)
         else:
-            return Container.objects.all()
+            return Container.objects.all().order_by(order_by)
 
 class CreateTool(CreateView):
     model = Tool
@@ -181,8 +188,12 @@ class CreateTool(CreateView):
     success_url = reverse_lazy('tool_list_v2')
 
     def form_valid(self, form):
+        self.object = form.save()
+        event = Event(event_type = "Oprettelse", tool = self.object)
+        event.save()
+
         messages.success(self.request, 'Værktøj oprettet')
-        return super(CreateTool, self).form_valid(form)
+        return HttpResponseRedirect(self.get_success_url())
 
 class CreateToolModel(CreateView):
     model = ToolModel

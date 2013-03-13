@@ -71,15 +71,15 @@
 <table class="list">
   <tr class="cycle1">
     <th><input type="checkbox" class="mark_all"></th>
-    <th>Navn</th>
-    <th>Model</th>
-    <th>Kategori</th>
-    <th>Container</th>
-    <th>Seneste service</th>
-    <th>Indkøbsdato</th>
-    <th>Ophørsdato</th>
-    <th>Placering</th>
-    <th>Pris</th>
+    <th><a href="#name" class="order_by" id="order_by-name">Navn</a></th>
+    <th><a href="#model" class="order_by" id="order_by-model">Model</a></th>
+    <th><a href="#model__category" class="order_by" id="order_by-model__category">Kategori</a></th>
+    <th><a href="#container" class="order_by" id="order_by-container">Container</a></th>
+    <th><a href="#last_service" class="order_by" id="order_by-last_service">Seneste service</a></th>
+    <th><a href="#buy_date" class="order_by" id="order_by-buy_date">Indkøbsdato</a></th>
+    <th><a href="#end_date" class="order_by" id="order_by-end_date">Ophørsdato</a></th>
+    <th><a href="#location" class="order_by" id="order_by-location">Placering</a></th>
+    <th><a href="#price" class="order_by" id="order_by-price">Pris</a></th>
     <th>Funktioner</th>
   </tr>
   {% for tool in tool_list %}

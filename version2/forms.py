@@ -59,7 +59,7 @@ class BuildingSiteForm(forms.ModelForm):
 class ContainerForm(forms.ModelForm):
     class Meta:
         model = Container
-        exclude = ['customer', 'location', 'is_active']
+        exclude = ['customer', 'location']
 
 class ServiceForm(forms.Form):
     objects = forms.CharField(widget=forms.HiddenInput, required=False)

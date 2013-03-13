@@ -57,7 +57,7 @@ class Container(models.Model):
     name = models.CharField('Navn', max_length=255)
     location = models.ForeignKey(ConstructionSite, null=True, default=None,
                                  verbose_name = 'Placering')
-    is_active = models.BooleanField('Aktiv')
+    is_active = models.BooleanField('Aktiv', default=True)
     customer = models.ForeignKey(Customer, verbose_name='Kunde')
 
     def make_active(self, user):

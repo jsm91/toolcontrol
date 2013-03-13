@@ -53,6 +53,21 @@ $(document).ready(function() {
 	}, 500 );
     });
 
+    /* ORDERING OF LISTS */
+    $(document).on("click", 'a.order_by', function() {
+	var order_by = $(this).attr("href").replace("#","");
+	var search = $("input.search").val();
+	$("div#main").load(window.location.pathname, "search=" + search + "&order_by=" + order_by, function() {
+	    if (order_by.substring(0, 1) == "-") {
+		$("a#order_by-" + order_by.substring(1)).attr("href", "#" + order_by.substring(1));
+	    }
+	    else {
+		$("a#order_by-" + order_by).attr("href", "#-" + order_by);
+	    }
+	});
+	return false;
+    });
+
     /* ACTION FUNCTION */
     $('select.action').change(function() {
 	object_ids = []
@@ -96,6 +111,7 @@ $(document).ready(function() {
 	return false;
     });
 
+    /* DROPDOWN MENU */
     $("a.menu-right").click(function(e) {
 	e.stopPropagation();
 	if($(this).hasClass("dropdown-selected")) {

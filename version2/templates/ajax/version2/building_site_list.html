@@ -8,8 +8,8 @@
 <table class="list">
   <tr class="cycle1">
     <th><input type="checkbox" class="mark_all"></th>
-    <th>Adresse</th>
-    <th>Aktiv</th>
+    <th><a href="#name" class="order_by" id="order_by-name">Adresse</a></th>
+    <th><a href="#is_active" class="order_by" id="order_by-is_active">Aktiv</a></th>
     <th>Funktioner</th>
   </tr>
   {% for buildingsite in constructionsite_list %}
@@ -18,10 +18,14 @@
       <input type="checkbox" class="object_checkbox" name="{{ buildingsite.pk }}">
     </td>
     <td>{{ buildingsite }}</td>
-    <td>{{ buildingsite.is_active }}</td>
+    <td><img src="{{ STATIC_URL}}Icon_{{ buildingsite.is_active }}.svg"></td>
     <td>
-      <a href="{% url 'update_building_site_v2' buildingsite.pk %}">Rediger</a>
-      <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">Slet</a>
+      <a href="{% url 'update_building_site_v2' buildingsite.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
     </td>
   </tr>
   {% endfor %}
