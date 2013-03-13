@@ -87,7 +87,7 @@ class ToolList(AjaxResponseMixin, ListView):
                                        Q(invoice_number__icontains=search),
                                        model__category__customer=self.request.user.customer).select_related('loaned_to').order_by(order_by)
         else:
-            return Tool.objects.all().order_by(order_by)
+            return Tool.objects.filter(model__category__customer=self.request.user.customer).order_by(order_by)
 
 class ToolModelList(AjaxResponseMixin, ListView):
     model = ToolModel
@@ -103,7 +103,7 @@ class ToolModelList(AjaxResponseMixin, ListView):
                                             Q(category__name__icontains=search),
                                             category__customer=self.request.user.customer).order_by(order_by)
         else:
-            return ToolModel.objects.all().order_by(order_by)
+            return ToolModel.objects.filter(category__customer=self.request.user.customer).order_by(order_by)
 
 class ToolCategoryList(AjaxResponseMixin, ListView):
     model = ToolCategory
@@ -118,7 +118,7 @@ class ToolCategoryList(AjaxResponseMixin, ListView):
             return ToolCategory.objects.filter(customer=self.request.user.customer,
                                            name__icontains=search).order_by(order_by)
         else:
-            return ToolCategory.objects.all().order_by(order_by)
+            return ToolCategory.objects.filter(customer=self.request.user.customer).order_by(order_by)
 
 class EmployeeList(AjaxResponseMixin, ListView):
     model = Employee
@@ -142,7 +142,7 @@ class EmployeeList(AjaxResponseMixin, ListView):
                                                Q(email__icontains=search),
                                                customer=self.request.user.customer).order_by(order_by)
         else:
-            return Employee.objects.all().order_by(order_by)
+            return Employee.objects.filter(customer=self.request.user.customer).order_by(order_by)
 
 class BuildingSiteList(AjaxResponseMixin, ListView):
     model = ConstructionSite
@@ -163,7 +163,7 @@ class BuildingSiteList(AjaxResponseMixin, ListView):
                 return ConstructionSite.objects.filter(customer=self.request.user.customer,
                                                        name__icontains=search).order_by(order_by)
         else:
-            return ConstructionSite.objects.all().order_by(order_by)
+            return ConstructionSite.objects.filter(customer=self.request.user.customer).order_by(order_by)
 
 class ContainerList(AjaxResponseMixin, ListView):
     model = Container
@@ -179,7 +179,7 @@ class ContainerList(AjaxResponseMixin, ListView):
                                             Q(location__name__icontains=search),
                                             customer=self.request.user.customer).select_related('location').order_by(order_by)
         else:
-            return Container.objects.all().order_by(order_by)
+            return Container.objects.filter(customer=self.request.user.customer).order_by(order_by)
 
 class CreateTool(CreateView):
     model = Tool
