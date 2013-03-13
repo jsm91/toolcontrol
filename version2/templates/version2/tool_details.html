@@ -1,0 +1,30 @@
+{% if tool.reservation_set.all.exists %}
+<span class="details">Reservationer</span>
+<hr class="details">
+<table class="details">
+  <tr>
+    <th>Dato</th>
+    <th>Reserveret af</th>
+  </tr>
+  {% for reservation in tool.reservation_set.all %}
+    <tr>
+      <td>{{ reservation.start_date }} - {{ reservation.end_date }}</td>
+      <td>{{ reservation.employee }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endif %}
+<span class="details">Begivenheder</span>
+<hr class="details">
+<table class="details">
+  <tr>
+    <th>Begivenhed</th>
+    <th>Dato</th>
+  </tr>
+  {% for event in tool.event_set.all %}
+    <tr>
+      <td>{{ event.event_type }}</td>
+      <td>{{ event.start_date }}{% if event.end_date %} - {{ event.end_date }}{% endif %}</td>
+    </tr>
+  {% endfor %}
+</table>

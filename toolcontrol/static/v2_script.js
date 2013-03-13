@@ -65,4 +65,54 @@ $(document).ready(function() {
 	window.location = window.location.pathname + action + "/?object_ids=" + object_ids.toString();
     });
 
+    /* SELECT ALL CHECKBOX */
+    $(document).on("click", "input.mark_all", function() {
+	if($(this).is(":checked")) {
+	    $("input.object_checkbox").attr("checked", true);
+	    $("tr.object_line").addClass("selected");
+	}
+	else {
+	    $("input.object_checkbox").attr("checked", false);
+	    $("tr.object_line").removeClass("selected");
+	}
+    });
+
+    /* SHOW DETAILS */
+    $(document).on("click", "a.show_details", function() {
+	var tool_id = $(this).attr("href").replace("#","");
+	var tr_id = "details-" + tool_id;
+	if($("tr#" + tr_id).is(":visible")) {
+	    $("tr#" + tr_id + " div").slideUp(function() {
+		$("tr#" + tr_id).hide();
+	    });
+	}
+	else {
+	    $("tr#" + tr_id + " div").load("/version2/vaerktoej/"+tool_id+"/", function() {
+		$("tr#" + tr_id).show();
+		$("tr#" + tr_id + " div").slideDown();
+	    });
+	}
+
+	return false;
+    });
+
+    $("a.menu-right").click(function(e) {
+	e.stopPropagation();
+	if($(this).hasClass("dropdown-selected")) {
+	    $("div#dropdown").slideToggle(function() {
+		$("a.menu-right").removeClass("dropdown-selected");
+		$("html").off("click");
+	    });
+	}
+	else {
+	    $(this).addClass("dropdown-selected");
+	    $("div#dropdown").slideToggle();
+	    $("html").click(function() {
+		$("div#dropdown").slideToggle(function() {
+		    $("a.menu-right").removeClass("dropdown-selected");
+		    $("html").off("click");
+		});
+	    });
+	}
+    });
 });

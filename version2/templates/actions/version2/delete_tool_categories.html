@@ -7,23 +7,6 @@
 <a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
 {% endblock %}
 
-{% block sub-top %}
-<div class="right-spacer">&nbsp;</div>
-<div class="right">
-  <form method="POST">
-    <input type="text" class="search" name="search" placeholder="Søg...">
-  </form>
-</div>
-<div class="left">
-  <form method="POST">
-    <select class="action" name="action_type">
-      <option value="none">Med det markerede...</option>
-      <option value="slet">Slet</option>
-    </select>
-  </form>
-</div>
-{% endblock %}
-
 {% block sidebar %}
 <div class="sidebar-menu-block">
   <span>Indhold</span>
@@ -52,7 +35,7 @@
 <div class="sidebar-menu-block">
   <span>Side</span>
 </div>
-<div class="sidebar-menu-active">
+<div class="sidebar-menu">
   <a href="{% url 'tool_category_list_v2' %}">Liste</a>
 </div>
 <div class="sidebar-menu">
@@ -61,29 +44,58 @@
 {% endblock %}
 
 {% block main %}
-<table class="list">
-  <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
-    <th>Navn</th>
-    <th>Antal modeller</th>
-    <th>Antal værktøj</th>
-    <th>Samlet pris</th>
-    <th>Funktioner</th>
-  </tr>
-  {% for toolcategory in toolcategory_list %}
-  <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
-      <input type="checkbox" class="object_checkbox" name="{{ toolcategory.pk }}">
-    </td>
-    <td>{{ toolcategory }}</td>
-    <td>{{ toolcategory.number_of_models }}</td>
-    <td>{{ toolcategory.number_of_tools }}</td>
-    <td>{{ toolcategory.total_price }}</td>
-    <td>
-      <a href="{% url 'update_tool_category_v2' toolcategory.pk %}">Rediger</a>
-      <a href="{% url 'delete_tool_category_v2' toolcategory.pk %}">Slet</a>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+<form method="POST">
+  {% csrf_token %}
+  <table class="form">
+    {% if form.non_field_errors %}
+    <tr class="non-field-error">
+      <td colspan="2">
+	{% for error in form.non_field_errors %}
+	  {{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th>Kategorier, der skal slettes</th>
+      <td>
+	{% for toolcategory in objects %}
+	  {% if forloop.first %}
+	    {{ toolcategory }}
+	  {% else %}
+	    {% if forloop.last %}
+	      og {{ toolcategory }}
+	    {% else %}
+	      , {{ toolcategory }}
+	    {% endif %}
+	  {% endif %}
+	{% empty %}
+	  Intet!
+	{% endfor %}
+      </td>
+    </tr> 
+    {% for field in form %}
+    {% if not field.is_hidden %}
+    <tr class="{% if field.errors %}field-error{% endif %} {% cycle 'cycle1' 'cycle2' %}">
+      <th>
+	{{ field.label }}
+      </th>
+      <td>
+	{{ field }}
+	{% for error in field.errors %}
+	{{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% else %}
+    {{ field }}
+    {% endif %}
+    {% endfor %}
+    <tr>
+      <td colspan="2" class="bottom">
+	<input type="submit" value="Slet">
+      </td>
+    </tr>
+  </table>
+</form>
 {% endblock %}

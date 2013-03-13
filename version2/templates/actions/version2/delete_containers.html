@@ -42,10 +42,10 @@
 <div class="sidebar-menu">
   <a href="{% url 'employee_list_v2' %}">Medarbejdere</a>
 </div>
-<div class="sidebar-menu">
+<div class="sidebar-menu-active">
   <a href="{% url 'building_site_list_v2' %}">Byggepladser</a>
 </div>
-<div class="sidebar-menu-active">
+<div class="sidebar-menu">
   <a href="{% url 'container_list_v2' %}">Containere</a>
 </div>
 <div class="sidebar-menu-block">
@@ -54,7 +54,7 @@
 <div class="sidebar-menu-block">
   <span>Side</span>
 </div>
-<div class="sidebar-menu-active">
+<div class="sidebar-menu">
   <a href="{% url 'container_list_v2' %}">Liste</a>
 </div>
 <div class="sidebar-menu">
@@ -63,27 +63,58 @@
 {% endblock %}
 
 {% block main %}
-<table class="list">
-  <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
-    <th>Navn</th>
-    <th>Placering</th>
-    <th>Aktiv</th>
-    <th>Funktioner</th>
-  </tr>
-  {% for container in container_list %}
-  <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
-      <input type="checkbox" class="object_checkbox" name="{{ container.pk }}">
-    </td>
-    <td>{{ container }}</td>
-    <td>{{ container.location }}</td>
-    <td>{{ container.is_active }}</td>
-    <td>
-      <a href="{% url 'update_container_v2' container.pk %}">Rediger</a>
-      <a href="{% url 'delete_container_v2' container.pk %}">Slet</a>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+<form method="POST">
+  {% csrf_token %}
+  <table class="form">
+    {% if form.non_field_errors %}
+    <tr class="non-field-error">
+      <td colspan="2">
+	{% for error in form.non_field_errors %}
+	  {{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th>Containere, der skal slettes</th>
+      <td>
+	{% for container in objects %}
+	  {% if forloop.first %}
+	    {{ container }}
+	  {% else %}
+	    {% if forloop.last %}
+	      og {{ container }}
+	    {% else %}
+	      , {{ container }}
+	    {% endif %}
+	  {% endif %}
+	{% empty %}
+	  Intet!
+	{% endfor %}
+      </td>
+    </tr> 
+    {% for field in form %}
+    {% if not field.is_hidden %}
+    <tr class="{% if field.errors %}field-error{% endif %} {% cycle 'cycle1' 'cycle2' %}">
+      <th>
+	{{ field.label }}
+      </th>
+      <td>
+	{{ field }}
+	{% for error in field.errors %}
+	{{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% else %}
+    {{ field }}
+    {% endif %}
+    {% endfor %}
+    <tr>
+      <td colspan="2" class="bottom">
+	<input type="submit" value="Slet">
+      </td>
+    </tr>
+  </table>
+</form>
 {% endblock %}

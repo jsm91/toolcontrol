@@ -5,8 +5,8 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.views.generic import CreateView, DeleteView, FormView, ListView
-from django.views.generic import UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, FormView
+from django.views.generic import ListView, UpdateView
 
 from tools.models import ConstructionSite, Container, Employee
 from tools.models import Tool, ToolCategory, ToolModel
@@ -15,7 +15,15 @@ from version2.forms import BuildingSiteForm, ContainerForm, EmployeeForm
 from version2.forms import ToolForm, ToolCategoryForm, ToolModelForm
 from version2.forms import LoanForm, RepairForm, ReturnForm, ServiceForm
 from version2.forms import ReserveForm, ScrapForm, LostForm, DeleteToolsForm
-from version2.forms import DeleteToolModelsForm
+from version2.forms import DeleteToolModelsForm, DeleteToolCategoriesForm
+from version2.forms import MakeEmployeesActiveForm, MakeEmployeesInactiveForm
+from version2.forms import MakeEmployeesAdminForm, MakeEmployeesNonadminForm
+from version2.forms import MakeEmployeesLoanFlaggedForm, DeleteEmployeesForm
+from version2.forms import MakeEmployeesNotLoanFlaggedForm
+from version2.forms import MakeBuildingSitesActiveForm, DeleteBuildingSitesForm
+from version2.forms import MakeBuildingSitesInactiveForm
+from version2.forms import MakeContainersActiveForm, DeleteContainersForm
+from version2.forms import MakeContainersInactiveForm
 
 class AjaxResponseMixin(object):
     def get_template_names(self):
@@ -44,6 +52,11 @@ class ActionView(FormView):
                 context['objects'].append(obj)
 
         return context
+
+    def get_template_names(self):
+        names = super(ActionView, self).get_template_names()
+        names = ['actions/' + name for name in names]    
+        return names
 
     def form_valid(self, form):
         form.save(self.request.user)
@@ -326,54 +339,143 @@ class DeleteContainer(DeleteView):
 
 class ServiceTools(ActionView):
     form_class = ServiceForm
-    template_name = 'version2/actions/service.html'
+    template_name = 'version2/service.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
 class LoanTools(ActionView):
     form_class = LoanForm
-    template_name = 'version2/actions/loan.html'
+    template_name = 'version2/loan.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
 class RepairTools(ActionView):
     form_class = RepairForm
-    template_name = 'version2/actions/repair.html'
+    template_name = 'version2/repair.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
 class ReturnTools(ActionView):
     form_class = ReturnForm
-    template_name = 'version2/actions/return.html'
+    template_name = 'version2/return.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
 class ReserveTools(ActionView):
     form_class = ReserveForm
-    template_name = 'version2/actions/reserve.html'
+    template_name = 'version2/reserve.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
 class ScrapTools(ActionView):
     form_class = ScrapForm
-    template_name = 'version2/actions/scrap.html'
+    template_name = 'version2/scrap.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
 class LostTools(ActionView):
     form_class = LostForm
-    template_name = 'version2/actions/lost.html'
+    template_name = 'version2/lost.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
 class DeleteTools(ActionView):
     form_class = DeleteToolsForm
-    template_name = 'version2/actions/delete_tools.html'
+    template_name = 'version2/delete_tools.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
 
-class DeleteModels(ActionView):
+class DeleteToolModels(ActionView):
     form_class = DeleteToolModelsForm
-    template_name = 'version2/actions/delete_models.html'
+    template_name = 'version2/delete_models.html'
     success_url = reverse_lazy('tool_model_list_v2')
     model = ToolModel
+
+class DeleteToolCategories(ActionView):
+    form_class = DeleteToolCategoriesForm
+    template_name = 'version2/delete_tool_categories.html'
+    success_url = reverse_lazy('tool_category_list_v2')
+    model = ToolCategory
+
+class MakeEmployeesActive(ActionView):
+    form_class = MakeEmployeesActiveForm
+    template_name = 'version2/make_employees_active.html'
+    success_url = reverse_lazy('employee_list_v2')
+    model = Employee
+
+class MakeEmployeesInactive(ActionView):
+    form_class = MakeEmployeesInactiveForm
+    template_name = 'version2/make_employees_inactive.html'
+    success_url = reverse_lazy('employee_list_v2')
+    model = Employee
+
+class MakeEmployeesAdmin(ActionView):
+    form_class = MakeEmployeesAdminForm
+    template_name = 'version2/make_employees_admin.html'
+    success_url = reverse_lazy('employee_list_v2')
+    model = Employee
+
+class MakeEmployeesNonadmin(ActionView):
+    form_class = MakeEmployeesNonadminForm
+    template_name = 'version2/make_employees_nonadmin.html'
+    success_url = reverse_lazy('employee_list_v2')
+    model = Employee
+
+class MakeEmployeesLoanFlagged(ActionView):
+    form_class = MakeEmployeesLoanFlaggedForm
+    template_name = 'version2/make_employees_loan_flagged.html'
+    success_url = reverse_lazy('employee_list_v2')
+    model = Employee
+
+class MakeEmployeesNotLoanFlagged(ActionView):
+    form_class = MakeEmployeesNotLoanFlaggedForm
+    template_name = 'version2/make_employees_not_loan_flagged.html'
+    success_url = reverse_lazy('employee_list_v2')
+    model = Employee
+
+class DeleteEmployees(ActionView):
+    form_class = DeleteEmployeesForm
+    template_name = 'version2/delete_employees.html'
+    success_url = reverse_lazy('employee_list_v2')
+    model = Employee
+
+class MakeBuildingSitesActive(ActionView):
+    form_class = MakeBuildingSitesActiveForm
+    template_name = 'version2/make_building_sites_active.html'
+    success_url = reverse_lazy('building_site_list_v2')
+    model = ConstructionSite
+
+class MakeBuildingSitesInactive(ActionView):
+    form_class = MakeBuildingSitesInactiveForm
+    template_name = 'version2/make_building_sites_inactive.html'
+    success_url = reverse_lazy('building_site_list_v2')
+    model = ConstructionSite
+
+class DeleteBuildingSites(ActionView):
+    form_class = DeleteBuildingSitesForm
+    template_name = 'version2/delete_building_sites.html'
+    success_url = reverse_lazy('building_site_list_v2')
+    model = ConstructionSite
+
+class MakeContainersActive(ActionView):
+    form_class = MakeContainersActiveForm
+    template_name = 'version2/make_containers_active.html'
+    success_url = reverse_lazy('container_list_v2')
+    model = Container
+
+class MakeContainersInactive(ActionView):
+    form_class = MakeContainersInactiveForm
+    template_name = 'version2/make_containers_inactive.html'
+    success_url = reverse_lazy('container_list_v2')
+    model = Container
+
+class DeleteContainers(ActionView):
+    form_class = DeleteContainersForm
+    template_name = 'version2/delete_containers.html'
+    success_url = reverse_lazy('container_list_v2')
+    model = Container
+
+
+class ToolDetails(DetailView):
+    model = Tool
+    template_name = 'version2/tool_details.html'

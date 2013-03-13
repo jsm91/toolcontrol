@@ -68,8 +68,57 @@ div#top a.menu, div#top a.menu-right {
 
 div#top a.menu-right {
     float: right;
-    font-size:10pt;
-    width:300px;
+    font-size:12pt;
+    margin:10px 50px 0px 50px;
+    width:200px;
+    border-top: 3px solid #465263;
+    border-right: 3px solid #465263;
+    border-left: 3px solid #465263;
+    line-height:49px;
+    height:49px;
+}
+
+div#top a.dropdown-selected {
+    background-color: #EEF3F9;
+    border-top: 3px solid #BEC3C9;
+    border-right: 3px solid #BEC3C9;
+    border-left: 3px solid #BEC3C9;
+    line-height:49px;
+}
+
+div#top a.dropdown-selected:hover {
+    background-color: #0088CC;
+    color: #FFFFFF;
+}
+
+/* DROPDOWN SPECIFIC */
+div#dropdown {
+    position:fixed;
+    top:62px;
+    right:50px;
+    background-color: #EEF3F9;
+    display:none;
+    z-index:3;
+    width:200px;
+    border-bottom: 3px solid #BEC3C9;
+    border-right: 3px solid #BEC3C9;
+    border-left: 3px solid #BEC3C9;
+}
+
+div#dropdown a {
+    display:inline-block;
+    width: 100%;
+    text-align: center;
+    line-height: 49px;
+    color: #8E96A3;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+div#dropdown a:hover {
+    background-color: #0088CC;
+    color: #FFFFFF;
 }
 
 /* SUB-TOP SPECIFIC */
@@ -172,8 +221,24 @@ div#main table.list tr.cycle1, div#main table.form tr.cycle1 {
     background-color: #F9F9FC;
 }
 
+div#main table.list tr.details, div#main table.list tr.details div {
+    display: none;
+    background-color: #DEE3E9;
+    padding:5px;
+}
+
+div#main table.list a {
+    text-decoration: none;
+}
+
+div#main table.list a img {
+    height:14px;
+    vertical-align:middle;
+}
+
+
 div#main table.form {
-    width:75%;
+    width:100%;
     margin-left: auto;
     margin-right: auto;
     border-spacing: 0px;
@@ -182,7 +247,7 @@ div#main table.form {
 }
 
 div#main table.form th {
-    width: 25%;
+    width: 30%;
     text-align: right;
     padding:13px;
 }
@@ -227,4 +292,21 @@ div#main table.form tr.non-field-error {
 div#main table.form tr.non-field-error td {
     padding: 13px;
     text-align: center;
+}
+
+div#main table.details {
+    background-color: #DEE3E9;
+    width:100%;
+    border-spacing: 0px;
+    font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+}
+
+div#main span.details {
+    display:inline-block;
+    font-weight:bold;
+    font-size:16px;
+    margin-top: 5px;
+}
+div#main hr.details {
+    margin:0px 0px 5px 0px;
 }

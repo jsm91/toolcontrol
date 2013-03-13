@@ -167,3 +167,133 @@ class DeleteToolModelsForm(forms.Form):
             for tool_model_id in self.cleaned_data.get('objects').split(','):
                 tool_model = get_object_or_404(ToolModel, pk=tool_model_id)
                 tool_model.delete()
+
+class DeleteToolCategoriesForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for tool_category_id in self.cleaned_data.get('objects').split(','):
+                tool_category = get_object_or_404(ToolCategory, pk=tool_category_id)
+                tool_category.delete()
+
+class MakeEmployeesActiveForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for employee_id in self.cleaned_data.get('objects').split(','):
+                employee = get_object_or_404(Employee, pk=employee_id)
+                employee.make_active(user)
+
+class MakeEmployeesInactiveForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for employee_id in self.cleaned_data.get('objects').split(','):
+                employee = get_object_or_404(Employee, pk=employee_id)
+                employee.make_inactive(user)
+
+class MakeEmployeesAdminForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for employee_id in self.cleaned_data.get('objects').split(','):
+                employee = get_object_or_404(Employee, pk=employee_id)
+                employee.make_admin(user)
+
+class MakeEmployeesNonadminForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for employee_id in self.cleaned_data.get('objects').split(','):
+                employee = get_object_or_404(Employee, pk=employee_id)
+                employee.make_not_admin(user)
+
+class MakeEmployeesLoanFlaggedForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for employee_id in self.cleaned_data.get('objects').split(','):
+                employee = get_object_or_404(Employee, pk=employee_id)
+                employee.make_loan_flagged(user)
+
+class MakeEmployeesNotLoanFlaggedForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for employee_id in self.cleaned_data.get('objects').split(','):
+                employee = get_object_or_404(Employee, pk=employee_id)
+                employee.make_not_loan_flagged(user)
+
+class DeleteEmployeesForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for employee_id in self.cleaned_data.get('objects').split(','):
+                employee = get_object_or_404(Employee, pk=employee_id)
+                employee.delete()
+
+class MakeBuildingSitesActiveForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for building_site_id in self.cleaned_data.get('objects').split(','):
+                building_site = get_object_or_404(ConstructionSite, 
+                                                  pk=building_site_id)
+                building_site.make_active(user)
+
+class MakeBuildingSitesInactiveForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for building_site_id in self.cleaned_data.get('objects').split(','):
+                building_site = get_object_or_404(ConstructionSite, 
+                                                  pk=building_site_id)
+                building_site.make_inactive(user)
+
+class DeleteBuildingSitesForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for building_site_id in self.cleaned_data.get('objects').split(','):
+                building_site = get_object_or_404(ConstructionSite, 
+                                                  pk=building_site_id)
+                building_site.delete()
+
+class MakeContainersActiveForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for container_id in self.cleaned_data.get('objects').split(','):
+                container = get_object_or_404(Container, 
+                                                  pk=container_id)
+                container.make_active(user)
+
+class MakeContainersInactiveForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for container_id in self.cleaned_data.get('objects').split(','):
+                container = get_object_or_404(Container, pk=container_id)
+                container.make_inactive(user)
+
+class DeleteContainersForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for container_id in self.cleaned_data.get('objects').split(','):
+                container = get_object_or_404(Container, pk=container_id)
+                container.delete()

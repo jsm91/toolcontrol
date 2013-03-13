@@ -8,22 +8,6 @@
 {% endblock %}
 
 {% block sub-top %}
-<div class="right-spacer">&nbsp;</div>
-<div class="right">
-  <form method="POST">
-    <input type="text" class="search" name="search" placeholder="Søg...">
-  </form>
-</div>
-<div class="left">
-  <form method="POST">
-    <select class="action" name="action_type">
-      <option value="none">Med det markerede...</option>
-      <option value="aktiv">Marker som aktiv</option>
-      <option value="inaktiv">Marker som inaktiv</option>
-      <option value="slet">Slet</option>
-    </select>
-  </form>
-</div>
 {% endblock %}
 
 {% block sidebar %}
@@ -54,7 +38,7 @@
 <div class="sidebar-menu-block">
   <span>Side</span>
 </div>
-<div class="sidebar-menu-active">
+<div class="sidebar-menu">
   <a href="{% url 'building_site_list_v2' %}">Liste</a>
 </div>
 <div class="sidebar-menu">
@@ -63,25 +47,58 @@
 {% endblock %}
 
 {% block main %}
-<table class="list">
-  <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
-    <th>Adresse</th>
-    <th>Aktiv</th>
-    <th>Funktioner</th>
-  </tr>
-  {% for buildingsite in constructionsite_list %}
-  <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
-      <input type="checkbox" class="object_checkbox" name="{{ buildingsite.pk }}">
-    </td>
-    <td>{{ buildingsite }}</td>
-    <td>{{ buildingsite.is_active }}</td>
-    <td>
-      <a href="{% url 'update_building_site_v2' buildingsite.pk %}">Rediger</a>
-      <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">Slet</a>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+<form method="POST">
+  {% csrf_token %}
+  <table class="form">
+    {% if form.non_field_errors %}
+    <tr class="non-field-error">
+      <td colspan="2">
+	{% for error in form.non_field_errors %}
+	  {{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% endif %}
+    <tr>
+      <th>Byggepladser, der skal markeres som aktive</th>
+      <td>
+	{% for buildingsite in objects %}
+	  {% if forloop.first %}
+	    {{ buildingsite }}
+	  {% else %}
+	    {% if forloop.last %}
+	      og {{ buildingsite }}
+	    {% else %}
+	      , {{ buildingsite }}
+	    {% endif %}
+	  {% endif %}
+	{% empty %}
+	  Intet!
+	{% endfor %}
+      </td>
+    </tr> 
+    {% for field in form %}
+    {% if not field.is_hidden %}
+    <tr class="{% if field.errors %}field-error{% endif %} {% cycle 'cycle1' 'cycle2' %}">
+      <th>
+	{{ field.label }}
+      </th>
+      <td>
+	{{ field }}
+	{% for error in field.errors %}
+	{{ error }}
+	{% endfor %}
+      </td>
+    </tr>
+    {% else %}
+    {{ field }}
+    {% endif %}
+    {% endfor %}
+    <tr>
+      <td colspan="2" class="bottom">
+	<input type="submit" value="Marker som aktive">
+      </td>
+    </tr>
+  </table>
+</form>
 {% endblock %}

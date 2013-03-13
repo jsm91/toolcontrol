@@ -11,6 +11,10 @@
       Top
       {% endblock %}
     </div>
+    <div id="dropdown">
+      <a href="{% url 'settings' %}">Indstillinger</a>
+      <a href="{% url 'logout' %}">Log ud</a>
+    </div>
     <div id="sub-top">
       {% block sub-top %}
       Sub-top

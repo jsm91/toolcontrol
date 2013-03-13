@@ -7,6 +7,7 @@
 {% endif %}
 <table class="list">
   <tr class="cycle1">
+    <th><input type="checkbox" class="mark_all"></th>
     <th>Navn</th>
     <th>Email</th>
     <th>Telefonnummer</th>
@@ -17,6 +18,9 @@
   </tr>
   {% for employee in employee_list %}
   <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>
+      <input type="checkbox" class="object_checkbox" name="{{ employee.pk }}">
+    </td>
     <td>{{ employee }}</td>
     <td>{{ employee.email }}</td>
     <td>{{ employee.phone_number }}</td>

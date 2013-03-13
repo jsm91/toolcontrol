@@ -8,9 +8,26 @@
 {% endblock %}
 
 {% block sub-top %}
-<form method="POST">
-  <input type="text" class="search" name="search" placeholder="Søg...">
-</form>
+<div class="right-spacer">&nbsp;</div>
+<div class="right">
+  <form method="POST">
+    <input type="text" class="search" name="search" placeholder="Søg...">
+  </form>
+</div>
+<div class="left">
+  <form method="POST">
+    <select class="action" name="action_type">
+      <option value="none">Med det markerede...</option>
+      <option value="aktiv">Marker som aktiv</option>
+      <option value="inaktiv">Marker som inaktiv</option>
+      <option value="administrator">Marker som administrator</option>
+      <option value="fjern-administrator">Marker som ikke-administrator</option>
+      <option value="laaneflag">Marker som med låneflag</option>
+      <option value="fjern-laaneflag">Marker som uden låneflag</option>
+      <option value="slet">Slet</option>
+    </select>
+  </form>
+</div>
 {% endblock %}
 
 {% block sidebar %}
@@ -52,6 +69,7 @@
 {% block main %}
 <table class="list">
   <tr class="cycle1">
+    <th><input type="checkbox" class="mark_all"></th>
     <th>Navn</th>
     <th>Email</th>
     <th>Telefonnummer</th>
@@ -62,6 +80,9 @@
   </tr>
   {% for employee in employee_list %}
   <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>
+      <input type="checkbox" class="object_checkbox" name="{{ employee.pk }}">
+    </td>
     <td>{{ employee }}</td>
     <td>{{ employee.email }}</td>
     <td>{{ employee.phone_number }}</td>

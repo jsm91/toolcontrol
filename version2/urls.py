@@ -15,11 +15,14 @@ from version2.views import DeleteTool, DeleteToolCategory, DeleteToolModel
 from version2.views import DeleteContainer, DeleteBuildingSite, DeleteEmployee
 from version2.views import LoanTools, RepairTools, ReturnTools, ServiceTools
 from version2.views import ReserveTools, ScrapTools, LostTools, DeleteTools
-from version2.views import DeleteModels
-
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from version2.views import DeleteToolModels, DeleteToolCategories
+from version2.views import MakeEmployeesActive, MakeEmployeesInactive
+from version2.views import MakeEmployeesAdmin, MakeEmployeesNonadmin
+from version2.views import MakeEmployeesLoanFlagged, DeleteEmployees
+from version2.views import MakeEmployeesNotLoanFlagged, ToolDetails
+from version2.views import MakeBuildingSitesActive, MakeBuildingSitesInactive
+from version2.views import DeleteBuildingSites, MakeContainersActive
+from version2.views import DeleteContainers, MakeContainersInactive
 
 urlpatterns = patterns(
     '',
@@ -95,6 +98,40 @@ urlpatterns = patterns(
         name='scrap_tools_v2'),
     url(r'^vaerktoej/slet/$', DeleteTools.as_view(), 
         name='delete_tools_v2'),
-    url(r'^modeller/slet/$', DeleteModels.as_view(), 
-        name='delete_models_v2'),
+    url(r'^modeller/slet/$', DeleteToolModels.as_view(), 
+        name='delete_tool_models_v2'),
+    url(r'^kategorier/slet/$', DeleteToolCategories.as_view(), 
+        name='delete_tool_categories_v2'),
+    url(r'^medarbejdere/aktiv/$', MakeEmployeesActive.as_view(), 
+        name='make_employees_active_v2'),
+    url(r'^medarbejdere/inaktiv/$', MakeEmployeesInactive.as_view(), 
+        name='make_employees_inactive_v2'),
+    url(r'^medarbejdere/administrator/$', MakeEmployeesAdmin.as_view(), 
+        name='make_employees_admin_v2'),
+    url(r'^medarbejdere/fjern-administrator/$', 
+        MakeEmployeesNonadmin.as_view(),
+        name='make_employees_nonadmin_v2'),
+    url(r'^medarbejdere/laaneflag/$', MakeEmployeesLoanFlagged.as_view(), 
+        name='make_employees_loan_flagged_v2'),
+    url(r'^medarbejdere/fjern-laaneflag/$', 
+        MakeEmployeesNotLoanFlagged.as_view(),
+        name='make_employees_not_loan_flagged_v2'),
+    url(r'^medarbejdere/slet/$', DeleteEmployees.as_view(),
+        name='delete_employees_v2'),
+    url(r'^byggepladser/aktiv/$', MakeBuildingSitesActive.as_view(), 
+        name='make_building_sites_active_v2'),
+    url(r'^byggepladser/inaktiv/$', MakeBuildingSitesInactive.as_view(), 
+        name='make_building_sites_inactive_v2'),
+    url(r'^byggepladser/slet/$', DeleteBuildingSites.as_view(),
+        name='delete_building_sites_v2'),
+    url(r'^containere/aktiv/$', MakeContainersActive.as_view(), 
+        name='make_containers_active_v2'),
+    url(r'^containere/inaktiv/$', MakeContainersInactive.as_view(), 
+        name='make_containers_inactive_v2'),
+    url(r'^containere/slet/$', DeleteContainers.as_view(),
+        name='delete_containers_v2'),
+
+    # Detail views
+    url(r'^vaerktoej/(?P<pk>\d+)/$', ToolDetails.as_view(), 
+        name='tool_details_v2'),    
 )
