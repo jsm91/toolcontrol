@@ -18,6 +18,8 @@
   <form method="POST">
     <select class="action" name="action_type">
       <option value="none">Med det markerede...</option>
+      <option value="udlaan">Marker som udlånt</option>
+      <option value="returnering">Marker som afleveret</option>
       <option value="aktiv">Marker som aktiv</option>
       <option value="inaktiv">Marker som inaktiv</option>
       <option value="slet">Slet</option>
@@ -77,11 +79,15 @@
       <input type="checkbox" class="object_checkbox" name="{{ container.pk }}">
     </td>
     <td>{{ container }}</td>
-    <td>{{ container.location }}</td>
-    <td>{{ container.is_active }}</td>
+    <td>{{ container.location|default_if_none:"Ikke i brug" }}</td>
+    <td><img src="{{ STATIC_URL }}Icon_{{ container.is_active }}.svg"></td>
     <td>
-      <a href="{% url 'update_container_v2' container.pk %}">Rediger</a>
-      <a href="{% url 'delete_container_v2' container.pk %}">Slet</a>
+      <a href="{% url 'update_container_v2' container.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="{% url 'delete_container_v2' container.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
     </td>
   </tr>
   {% endfor %}

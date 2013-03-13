@@ -3,7 +3,7 @@
 {% block top %}
 <a href="{% url 'tool_list_v2' %}" id="logo">ToolControl</a>
 <a href="{% url 'tool_list_v2' %}" class="menu">Database</a>
-<a href="#" class="menu">Statistik</a>
+<a href="{% url 'stats_v2' %}" class="menu">Statistik</a>
 <a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
 {% endblock %}
 

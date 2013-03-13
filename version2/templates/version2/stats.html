@@ -1,0 +1,69 @@
+{% extends "version2/base.html" %}
+
+{% block top %}
+<a href="{% url 'tool_list_v2' %}" id="logo">ToolControl</a>
+<a href="{% url 'tool_list_v2' %}" class="menu">Database</a>
+<a href="{% url 'stats_v2' %}"class="menu">Statistik</a>
+<a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-menu-block">
+  <span>Statistik</span>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'stats_v2' %}">Generelt</a>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'employee_stats_v2' %}">Medarbejdere</a>
+</div>
+{% endblock %}
+
+{% block main %}
+<table class="form">
+  <tr class="cycle1">
+    <th>Antal værktøj</th>
+    <td>{{ tool_count }} stk.</td>
+  </tr>
+  <tr class="cycle2">
+    <th>Antal modeller</th>
+    <td>{{ model_count }} stk.</td>
+  </tr>
+  <tr class="cycle1">
+    <th>Antal kategorier</th>
+    <td>{{ category_count }} stk.</td>
+  </tr>
+  <tr class="cycle2">
+    <th>Gennemsnitlig værktøjsalder</th>
+    <td>{{ average_age }} dage</td>
+  </tr>
+  <tr class="cycle1">
+    <th>Samlet pris på værktøj</th>
+    <td>{{ sum_price_tools.price__sum }} kr.</td>
+  </tr>
+  <tr class="cycle2">
+    <th>Gennemsnitlig pris på værktøj</th>
+    <td>{{ avg_price_tools.price__avg }} kr./stk.</td>
+  </tr>
+  <tr class="cycle1">
+    <th>Gennemsnitlig pris på modeller</th>
+    <td>{{ avg_price_models.price__avg }} kr./stk.</td>
+  </tr>
+  <tr class="cycle2">
+    <th>Antal bortkommet værktøj</th>
+    <td>{{ lost_tool_count }} stk.</td>
+  </tr>
+  <tr class="cycle1">
+    <th>Antal kasseret værktøj</th>
+    <td>{{ scrapped_tool_count }} stk.</td>
+  </tr>
+  <tr class="cycle2">
+    <th>Fordeling af udfasningsmåder</th>
+    <td>{{ scrapped_tools_ratio }} % / {{ lost_tools_ratio }} %</td>
+  </tr>
+  <tr class="cycle1">
+    <th>Gennemsnitlig levetid</th>
+    <td>{{ average_life }} dage</td>
+  </tr>
+</table>
+{% endblock %}

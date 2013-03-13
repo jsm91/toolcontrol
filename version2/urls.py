@@ -23,12 +23,19 @@ from version2.views import MakeEmployeesNotLoanFlagged, ToolDetails
 from version2.views import MakeBuildingSitesActive, MakeBuildingSitesInactive
 from version2.views import DeleteBuildingSites, MakeContainersActive
 from version2.views import DeleteContainers, MakeContainersInactive
+from version2.views import LoanContainers, ReturnContainers, Settings
+from version2.views import ChangePassword, Stats, EmployeeStats
 
 urlpatterns = patterns(
     '',
 
     url(r'^$', RedirectView.as_view(url=reverse_lazy('tool_list_v2')), 
         name='index'),
+    url(r'^indstillinger/$', Settings.as_view(), name='settings_v2'),
+    url(r'^skift-kode/$', ChangePassword.as_view(), name='change_password_v2'),
+    url(r'^statistik/$', Stats.as_view(), name='stats_v2'),
+    url(r'^statistik/medarbejdere/$', EmployeeStats.as_view(), 
+        name='employee_stats_v2'),
     
     # List views
     url(r'^vaerktoej/$', ToolList.as_view(), name='tool_list_v2'),
@@ -130,6 +137,10 @@ urlpatterns = patterns(
         name='make_containers_inactive_v2'),
     url(r'^containere/slet/$', DeleteContainers.as_view(),
         name='delete_containers_v2'),
+    url(r'^containere/udlaan/$', LoanContainers.as_view(), 
+        name='loan_containers_v2'),
+    url(r'^containere/returnering/$', ReturnContainers.as_view(), 
+        name='return_containers_v2'),
 
     # Detail views
     url(r'^vaerktoej/(?P<pk>\d+)/$', ToolDetails.as_view(), 

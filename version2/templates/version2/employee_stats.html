@@ -1,0 +1,39 @@
+{% extends "version2/base.html" %}
+
+{% block top %}
+<a href="{% url 'tool_list_v2' %}" id="logo">ToolControl</a>
+<a href="{% url 'tool_list_v2' %}" class="menu">Database</a>
+<a href="{% url 'stats_v2' %}"class="menu">Statistik</a>
+<a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
+{% endblock %}
+
+{% block sidebar %}
+<div class="sidebar-menu-block">
+  <span>Statistik</span>
+</div>
+<div class="sidebar-menu">
+  <a href="{% url 'stats_v2' %}">Generelt</a>
+</div>
+<div class="sidebar-menu-active">
+  <a href="{% url 'employee_stats_v2' %}">Medarbejdere</a>
+</div>
+{% endblock %}
+
+{% block main %}
+<table class="list">
+  <tr class="cycle1">
+    <th>Navn</th>
+    <th>Kasseret værktøj</th>
+    <th>Bortkommet værktøj</th>
+    <th>Antal udlån</th>
+  </tr>
+  {% for employee in employee_list %}
+  <tr class="{% cycle 'cycle2' 'cycle1' %}">
+    <td>{{ employee }}</td>
+    <td>{{ employee.number_of_scrapped_tools }} stk.</td>
+    <td>{{ employee.number_of_lost_tools }} stk.</td>
+    <td>{{ employee.number_of_loans }} stk.</td>
+   </tr>
+  {% endfor %}
+</table>
+{% endblock %}

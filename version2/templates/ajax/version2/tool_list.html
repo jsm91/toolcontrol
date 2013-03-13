@@ -27,15 +27,29 @@
     <td>{{ tool }}</td>
     <td>{{ tool.model }}</td>
     <td>{{ tool.model.category }}</td>
-    <td>{{ tool.container }}</td>
+    <td>{{ tool.container|default_if_none:"" }}</td>
     <td>{{ tool.last_service }}</td>
     <td>{{ tool.buy_date }}</td>
-    <td>{{ tool.end_date }}</td>
+    <td>{{ tool.end_date|default_if_none:"" }}</td>
     <td>{{ tool.get_location }}</td>
-    <td>{{ tool.price }}</td>
+    <td>{{ tool.price }} kr.</td>
     <td>
-      <a href="{% url 'update_tool_v2' tool.pk %}">Rediger</a>
-      <a href="{% url 'delete_tool_v2' tool.pk %}">Slet</a>
+      <a href="#{{ tool.pk }}" class="show_details">
+	<img src="{{ STATIC_URL }}Icon_History.svg">
+      </a>
+      <a href="{% url 'update_tool_v2' tool.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="{% url 'delete_tool_v2' tool.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
+    </td>
+  </tr>
+  <tr id="details-{{ tool.pk }}" class="details">
+    <td colspan="11">
+      <div>
+	Detaljer
+      </div>
     </td>
   </tr>
   {% endfor %}

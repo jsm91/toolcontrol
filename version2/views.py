@@ -1,19 +1,22 @@
 # -*- coding:utf-8 -*-
 from __future__ import unicode_literals
 
+import datetime
+
 from django.contrib import messages
+from django.contrib.auth.forms import PasswordChangeForm
 from django.core.urlresolvers import reverse_lazy
-from django.db.models import Q
+from django.db.models import Q, Sum, Avg
 from django.shortcuts import get_object_or_404
 from django.views.generic import CreateView, DeleteView, DetailView, FormView
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView, TemplateView, UpdateView
 
 from tools.models import ConstructionSite, Container, Employee
 from tools.models import Tool, ToolCategory, ToolModel
 
 from version2.forms import BuildingSiteForm, ContainerForm, EmployeeForm
 from version2.forms import ToolForm, ToolCategoryForm, ToolModelForm
-from version2.forms import LoanForm, RepairForm, ReturnForm, ServiceForm
+from version2.forms import LoanToolsForm, RepairForm, ReturnToolsForm
 from version2.forms import ReserveForm, ScrapForm, LostForm, DeleteToolsForm
 from version2.forms import DeleteToolModelsForm, DeleteToolCategoriesForm
 from version2.forms import MakeEmployeesActiveForm, MakeEmployeesInactiveForm
@@ -23,7 +26,8 @@ from version2.forms import MakeEmployeesNotLoanFlaggedForm
 from version2.forms import MakeBuildingSitesActiveForm, DeleteBuildingSitesForm
 from version2.forms import MakeBuildingSitesInactiveForm
 from version2.forms import MakeContainersActiveForm, DeleteContainersForm
-from version2.forms import MakeContainersInactiveForm
+from version2.forms import MakeContainersInactiveForm, LoanContainersForm
+from version2.forms import ReturnContainersForm, ServiceForm, SettingsForm
 
 class AjaxResponseMixin(object):
     def get_template_names(self):
@@ -344,7 +348,7 @@ class ServiceTools(ActionView):
     model = Tool
 
 class LoanTools(ActionView):
-    form_class = LoanForm
+    form_class = LoanToolsForm
     template_name = 'version2/loan.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
@@ -356,7 +360,7 @@ class RepairTools(ActionView):
     model = Tool
 
 class ReturnTools(ActionView):
-    form_class = ReturnForm
+    form_class = ReturnToolsForm
     template_name = 'version2/return.html'
     success_url = reverse_lazy('tool_list_v2')
     model = Tool
@@ -475,7 +479,92 @@ class DeleteContainers(ActionView):
     success_url = reverse_lazy('container_list_v2')
     model = Container
 
+class LoanContainers(ActionView):
+    form_class = LoanContainersForm
+    template_name = 'version2/loan_containers.html'
+    success_url = reverse_lazy('container_list_v2')
+    model = Container
+
+class ReturnContainers(ActionView):
+    form_class = ReturnContainersForm
+    template_name = 'version2/return_containers.html'
+    success_url = reverse_lazy('container_list_v2')
+    model = Container
 
 class ToolDetails(DetailView):
     model = Tool
     template_name = 'version2/tool_details.html'
+
+class Settings(UpdateView):
+    form_class = SettingsForm
+    template_name = 'version2/settings.html'
+    model = Employee
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_success_url(self):
+        messages.success(self.request, 'Indstillinger opdateret')
+        return reverse_lazy('settings_v2')
+
+class ChangePassword(FormView):
+    form_class = PasswordChangeForm
+    template_name = 'version2/change_password.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(ChangePassword, self).get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def get_success_url(self):
+        messages.success(self.request, 'Kodeord ændret')
+        return reverse_lazy('change_password_v2')
+
+class Stats(TemplateView):
+    template_name = 'version2/stats.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(Stats, self).get_context_data(**kwargs)
+
+        lost_tool_count = Tool.objects.filter(location='Bortkommet', model__category__customer=self.request.user.customer).count()
+        scrapped_tool_count = Tool.objects.filter(location='Kasseret', model__category__customer=self.request.user.customer).count()
+        
+        try:
+            lost_tools_ratio = (lost_tool_count / (float(scrapped_tool_count + lost_tool_count)) * 100)
+            scrapped_tools_ratio = (scrapped_tool_count / (float(scrapped_tool_count + lost_tool_count)) * 100)
+        except ZeroDivisionError:
+            scrapped_tools_ratio = 0
+            lost_tools_ratio = 0
+
+        alive_tools = Tool.objects.filter(end_date__isnull=True, model__category__customer=self.request.user.customer)
+        timedeltas = [datetime.date.today() - tool.buy_date for tool in alive_tools]
+        try:
+            average_age = (sum(timedeltas, datetime.timedelta(0)) / alive_tools.count()).days
+        except ZeroDivisionError:
+            average_age = 0
+
+        dead_tools = Tool.objects.filter(end_date__isnull=False, model__category__customer=self.request.user.customer)
+        timedeltas = [tool.end_date - tool.buy_date for tool in dead_tools]
+        try:
+            average_life = (sum(timedeltas, datetime.timedelta(0)) / dead_tools.count()).days
+        except ZeroDivisionError:
+            average_life = 0
+
+        context['tool_count'] = Tool.objects.filter(model__category__customer=self.request.user.customer).count()
+        context['model_count'] = ToolModel.objects.filter(category__customer=self.request.user.customer).count()
+        context['category_count'] = ToolCategory.objects.filter(customer=self.request.user.customer).count()
+        context['sum_price_tools'] = Tool.objects.filter(model__category__customer=self.request.user.customer).aggregate(Sum('price'))
+        context['avg_price_tools'] = Tool.objects.filter(model__category__customer=self.request.user.customer).aggregate(Avg('price'))
+        context['avg_price_models'] = ToolModel.objects.filter(category__customer=self.request.user.customer).aggregate(Avg('price'))
+        context['lost_tool_count'] = lost_tool_count
+        context['scrapped_tool_count'] = scrapped_tool_count
+        context['scrapped_tools_ratio'] = scrapped_tools_ratio
+        context['lost_tools_ratio'] = lost_tools_ratio
+        context['average_age'] = average_age
+        context['average_life'] = average_life
+
+        return context
+
+class EmployeeStats(ListView):
+    model = Employee
+    template_name = 'version2/employee_stats.html'

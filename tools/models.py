@@ -172,6 +172,33 @@ class Employee(AbstractBaseUser):
     
     USERNAME_FIELD = 'name'
 
+    def number_of_scrapped_tools(self):
+        tools = Tool.objects.filter(location='Kasseret')
+        count = 0
+
+        for tool in tools:
+            second_last_event = tool.event_set.all().order_by('-start_date')[1]
+            if (second_last_event.event_type == 'Udlån' and 
+                second_last_event.employee == self):
+                count += 1
+
+        return count
+
+    def number_of_lost_tools(self):
+        tools = Tool.objects.filter(location='Bortkommet')
+        count = 0
+
+        for tool in tools:
+            second_last_event = tool.event_set.all().order_by('-start_date')[1]
+            if (second_last_event.event_type == 'Udlån' and 
+                second_last_event.employee == self):
+                count += 1
+
+        return count
+
+    def number_of_loans(self):
+        return self.event_set.all().count()
+
     def send_message(self, subject, message):
         if self.receive_sms:
             self.send_sms(message)
@@ -682,4 +709,3 @@ def pre_delete_event(sender, instance, **kwargs):
         instance.tool.loaned_to = None
         instance.tool.location = 'Lager'
         instance.tool.save()
-

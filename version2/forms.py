@@ -35,6 +35,21 @@ class EmployeeForm(forms.ModelForm):
 
         return cleaned_data
 
+class SettingsForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        exclude = ['customer', 'password', 'last_login', 'is_active',
+                   'is_loan_flagged', 'is_admin', 'name']
+
+    def clean(self):
+        cleaned_data = super(SettingsForm, self).clean()
+        phone_number = cleaned_data.get('phone_number')
+        email = cleaned_data.get('email')
+
+        if not phone_number and not email:
+            raise forms.ValidationError('Enten email eller telefonnummer er påkrævet')
+
+        return cleaned_data
 
 class BuildingSiteForm(forms.ModelForm):
     class Meta:
@@ -55,7 +70,7 @@ class ServiceForm(forms.Form):
                 tool = get_object_or_404(Tool, pk=tool_id)
                 tool.service(user)
 
-class LoanForm(forms.Form):
+class LoanToolsForm(forms.Form):
     objects = forms.CharField(widget=forms.HiddenInput, required=False)
     employee = forms.ModelChoiceField(queryset=Employee.objects.all(),
                                       required=False, label="Medarbejder")
@@ -64,7 +79,7 @@ class LoanForm(forms.Form):
                                            required=False, label="Byggeplads")
 
     def clean(self):
-        cleaned_data = super(LoanForm, self).clean()
+        cleaned_data = super(LoanToolsForm, self).clean()
         employee = cleaned_data.get('employee')
         building_site = cleaned_data.get('building_site')
 
@@ -89,7 +104,7 @@ class RepairForm(forms.Form):
                 tool = get_object_or_404(Tool, pk=tool_id)
                 tool.repair(user)
 
-class ReturnForm(forms.Form):
+class ReturnToolsForm(forms.Form):
     objects = forms.CharField(widget=forms.HiddenInput, required=False)
 
     def save(self, user):
@@ -297,3 +312,24 @@ class DeleteContainersForm(forms.Form):
             for container_id in self.cleaned_data.get('objects').split(','):
                 container = get_object_or_404(Container, pk=container_id)
                 container.delete()
+
+class LoanContainersForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+    building_site = forms.ModelChoiceField(queryset=
+                                           ConstructionSite.objects.all(),
+                                           label="Byggeplads")
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for container_id in self.cleaned_data.get('objects').split(','):
+                container = get_object_or_404(Container, pk=container_id)
+                container.loan(self.cleaned_data.get('building_site'), user)
+
+class ReturnContainersForm(forms.Form):
+    objects = forms.CharField(widget=forms.HiddenInput, required=False)
+
+    def save(self, user):
+        if self.cleaned_data.get('objects'):
+            for container_id in self.cleaned_data.get('objects').split(','):
+                container = get_object_or_404(Container, pk=container_id)
+                container.end_loan(user)

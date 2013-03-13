@@ -231,8 +231,8 @@ div#main table.list a {
     text-decoration: none;
 }
 
-div#main table.list a img {
-    height:14px;
+div#main table.list img {
+    height:16px;
     vertical-align:middle;
 }
 

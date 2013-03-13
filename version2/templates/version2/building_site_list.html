@@ -76,10 +76,14 @@
       <input type="checkbox" class="object_checkbox" name="{{ buildingsite.pk }}">
     </td>
     <td>{{ buildingsite }}</td>
-    <td>{{ buildingsite.is_active }}</td>
+    <td><img src="{{ STATIC_URL}}Icon_{{ buildingsite.is_active }}.svg"></td>
     <td>
-      <a href="{% url 'update_building_site_v2' buildingsite.pk %}">Rediger</a>
-      <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">Slet</a>
+      <a href="{% url 'update_building_site_v2' buildingsite.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
     </td>
   </tr>
   {% endfor %}

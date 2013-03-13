@@ -84,14 +84,22 @@
       <input type="checkbox" class="object_checkbox" name="{{ employee.pk }}">
     </td>
     <td>{{ employee }}</td>
-    <td>{{ employee.email }}</td>
-    <td>{{ employee.phone_number }}</td>
-    <td>{{ employee.is_active }}</td>
-    <td>{{ employee.is_admin }}</td>
-    <td>{{ employee.is_loan_flagged }}</td>
+    <td>{{ employee.email|default:"Ikke oplyst" }}</td>
+    <td>{{ employee.phone_number|default:"Ikke oplyst" }}</td>
+    <td><img src="{{ STATIC_URL}}Icon_{{ employee.is_active }}.svg"></td>
+    <td><img src="{{ STATIC_URL}}Icon_{{ employee.is_admin }}.svg"></td>
     <td>
-      <a href="{% url 'update_employee_v2' employee.pk %}">Rediger</a>
-      <a href="{% url 'delete_employee_v2' employee.pk %}">Slet</a>
+      {% if employee.is_loan_flagged %}
+      <img src="{{ STATIC_URL}}Icon_Warning.svg">
+      {% endif %}
+    </td>
+    <td>
+      <a href="{% url 'update_employee_v2' employee.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+      </a>
+      <a href="{% url 'delete_employee_v2' employee.pk %}">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+      </a>
     </td>
   </tr>
   {% endfor %}
