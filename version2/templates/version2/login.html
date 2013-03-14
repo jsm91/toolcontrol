@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>ToolControl</title>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}v2_style.css">
+  </head>
+  <body class="login">
+    <div class="login-stripe">&nbsp;</div>
+    <div class="login">
+      <form method="POST" action="{% url 'login_v2' %}">
+	<table>
+	  {{ form.as_table }}
+	  <tr>
+	    <td colspan="2" class="bottom">
+	      {% csrf_token %}
+	      <input type="submit" value="Log ind">
+	    </td>
+	  </tr>
+	</table>
+      </form>
+    </div>
+  </body>
+</html>

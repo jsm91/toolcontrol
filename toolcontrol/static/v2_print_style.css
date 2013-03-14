@@ -1,0 +1,12 @@
+div#top, div#sub-top, div#sidebar-container {
+    display: none;
+}
+
+div#main-container {
+    width:100%;
+    top:0;
+}
+
+th.checkbox, td.checkbox, th.functions, td.functions {
+    display:none;
+}

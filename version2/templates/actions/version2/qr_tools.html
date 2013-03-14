@@ -1,0 +1,6 @@
+{% for tool in tools %}
+<div style="text-align:center; font-size:18px; font-weight:bold; display:inline-block; margin:10px;">
+  <img style="width:200px;" src="{% url 'qr_code_v2' tool.pk %}"><br>
+  {{ tool }}
+</div>
+{% endfor %}

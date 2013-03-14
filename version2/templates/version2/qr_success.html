@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>ToolControl</title>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}v2_style.css">
+  </head>
+  <body class="qr">
+    <div class="qr">
+      <img src="{{ STATIC_URL }}Icon_Info.svg"><br>
+    </div>
+    {% for message in messages %}
+    <div class="qr">
+      <p>
+	{{ message }}
+      </p>
+    </div>
+    {% endfor %}
+  </body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>ToolControl</title>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}v2_style.css">
+  </head>
+  <body class="qr">
+    {% if tool.location == "Kasseret" %}
+    <div class="qr">
+      <p>
+	Værktøjet kan ikke lånes eller afleveres, da det er kasseret.
+      </p>
+    </div>
+    {% else %}
+    {% if tool.location == "Bortkommet" %}
+    <div class="qr">
+      <p>
+	Værktøjet kan ikke lånes eller afleveres, da det er bortkommet.
+      </p>
+    </div>
+    {% else %}
+    <div class="qr">
+      <form method="POST" action="{% url 'qr_action_v2' tool.pk %}">
+	<table>
+	  <tr>
+	    <th>Værktøj, der skal {% if tool.locaton == "Udlånt" %}returneres{% else %}udlånes{% endif %}:</th>
+	    <td><p>{{ tool }}</p></td>
+	  </tr>
+	  {{ form.as_table }}
+	  <tr>
+	    <td colspan="2">
+	      {% csrf_token %}
+	      <input type="submit" value="Gem">
+	    </td>
+	  </tr>
+	</table>
+      </form>
+    </div>
+    {% endif %}
+    {% endif %}
+  </body>
+</html>
