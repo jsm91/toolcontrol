@@ -5,17 +5,21 @@
   <tr>
     <th>Dato</th>
     <th>Reserveret af</th>
-    <th>&nbsp;</th>
+    {% if user.is_admin %}
+    <th class="functions">Funktioner</th>
+    {% endif %}
   </tr>
   {% for reservation in tool.reservation_set.all %}
     <tr>
       <td>{{ reservation.start_date }} - {{ reservation.end_date }}</td>
       <td>{{ reservation.employee }}</td>
+      {% if user.is_admin %}
       <td>
 	<a href="{% url 'delete_reservation_v2' reservation.id %}">
 	  <img src="{{ STATIC_URL }}Icon_Delete.svg">
 	</a>
       </td>
+      {% endif %}
     </tr>
   {% endfor %}
 </table>
@@ -26,7 +30,9 @@
   <tr>
     <th>Begivenhed</th>
     <th>Dato</th>
-    <th>&nbsp;</th>
+    {% if user.is_admin %}
+    <th class="functions">Funktioner</th>
+    {% endif %}
   </tr>
   {% for event in tool.event_set.all %}
     <tr>
@@ -38,6 +44,7 @@
 	{% endif %}
       </td>
       <td>{{ event.start_date }}{% if event.end_date %} - {{ event.end_date }}{% endif %}</td>
+      {% if user.is_admin %}
       <td>
 	{% if event.event_type != "Oprettelse" %}
 	<a href="{% url 'delete_event_v2' event.id %}">
@@ -45,6 +52,7 @@
 	</a>
 	{% endif %}
       </td>
+      {% endif %}
     </tr>
   {% endfor %}
 </table>

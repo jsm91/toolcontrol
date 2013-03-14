@@ -135,6 +135,16 @@ div#sub-top div.right input {
     margin:13px 13px 0px 0px;
 }
 
+div.left {
+    float:left;
+    margin-right:10px;
+}
+
+div.left img {
+    height: 40px;
+    margin: 5px 0px 5px 0px;
+}
+
 div#sub-top div.left select {
     margin:13px 0px 0px 13px;
 }
@@ -245,6 +255,14 @@ div#main table.list img {
     vertical-align:middle;
 }
 
+div#main table.list td.empty {
+    text-align: center;
+}
+
+div#main table.list th.functions {
+    width: 0px;
+    padding-right:5px;
+}
 
 div#main table.form {
     width:100%;
@@ -256,7 +274,7 @@ div#main table.form {
 }
 
 div#main table.form th {
-    width: 30%;
+    width: 35%;
     text-align: right;
     padding:13px;
 }
@@ -318,4 +336,83 @@ div#main span.details {
 }
 div#main hr.details {
     margin:0px 0px 5px 0px;
+}
+
+div#main span.helptext {
+    font-weight:normal;
+}
+
+/* QR SPECIFIC */
+body.qr {
+    background-color: #CCCCCC;
+}
+
+div.qr {
+    background-color: #465263;
+    text-align: center;
+    margin: 50px 200px 0px 200px;
+    padding: 10px 10px 10px 10px;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 20pt;
+}
+
+div.qr img {
+    width:100%;
+}
+
+div.qr table {
+    width: 100%;
+}
+
+div.qr input, div.qr select {
+    width: 100%;
+    padding:5px;
+    font-weight: bold;
+    font-size: 20pt;
+}
+
+div.qr p {
+    margin: 10px;
+}
+
+/* LOGIN */
+body.login {
+    text-align: center;
+    background-color: #CCCCCC;
+}
+
+div.login {
+    margin-top:200px;
+    display:inline-block;
+    background-color: #465263;
+    border-radius: 5px 5px 5px 5px;
+    -moz-border-radius: 5px; /* Firefox */
+    -webkit-border-radius: 5px; /* Safari, Chrome */    
+    box-shadow: 0px 0px 20px #465263; /* CSS3 */
+    -moz-box-shadow: 0px 0px 20px #465263; /* Firefox */
+    -webkit-box-shadow: 0px 0px 20px #465263; /* Safari, Chrome */
+}
+
+div.login table {
+    width: 100%;
+    color: #FFFFFF;
+    padding: 10px;
+}
+
+div.login input {
+    padding:5px;
+}
+
+div.login td.bottom input {
+    width: 100%;
+    margin-bottom:10px;
+}
+
+div.login a {
+    color: #FFFFFF;
+}
+
+div.login a:hover {
+    text-decoration: none;
 }

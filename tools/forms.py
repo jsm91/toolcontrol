@@ -381,15 +381,7 @@ class CreateManyToolsForm(NewForm):
     def __init__(self, customer, *args, **kwargs):
         super(CreateManyToolsForm, self).__init__(*args, **kwargs)
         self.fields['model'].queryset = ToolModel.objects.filter(category__customer=customer).order_by('name')
-
         self.fields['buy_date'].initial = datetime.datetime.now()
-        try:
-            self.fields['model'].initial = ToolModel.objects.all()[0]
-        except:
-            pass
-        if self.fields['model'].initial:
-            self.fields['price'].initial = self.fields['model'].initial.price
-            self.fields['service_interval'].initial = self.fields['model'].initial.service_interval
 
     def save(self, force_insert=False, force_update=False, commit=True):
         zeros = len(self.cleaned_data['start_index']) - 1

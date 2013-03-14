@@ -56,7 +56,8 @@ class Container(models.Model):
 
     name = models.CharField('Navn', max_length=255)
     location = models.ForeignKey(ConstructionSite, null=True, default=None,
-                                 verbose_name = 'Placering')
+                                 verbose_name = 'Placering', 
+                                 on_delete=models.SET_NULL)
     is_active = models.BooleanField('Aktiv', default=True)
     customer = models.ForeignKey(Customer, verbose_name='Kunde')
 
@@ -111,7 +112,7 @@ class Container(models.Model):
             container_loan.save()
 
             for tool in self.tool_set.filter(construction_site=self.location):
-                tool.end_loan()
+                tool.end_loan(user)
 
             self.location = None
             self.save()
@@ -352,7 +353,7 @@ class ToolModel(models.Model):
     verbose_name = 'model'
 
     name = models.CharField('Navn', max_length=200)
-    category = models.ForeignKey(ToolCategory)
+    category = models.ForeignKey(ToolCategory, verbose_name = 'Kategori')
     service_interval = models.IntegerField('Serviceinterval', default=6)
     price = models.IntegerField('Pris', default=0)
 
@@ -387,10 +388,13 @@ class Tool(models.Model):
     location = models.CharField('Placering', choices=LOCATION_CHOICES, 
                                 max_length=20, default="Lager")
 
-    employee = models.ForeignKey(Employee, null=True)
-    construction_site = models.ForeignKey(ConstructionSite, null=True)
+    employee = models.ForeignKey(Employee, null=True, 
+                                 on_delete=models.SET_NULL)
+    construction_site = models.ForeignKey(ConstructionSite, null=True,
+                                          on_delete=models.SET_NULL)
 
-    container = models.ForeignKey(Container, null=True, blank=True)
+    container = models.ForeignKey(Container, null=True, blank=True,
+                                  on_delete=models.SET_NULL)
 
     invoice_number = models.IntegerField('Bilagsnummer', null=True, blank=True)
     secondary_name = models.CharField('Sekundært navn', max_length=200, 
@@ -653,18 +657,22 @@ class Ticket(models.Model):
     description = models.TextField('Beskrivelse')
     created_by = models.ForeignKey(Employee, related_name='tickets_created',
                                    verbose_name='Oprettet af',
-                                   null=True, blank=True)
+                                   null=True, blank=True,
+                                   on_delete=models.SET_NULL)
     reported_by = models.ForeignKey(Customer, null=True, blank=True, 
                                     default=None, 
-                                    verbose_name='Rapporteret af')
+                                    verbose_name='Rapporteret af',
+                                    on_delete=models.SET_NULL)
     duplicate = models.ForeignKey('self', null=True, blank=True, default=None,
-                                  verbose_name='Dublet af')
+                                  verbose_name='Dublet af',
+                                  on_delete=models.SET_NULL)
     is_open = models.BooleanField('Åben', default=True)
     level = models.CharField('Type', choices=LEVEL_CHOICES, max_length=200)
     assigned_to = models.ForeignKey(Employee, 
                                     related_name='tickets_assigned_to', 
                                     null=True, blank=True, default=None,
-                                    verbose_name='Tildelt til')
+                                    verbose_name='Tildelt til',
+                                    on_delete=models.SET_NULL)
     
     def is_closed(self):
         return not self.is_open

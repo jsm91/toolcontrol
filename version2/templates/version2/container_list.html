@@ -11,7 +11,7 @@
 <div class="right-spacer">&nbsp;</div>
 <div class="right">
   <form method="POST">
-    <input type="text" class="search" name="search" placeholder="Søg...">
+    <input type="text" class="search" name="search" value="Søg...">
   </form>
 </div>
 <div class="left">
@@ -25,6 +25,9 @@
       <option value="slet">Slet</option>
     </select>
   </form>
+</div>
+<div class="left">
+  <a href="#" class="print"><img src="{{ STATIC_URL }}Icon_Print.svg"></a>
 </div>
 {% endblock %}
 
@@ -67,21 +70,21 @@
 {% block main %}
 <table class="list">
   <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="checkbox"><input type="checkbox" class="mark_all"></th>
     <th><a href="#name" class="order_by" id="order_by-name">Adresse</a></th>
     <th><a href="#location" class="order_by" id="order_by-location">Placering</a></th>
     <th><a href="#is_active" class="order_by" id="order_by-is_active">Aktiv</a></th>
-    <th>Funktioner</th>
+    <th class="functions">Funktioner</th>
   </tr>
   {% for container in container_list %}
   <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
+    <td class="checkbox">
       <input type="checkbox" class="object_checkbox" name="{{ container.pk }}">
     </td>
     <td>{{ container }}</td>
     <td>{{ container.location|default_if_none:"Ikke i brug" }}</td>
     <td><img src="{{ STATIC_URL }}Icon_{{ container.is_active }}.svg"></td>
-    <td>
+    <td class="functions">
       <a href="#{{ container.pk }}" class="show_details">
 	<img src="{{ STATIC_URL }}Icon_History.svg">
       </a>
@@ -94,10 +97,16 @@
     </td>
   </tr>
   <tr id="details-{{ container.pk }}" class="details">
-    <td colspan="11">
+    <td colspan="5">
       <div>
 	Detaljer
       </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr class="cycle2">
+    <td colspan="5" class="empty">
+      Der er ingen containere at vise.
     </td>
   </tr>
   {% endfor %}

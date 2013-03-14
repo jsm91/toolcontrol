@@ -7,7 +7,7 @@
 {% endif %}
 <table class="list">
   <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="checkbox"><input type="checkbox" class="mark_all"></th>
     <th><a href="#name" class="order_by" id="order_by-name">Navn</a></th>
     <th><a href="#model" class="order_by" id="order_by-model">Model</a></th>
     <th><a href="#model__category" class="order_by" id="order_by-model__category">Kategori</a></th>
@@ -16,12 +16,14 @@
     <th><a href="#buy_date" class="order_by" id="order_by-buy_date">Indkøbsdato</a></th>
     <th><a href="#end_date" class="order_by" id="order_by-end_date">Ophørsdato</a></th>
     <th><a href="#location" class="order_by" id="order_by-location">Placering</a></th>
+    {% if user.is_admin %}
     <th><a href="#price" class="order_by" id="order_by-price">Pris</a></th>
-    <th>Funktioner</th>
+    {% endif %}
+    <th class="functions">Funktioner</th>
   </tr>
   {% for tool in tool_list %}
   <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
+    <td class="checkbox">
       <input type="checkbox" class="object_checkbox" name="{{ tool.pk }}">
     </td>
     <td>{{ tool }}</td>
@@ -32,17 +34,21 @@
     <td>{{ tool.buy_date }}</td>
     <td>{{ tool.end_date|default_if_none:"" }}</td>
     <td>{{ tool.get_location }}</td>
+    {% if user.is_admin %}
     <td>{{ tool.price }} kr.</td>
-    <td>
+    {% endif %}
+    <td class="functions">
       <a href="#{{ tool.pk }}" class="show_details">
-	<img src="{{ STATIC_URL }}Icon_History.svg">
+	<img src="{{ STATIC_URL }}Icon_History.svg" alt="Detaljer">
       </a>
+      {% if user.is_admin %}
       <a href="{% url 'update_tool_v2' tool.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg" alt="Rediger">
       </a>
       <a href="{% url 'delete_tool_v2' tool.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg" alt="Slet">
       </a>
+      {% endif %}
     </td>
   </tr>
   <tr id="details-{{ tool.pk }}" class="details">
@@ -50,6 +56,12 @@
       <div>
 	Detaljer
       </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr class="cycle2">
+    <td colspan="11" class="empty">
+      Der er intet værktøj at vise.
     </td>
   </tr>
   {% endfor %}

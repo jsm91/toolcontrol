@@ -3,31 +3,43 @@
 {% block top %}
 <a href="{% url 'tool_list_v2' %}" id="logo">ToolControl</a>
 <a href="{% url 'tool_list_v2' %}" class="menu">Database</a>
+{% if user.is_admin %}
 <a href="{% url 'stats_v2' %}" class="menu">Statistik</a>
+{% endif %}
 <a href="#" class="menu-right">{{ user }}&nbsp;&nbsp;&nbsp;&#9660;</a>
 {% endblock %}
 
 {% block sub-top %}
 <div class="right-spacer">&nbsp;</div>
-<div class="right">
-  <form method="POST">
-    <input type="text" class="search" name="search" placeholder="Søg...">
-  </form>
-</div>
-<div class="left">
-  <form method="POST">
+<form method="POST" action="{% url 'tool_list_v2' %}">
+  <div class="right">
+    <input type="text" class="search" name="search" value="Søg...">
+  </div>
+</form>
+<form method="POST" action="{% url 'tool_list_v2' %}">
+  <div class="left">
     <select class="action" name="action_type">
-      <option value="none">Med det markerede...</option>
-      <option value="service">Marker som serviceret</option>
+      <option value="none">Med det markerede...</option> 
+      {% if user.is_admin %}
       <option value="udlaan">Marker som udlånt</option>
-      <option value="reparation">Marker som til reparation</option>
       <option value="returnering">Marker som afleveret</option>
       <option value="reservation">Marker som reserveret</option>
+      <option value="service">Marker som serviceret</option>
+      <option value="reparation">Marker som til reparation</option>
       <option value="kasseret">Marker som kasseret</option>
       <option value="bortkommet">Marker som bortkommet</option>
+      <option value="qr-koder">Vis QR-koder</option>
       <option value="slet">Slet</option>
+      {% else %}
+      <option value="udlaan-enkelt">Marker som udlånt</option>
+      <option value="returnering">Marker som afleveret</option>
+      <option value="reservation-enkelt">Marker som reserveret</option>
+      {% endif %}
     </select>
-  </form>
+  </div>
+</form>
+<div class="left">
+  <a href="#" class="print"><img src="{{ STATIC_URL }}Icon_Print.svg"></a>
 </div>
 {% endblock %}
 
@@ -38,6 +50,7 @@
 <div class="sidebar-menu-active">
   <a href="{% url 'tool_list_v2' %}">Værktøj</a>
 </div>
+{% if user.is_admin %}
 <div class="sidebar-menu">
   <a href="{% url 'tool_model_list_v2' %}">Modeller</a>
 </div>
@@ -65,12 +78,16 @@
 <div class="sidebar-menu">
   <a href="{% url 'create_tool_v2' %}">Opret nyt værktøj</a>
 </div>
+<div class="sidebar-menu">
+  <a href="{% url 'create_many_tools_v2' %}">Opret flere stykker nyt værktøj</a>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block main %}
 <table class="list">
   <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="checkbox"><input type="checkbox" class="mark_all"></th>
     <th><a href="#name" class="order_by" id="order_by-name">Navn</a></th>
     <th><a href="#model" class="order_by" id="order_by-model">Model</a></th>
     <th><a href="#model__category" class="order_by" id="order_by-model__category">Kategori</a></th>
@@ -79,12 +96,14 @@
     <th><a href="#buy_date" class="order_by" id="order_by-buy_date">Indkøbsdato</a></th>
     <th><a href="#end_date" class="order_by" id="order_by-end_date">Ophørsdato</a></th>
     <th><a href="#location" class="order_by" id="order_by-location">Placering</a></th>
+    {% if user.is_admin %}
     <th><a href="#price" class="order_by" id="order_by-price">Pris</a></th>
-    <th>Funktioner</th>
+    {% endif %}
+    <th class="functions">Funktioner</th>
   </tr>
   {% for tool in tool_list %}
   <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
+    <td class="checkbox">
       <input type="checkbox" class="object_checkbox" name="{{ tool.pk }}">
     </td>
     <td>{{ tool }}</td>
@@ -95,17 +114,21 @@
     <td>{{ tool.buy_date }}</td>
     <td>{{ tool.end_date|default_if_none:"" }}</td>
     <td>{{ tool.get_location }}</td>
+    {% if user.is_admin %}
     <td>{{ tool.price }} kr.</td>
-    <td>
+    {% endif %}
+    <td class="functions">
       <a href="#{{ tool.pk }}" class="show_details">
-	<img src="{{ STATIC_URL }}Icon_History.svg">
+	<img src="{{ STATIC_URL }}Icon_History.svg" alt="Detaljer">
       </a>
+      {% if user.is_admin %}
       <a href="{% url 'update_tool_v2' tool.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg" alt="Rediger">
       </a>
       <a href="{% url 'delete_tool_v2' tool.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg" alt="Slet">
       </a>
+      {% endif %}
     </td>
   </tr>
   <tr id="details-{{ tool.pk }}" class="details">
@@ -113,6 +136,12 @@
       <div>
 	Detaljer
       </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr class="cycle2">
+    <td colspan="11" class="empty">
+      Der er intet værktøj at vise.
     </td>
   </tr>
   {% endfor %}

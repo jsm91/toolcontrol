@@ -9,18 +9,21 @@
 
 {% block sub-top %}
 <div class="right-spacer">&nbsp;</div>
-<div class="right">
-  <form method="POST">
-    <input type="text" class="search" name="search" placeholder="Søg...">
-  </form>
-</div>
-<div class="left">
-  <form method="POST">
+<form method="POST" action="{% url 'tool_model_list_v2' %}">
+  <div class="right">
+    <input type="text" class="search" name="search" value="Søg...">
+  </div>
+</form>
+<form method="POST" action="{% url 'tool_model_list_v2' %}">
+  <div class="left">
     <select class="action" name="action_type">
       <option value="none">Med det markerede...</option>
       <option value="slet">Slet</option>
     </select>
-  </form>
+  </div>
+</form>
+<div class="left">
+  <a href="#" class="print"><img src="{{ STATIC_URL }}Icon_Print.svg"></a>
 </div>
 {% endblock %}
 
@@ -63,18 +66,18 @@
 {% block main %}
 <table class="list">
   <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="checkbox"><input type="checkbox" class="mark_all"></th>
     <th><a href="#name" class="order_by" id="order_by-name">Navn</a></th>
     <th><a href="#category" class="order_by" id="order_by-category">Kategori</a></th>
     <th><a href="#service_interval" class="order_by" id="order_by-service_interval">Serviceinterval</a></th>
     <th><a href="#price" class="order_by" id="order_by-price">Pris</a></th>
     <th>Samlet pris</th>
     <th>Antal værktøj</th>
-    <th>Funktioner</th>
+    <th class="functions">Funktioner</th>
   </tr>
   {% for toolmodel in toolmodel_list %}
   <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
+    <td class="checkbox">
       <input type="checkbox" class="object_checkbox" name="{{ toolmodel.pk }}">
     </td>
     <td>{{ toolmodel }}</td>
@@ -83,23 +86,29 @@
     <td>{{ toolmodel.price }} kr.</td>
     <td>{{ toolmodel.total_price }} kr.</td>
     <td>{{ toolmodel.number_of_tools }} stk.</td>
-    <td>
+    <td class="functions">
       <a href="#{{ toolmodel.pk }}" class="show_details">
-	<img src="{{ STATIC_URL }}Icon_History.svg">
+	<img src="{{ STATIC_URL }}Icon_History.svg" alt="Detaljer">
       </a>
       <a href="{% url 'update_tool_model_v2' toolmodel.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg" alt="Rediger">
       </a>
       <a href="{% url 'delete_tool_model_v2' toolmodel.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg" alt="Slet">
       </a>
     </td>
   </tr>
   <tr id="details-{{ toolmodel.pk }}" class="details">
-    <td colspan="11">
+    <td colspan="8">
       <div>
 	Detaljer
       </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr class="cycle2">
+    <td colspan="8" class="empty">
+      Der er ingen modeller at vise.
     </td>
   </tr>
   {% endfor %}

@@ -1,33 +1,33 @@
 {% if messages %}
-  {% for message in messages %}
-    <div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
-      {{ message }}
-    </div>
-  {% endfor %}
+{% for message in messages %}
+<div class="message{% if message.tags %}-{{ message.tags }}{% endif %}">
+  {{ message }}
+</div>
+{% endfor %}
 {% endif %}
 <table class="list">
   <tr class="cycle1">
-    <th><input type="checkbox" class="mark_all"></th>
+    <th class="checkbox"><input type="checkbox" class="mark_all"></th>
     <th><a href="#name" class="order_by" id="order_by-name">Adresse</a></th>
     <th><a href="#is_active" class="order_by" id="order_by-is_active">Aktiv</a></th>
-    <th>Funktioner</th>
+    <th class="functions">Funktioner</th>
   </tr>
   {% for buildingsite in constructionsite_list %}
   <tr class="{% cycle 'cycle2' 'cycle1' %}">
-    <td>
+    <td class="checkbox">
       <input type="checkbox" class="object_checkbox" name="{{ buildingsite.pk }}">
     </td>
     <td>{{ buildingsite }}</td>
-    <td><img src="{{ STATIC_URL}}Icon_{{ buildingsite.is_active }}.svg"></td>
-    <td>
+    <td><img src="{{ STATIC_URL}}Icon_{{ buildingsite.is_active }}.svg" alt="{{ buildingsite.is_active"></td>
+    <td class="functions">
       <a href="#{{ buildingsite.pk }}" class="show_details">
-	<img src="{{ STATIC_URL }}Icon_History.svg">
+	<img src="{{ STATIC_URL }}Icon_History.svg" alt="Detaljer">
       </a>
       <a href="{% url 'update_building_site_v2' buildingsite.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Edit.svg">
+	<img src="{{ STATIC_URL }}Icon_Edit.svg" alt="Rediger">
       </a>
       <a href="{% url 'delete_building_site_v2' buildingsite.pk %}">
-	<img src="{{ STATIC_URL }}Icon_Delete.svg">
+	<img src="{{ STATIC_URL }}Icon_Delete.svg" alt="Slet">
       </a>
     </td>
   </tr>
@@ -36,6 +36,12 @@
       <div>
 	Detaljer
       </div>
+    </td>
+  </tr>
+  {% empty %}
+  <tr class="cycle2">
+    <td colspan="4" class="empty">
+      Der er ingen byggepladser at vise.
     </td>
   </tr>
   {% endfor %}

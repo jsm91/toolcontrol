@@ -57,6 +57,11 @@ $(document).ready(function() {
     $(document).on("click", 'a.order_by', function() {
 	var order_by = $(this).attr("href").replace("#","");
 	var search = $("input.search").val();
+
+	if (search == "Søg...") {
+	    search = "";
+	}
+
 	$("div#main").load(window.location.pathname, "search=" + search + "&order_by=" + order_by, function() {
 	    if (order_by.substring(0, 1) == "-") {
 		$("a#order_by-" + order_by.substring(1)).attr("href", "#" + order_by.substring(1));
@@ -76,6 +81,8 @@ $(document).ready(function() {
 	$("input.object_checkbox").filter(":checked").each(function() {
 	    object_ids.push($(this).attr("name"));
 	});
+
+	$('select.action').val("none");
 
 	window.location = window.location.pathname + action + "/?object_ids=" + object_ids.toString();
     });
@@ -141,5 +148,23 @@ $(document).ready(function() {
 	    $("input#id_service_interval").val(model.fields.service_interval);
 	    $("input#id_price").val(model.fields.price);
 	});
+    });
+
+    /* SEARCH PLACEHOLDER */
+    $("input.search").focus(function() {
+	if($(this).val() == "Søg...") {
+	    $(this).val("");
+	}
+    });
+    $("input.search").blur(function() {
+	if($(this).val() == "") {
+	    $(this).val("Søg...");
+	}
+    });
+
+    /* PRINT */
+    $("a.print").click(function() {
+	window.print();
+	return false;
     });
 });

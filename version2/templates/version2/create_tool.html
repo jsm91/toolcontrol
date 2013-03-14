@@ -41,11 +41,13 @@
 <div class="sidebar-menu-active">
   <a href="{% url 'create_tool_v2' %}">Opret nyt værktøj</a>
 </div>
+<div class="sidebar-menu">
+  <a href="{% url 'create_many_tools_v2' %}">Opret flere stykker nyt værktøj</a>
+</div>
 {% endblock %}
 
 {% block main %}
-<form method="POST">
-  {% csrf_token %}
+<form method="POST" action="{% url 'create_tool_v2' %}">
   <table class="form">
     {% if form.non_field_errors %}
     <tr class="non-field-error">
@@ -71,6 +73,7 @@
     {% endfor %}
     <tr>
       <td colspan="2" class="bottom">
+	{% csrf_token %}
 	<input type="submit" value="Gem">
       </td>
     </tr>
