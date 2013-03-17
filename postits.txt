@@ -1,0 +1,5 @@
+1: Firmalogo ved toolcontrol. 
+2: Ophørsdato skal skiftes til udgået pr. 
+3: Bekræftelses beskeden ved i forbindelse med at slette værktøj, skal have en fortryd knap.
+4: Med det markerede skal hedde: "Marker det valgte som...", eller i hvert fald i den stil, 
+så funktionerne efterfølgende kan beskrives i et ord.
